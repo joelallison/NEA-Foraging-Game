@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import tools.OpenSimplex2S;
 
 import java.text.DecimalFormat;
@@ -18,6 +19,7 @@ import static java.lang.Math.abs;
 
 public class MyGdxGame extends ApplicationAdapter {
 	SpriteBatch sb;
+
 
 	static final int noiseSize = 128;
 
@@ -44,9 +46,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 
-		cam = new OrthographicCamera(noiseSize*16, noiseSize*16 * (h / w));
+		cam = new OrthographicCamera();
 
-		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
 		cam.update();
 
 		sb = new SpriteBatch();
@@ -129,9 +130,9 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 
-		for (int y = 0; y < size; y++) {
+		for (int y = 0; y < size; y++) { //normalises the noise
 			for (int x = 0; x < size; x++) {
-				noiseMap[x][y] = (float) (inverseLERP(noiseMap[x][y], minNoiseHeight, maxNoiseHeight) * Math.pow(10, 38));
+				noiseMap[x][y] = (float) (inverseLERP(noiseMap[x][y], minNoiseHeight, maxNoiseHeight) * Math.pow(10, 38)); //not sure why it's out by x10^-38 but I fixed it
 			}
 		}
 
