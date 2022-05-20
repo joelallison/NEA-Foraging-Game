@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import tools.OpenSimplex2S;
+
+import java.util.Random;
+
 import static java.lang.Math.abs;
 
 public class MyGdxGame extends ApplicationAdapter {
@@ -13,7 +16,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	static final int SCREEN_WIDTH = 256;
 	static final int SCREEN_HEIGHT = 256;
-	static final int noiseSize = 16;
+	static final int noiseSize = 128;
 
 	private OrthographicCamera cam;
 
@@ -40,7 +43,10 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		sr.setProjectionMatrix(cam.combined);
 
-		float[][] grid = noiseMap(1L, noiseSize, 0.8f);
+		Random random = new Random();
+
+		long seed = random.nextLong();
+		float[][] grid = genNoiseMap(seed, noiseSize, 4f, 2, 6f, 0.9f); //4f, 16, 6f, 0.9f for
 		ScreenUtils.clear(1, 1, 1, 1);
 		sr.begin(ShapeRenderer.ShapeType.Filled);
 		for (int x = 0; x < noiseSize; x++) {
@@ -59,18 +65,39 @@ public class MyGdxGame extends ApplicationAdapter {
 		sr.dispose();
 	}
 
-	public static float[][] noiseMap (long seed, int size, float scale, int octaves, float persistence, float lacunarity) {
+	public static float[][] genNoiseMap (long seed, int size, float scale, int octaves, float persistence, float lacunarity) {
 		OpenSimplex2S noise = new OpenSimplex2S();
-		float[][] grid = new float[size][size];
+		float[][] noiseMap = new float[size][size];
 
-		
+		float minNoiseHeight = Float.MIN_VALUE;
+		float maxNoiseHeight = Float.MAX_VALUE;
 
-		for (int x = 0; x < size; x++) {
-			for (int y = 0; y < size; y++) {
-				grid[x][y] = (float) (abs(noise.noise2(seed, x, y)) / scale);
+		for (int y = 0; y < size; y++) {
+			for (int x = 0; x < size; x++) {
+
+				float amplitude = 1;
+				float frequency = 1;
+				float noiseHeight = 0;
+
+				for (int i = 0; i < octaves; i++) {
+
+					float sampleX = x / scale * frequency;
+					float sampleY = y / scale * frequency;
+
+					float noiseValue = (noise.noise2_ImproveX(seed, sampleX, sampleY));
+					noiseHeight = noiseValue * amplitude;
+
+					amplitude *= persistence;
+					frequency *= lacunarity;
+				}
+
+				noiseMap[x][y] = noiseHeight;
 			}
 		}
+		return noiseMap;
+	}
 
-		return grid;
+	static float inverseLERP(float x, float a, float b){
+		return (x - a) / (b - a);
 	}
 }
