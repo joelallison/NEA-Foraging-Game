@@ -16,7 +16,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	static final int SCREEN_WIDTH = 256;
 	static final int SCREEN_HEIGHT = 256;
-	static final int noiseSize = 128;
+	static final int noiseSize = 32;
 
 	private OrthographicCamera cam;
 
@@ -46,7 +46,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		Random random = new Random();
 
 		long seed = random.nextLong();
-		float[][] grid = genNoiseMap(seed, noiseSize, 4f, 2, 6f, 0.9f); //4f, 16, 6f, 0.9f for
+		float[][] grid = genNoiseMap(1L, noiseSize, 3f, 2, 6f, 0.3f); //4f, 16, 6f, 0.9f for
 		ScreenUtils.clear(1, 1, 1, 1);
 		sr.begin(ShapeRenderer.ShapeType.Filled);
 		for (int x = 0; x < noiseSize; x++) {
