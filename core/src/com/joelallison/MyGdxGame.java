@@ -2,10 +2,13 @@ package com.joelallison;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -18,8 +21,7 @@ import java.util.Random;
 import static java.lang.Math.abs;
 
 public class MyGdxGame extends ApplicationAdapter {
-	SpriteBatch sb;
-
+	private SpriteBatch sb;
 
 	static final int noiseSize = 128;
 
@@ -34,6 +36,12 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Texture bg;
 	private Sprite bgS;
 
+	private FreeTypeFontGenerator fontGenerator;
+	private FreeTypeFontGenerator.FreeTypeFontParameter fontParameter;
+	private BitmapFont font;
+
+	int num = 0;
+
 
 	Random random = new Random();
 	long seed = random.nextLong();
@@ -46,7 +54,9 @@ public class MyGdxGame extends ApplicationAdapter {
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 
-		cam = new OrthographicCamera();
+		cam = new OrthographicCamera(noiseSize*16, noiseSize*16 * (h / w));
+
+		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
 
 		cam.update();
 
@@ -60,6 +70,12 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		bg = new Texture(Gdx.files.internal("bg.png"));
 		bgS = new Sprite(bg, 0, 0, 16, 16);
+
+		fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/PerfectDOSVGA437.ttf"));
+		fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		fontParameter.size = 256;
+		fontParameter.color = Color.WHITE;
+		font = fontGenerator.generateFont(fontParameter);
 
 	}
 
@@ -86,6 +102,9 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			}
 		}
+
+		num++;
+		font.draw(sb, String.valueOf(num), noiseSize/2*16, noiseSize/2*16);
 		sb.end();
 	}
 	
