@@ -1,4 +1,4 @@
-package com.joelallison;
+package com.joelallison.main;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -73,8 +73,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/PerfectDOSVGA437.ttf"));
 		fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-		fontParameter.size = 256;
-		fontParameter.color = Color.WHITE;
+		fontParameter.size = 128;
+		fontParameter.color = Color.RED;
 		font = fontGenerator.generateFont(fontParameter);
 
 	}
@@ -103,8 +103,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 
-		num++;
-		font.draw(sb, String.valueOf(num), noiseSize/2*16, noiseSize/2*16);
+		font.draw(sb, "text.", 1600, 1400);
 		sb.end();
 	}
 	
