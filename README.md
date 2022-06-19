@@ -70,7 +70,7 @@ background --> (0, 0.1f, 0.1f, 1) colour <br /><br /><br /><br />
 
 <img src="https://user-images.githubusercontent.com/33546240/174501525-c29d988f-8077-4002-ad2e-a177d937bec1.png" width="662" height="391" />
 seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 1.7f, 0.3f, -1, true<br /><br />
-noiseMap[x][y] >= 0.5 --> (0.3f, 0.3f, 0.2f, 1) colour<br /><br />
-noiseMap[x][y] >= 0.16 && noiseMap[x][y] < 0.25 --> (0.5f, 0.5f, 0.3f, 1f) colour<br /><br />
+noiseMap[x][y] >= 0.5 --> (0.3f, 0.3f, 0.2f, 1) colour<br />
+noiseMap[x][y] >= 0.16 && noiseMap[x][y] < 0.25 --> (0.5f, 0.5f, 0.3f, 1f) colour<br />
 background --> 0, 0.1f, 0.1f, 1<br /><br /><br /><br />
 
