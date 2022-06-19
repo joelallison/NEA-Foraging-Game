@@ -1,1 +1,1 @@
-# NEA-Foraging-Game
+# NEA-Forest-Game
