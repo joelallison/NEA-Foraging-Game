@@ -2,30 +2,25 @@ package com.joelallison.main;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import tools.OpenSimplex2S;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Random;
 
-import static java.lang.Math.abs;
-
 public class MyGdxGame extends ApplicationAdapter {
-	private SpriteBatch sb;
+	private SpriteBatch batch;
 
-	static final int noiseSize = 128;
+	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(16*3, 9*3);
+	public static final int TILE_SIZE = 16;
+	public float ZOOM = 10f;
+	public static final float SCALAR = 2f;
 
-	private OrthographicCamera cam;
+	private OrthographicCamera camera;
 
 	private Texture tree;
 	private Sprite treeS;
@@ -36,13 +31,6 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Texture bg;
 	private Sprite bgS;
 
-	private FreeTypeFontGenerator fontGenerator;
-	private FreeTypeFontGenerator.FreeTypeFontParameter fontParameter;
-	private BitmapFont font;
-
-	int num = 0;
-
-
 	Random random = new Random();
 	long seed = random.nextLong();
 
@@ -50,17 +38,17 @@ public class MyGdxGame extends ApplicationAdapter {
 	
 	@Override
 	public void create () {
-
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 
-		cam = new OrthographicCamera(noiseSize*16, noiseSize*16 * (h / w));
+		camera = new OrthographicCamera();
+		camera.zoom = ZOOM;
+		camera.setToOrtho(false, SCALAR * VISIBLE_WORLD_SIZE.x * TILE_SIZE, SCALAR * VISIBLE_WORLD_SIZE.y * TILE_SIZE);
+		camera.position.set(camera.viewportWidth/2f, camera.viewportHeight/2f, 0);
 
-		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
+		camera.update();
 
-		cam.update();
-
-		sb = new SpriteBatch();
+		batch = new SpriteBatch();
 
 		tree = new Texture(Gdx.files.internal("tree.png"));
 		treeS = new Sprite(tree, 0, 0, 16, 16);
@@ -70,57 +58,54 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		bg = new Texture(Gdx.files.internal("bg.png"));
 		bgS = new Sprite(bg, 0, 0, 16, 16);
-
-		fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/PerfectDOSVGA437.ttf"));
-		fontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-		fontParameter.size = 128;
-		fontParameter.color = Color.RED;
-		font = fontGenerator.generateFont(fontParameter);
-
 	}
 
 	@Override
 	public void render () {
-		cam.update();
+		camera.update();
 
-		sb.setProjectionMatrix(cam.combined);
+		batch.setProjectionMatrix(camera.combined);
 
-		float[][] noiseMap = genNoiseMap(seed, noiseSize, 4f, 2, 2f, 0.6f); //higher lacunarity for things like trees, lower for grass
-		ScreenUtils.clear(1, 1, 1, 1);
-		sb.begin();
-		for (int x = 0; x < noiseSize; x++) {
-			for (int y = 0; y < noiseSize; y++) {
+		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, 4f, 2, 2f, 0.6f); //higher lacunarity for things like trees, lower for grass
+		ScreenUtils.clear(0, 0, 0.2f, 1);
+		batch.begin();
+		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
+			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
 
 				if(noiseMap[x][y] >= 0.9){
-					sb.draw(treeS, x*64, y*64, 64, 64);
+					batch.draw(treeS, SCALAR * x*16, SCALAR * y*16, SCALAR * 16, SCALAR * 16);
 				}else if(noiseMap[x][y] >= 0.45){ //higher threshold for less midtones, lower for more midtones
-					sb.draw(small_treeS, x*64, y*64, 64, 64);
+					batch.draw(small_treeS, SCALAR * x*16, SCALAR * y*16, SCALAR * 16, SCALAR * 16);
 				}else{
-					sb.draw(bgS, x*64, y*64, 64, 64);
+					batch.draw(bgS, SCALAR * x*16, SCALAR * y*16, SCALAR * 16, SCALAR * 16);
 				}
 
 
 			}
 		}
 
-		font.draw(sb, "text.", 1600, 1400);
-		sb.end();
+		batch.end();
+
+		ZOOM--;
 	}
 	
 	@Override
 	public void dispose () {
-		sb.dispose();
+		batch.dispose();
+		bg.dispose();
+		small_tree.dispose();
+		tree.dispose();
 	}
 
-	public static float[][] genNoiseMap (long seed, int size, float scale, int octaves, float persistence, float lacunarity) {
+	public static float[][] genNoiseMap (long seed, Vector2 Dimensions, float scale, int octaves, float persistence, float lacunarity) {
 		OpenSimplex2S noise = new OpenSimplex2S();
-		float[][] noiseMap = new float[size][size];
+		float[][] noiseMap = new float[(int) Dimensions.x][(int) Dimensions.y];
 
 		float minNoiseHeight = Float.MIN_VALUE;
 		float maxNoiseHeight = Float.MAX_VALUE;
 
-		for (int y = 0; y < size; y++) {
-			for (int x = 0; x < size; x++) {
+		for (int y = 0; y < Dimensions.y; y++) {
+			for (int x = 0; x < Dimensions.x; x++) {
 
 				float amplitude = 1;
 				float frequency = 1;
@@ -148,8 +133,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 
-		for (int y = 0; y < size; y++) { //normalises the noise
-			for (int x = 0; x < size; x++) {
+		for (int y = 0; y < Dimensions.y; y++) { //normalises the noise
+			for (int x = 0; x < Dimensions.x; x++) {
 				noiseMap[x][y] = (float) (inverseLERP(noiseMap[x][y], minNoiseHeight, maxNoiseHeight) * Math.pow(10, 38)); //not sure why it's out by x10^-38 but I fixed it
 			}
 		}
