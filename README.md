@@ -53,5 +53,14 @@ noiseMap[x][y] >= 0.62 --> //commented out so it does weird glitchy effect// col
 noiseMap[x][y] >= 0.6 --> (0.5f, 0.5f, 0.3f, 1f) colour <br />
 noiseMap[x][y] >= 0.5 --> (0.3f, 0.3f, 0.2f, 1) colour <br />
 background --> (0, 0.1f, 0.1f, 1) colour <br /><br /><br /><br />
+
+<img src="https://user-images.githubusercontent.com/33546240/174501340-2efd9cd4-7937-4f8d-a4ab-f1f892786f26.png" width="662" height="391" />
+seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 1, 2f, 0.5f, 3, true <br /><br />
+noiseMap[x][y] >= 0.96 --> (0.7f, 0.65f, 0.9f, 1) colour <br />
+noiseMap[x][y] >= 0.62 --> //commented out so it does weird glitchy effect// colour <br />
+noiseMap[x][y] >= 0.6 --> (0.5f, 0.5f, 0.3f, 1f) colour <br />
+noiseMap[x][y] >= 0.5 --> (0.3f, 0.3f, 0.2f, 1) colour <br />
+background --> (0, 0.1f, 0.1f, 1) colour <br /><br /><br /><br />
+
                                                                                                                               
 
