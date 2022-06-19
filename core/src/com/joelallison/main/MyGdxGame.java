@@ -17,7 +17,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(16*3, 9*3);
 	public static final int TILE_SIZE = 16;
-	public float ZOOM = 10f;
+	public static final float ZOOM = 0.5f; //After testing, I think that 0.2f should be the max zoomed in, 2f should be the max zoomed out and 0.5f should be default.
 	public static final float SCALAR = 2f;
 
 	private OrthographicCamera camera;
@@ -35,6 +35,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	long seed = random.nextLong();
 
 
+
 	
 	@Override
 	public void create () {
@@ -42,7 +43,6 @@ public class MyGdxGame extends ApplicationAdapter {
 		float h = Gdx.graphics.getHeight();
 
 		camera = new OrthographicCamera();
-		camera.zoom = ZOOM;
 		camera.setToOrtho(false, SCALAR * VISIBLE_WORLD_SIZE.x * TILE_SIZE, SCALAR * VISIBLE_WORLD_SIZE.y * TILE_SIZE);
 		camera.position.set(camera.viewportWidth/2f, camera.viewportHeight/2f, 0);
 
@@ -62,7 +62,9 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+		camera.zoom = ZOOM;
 		camera.update();
+
 
 		batch.setProjectionMatrix(camera.combined);
 
@@ -86,7 +88,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		batch.end();
 
-		ZOOM--;
+
 	}
 	
 	@Override
