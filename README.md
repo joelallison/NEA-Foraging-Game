@@ -4,4 +4,4 @@
 
 
 
-# terrain generation:
+# Terrain Generation Algorithm
