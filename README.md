@@ -20,7 +20,10 @@ wrapValue(noiseMap[x][y], 1, true) >= 0.9 --> (0.4f, 0.4f, 0.3f, 1) colour <br /
 noiseMap[x][y] >= 0.5 --> (0.3f, 0.3f, 0.2f, 1) colour <br />
 background --> (0, 0.1f, 0.1f, 1) colour <br /><br />
 
-<img src="https://user-images.githubusercontent.com/33546240/174500560-889e6887-9789-4d64-8e0c-2155c295930e.png" width="662" height="391" />
+
+
+
+<img src="https://user-images.githubusercontent.com/33546240/174500599-8148e28e-53db-4a59-911f-f6341f4ee08d.png" width="662" height="391" />
 seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 2f, 0.8f, -1, true <br /><br />
 threshold >= 0.5 for (0.3f, 0.3f, 0.2f, 1) colour <br />
 background --> (0, 0.1f, 0.1f, 1) colour <br /><br />
