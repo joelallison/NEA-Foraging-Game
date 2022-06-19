@@ -25,6 +25,13 @@ seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 2f, 0.8f, -1, true <br /><br />
 threshold >= 0.5 for (0.3f, 0.3f, 0.2f, 1) colour <br />
 background --> (0, 0.1f, 0.1f, 1) colour <br /><br /><br /><br />
 
+<img src="https://user-images.githubusercontent.com/33546240/174500707-739167aa-de0c-4754-8b39-74489e3ec54e.png" width="662" height="391" />
+seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 2f, 0.4f, -1, true <br /><br />
+noiseMap[x][y] >= 0.8 --> (0.5f, 0.5f, 0.3f, 1f) colour <br />
+noiseMap[x][y] >= 0.5 --> (0.3f, 0.3f, 0.2f, 1) colour <br />
+background --> (0, 0.1f, 0.1f, 1) colour <br /><br /><br /><br />
+
+
 
 
 
