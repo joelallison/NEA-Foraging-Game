@@ -31,6 +31,14 @@ noiseMap[x][y] >= 0.8 --> (0.5f, 0.5f, 0.3f, 1f) colour <br />
 noiseMap[x][y] >= 0.5 --> (0.3f, 0.3f, 0.2f, 1) colour <br />
 background --> (0, 0.1f, 0.1f, 1) colour <br /><br /><br /><br />
 
+<img src="https://user-images.githubusercontent.com/33546240/174500906-ce7f44b6-6527-4a8f-873c-917f37840b62.png" width="662" height="391" />
+seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 2f, 0.4f, -1, true <br /><br />
+noiseMap[x][y] >= 0.96 --> (0.7f, 0.65f, 0.9f, 1) colour <br />
+noiseMap[x][y] >= 0.8 --> (0.5f, 0.5f, 0.1f, 1) colour <br />
+noiseMap[x][y] >= 0.5 --> (0.3f, 0.3f, 0.2f, 1) colour <br />
+background --> (0, 0.1f, 0.1f, 1) colour <br /><br /><br /><br />
+
+                                                                                                                                        
 
 
 
