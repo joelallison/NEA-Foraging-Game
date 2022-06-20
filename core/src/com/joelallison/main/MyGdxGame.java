@@ -51,24 +51,13 @@ public class MyGdxGame extends ApplicationAdapter {
 		sr.setProjectionMatrix(camera.combined);
 
 
-		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 2f, 0.3f, 2, true);
+		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 1f, 1f, -1, true);
 		ScreenUtils.clear(0, 0.1f, 0.1f, 1);
 		sr.begin(ShapeRenderer.ShapeType.Filled);
 		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
 			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
 
-				if(wrapValue(noiseMap[x][y], 2, false) >= 0.95){
-					sr.setColor(0.02f, 0.1f, 0.1f, 1);
-				}else if(wrapValue(noiseMap[x][y], 2, false) >= 0.7) {
-					sr.setColor(0.5f, 0.5f, 0.3f, 1f);
-				}else if(noiseMap[x][y] >= 0.65){
-					sr.setColor(0.3f, 0.3f, 0.2f, 1);
-				}else if(noiseMap[x][y] >= 0.4){ //higher threshold for less midtones, lower for more midtones
-					sr.setColor(0.05f, 0.15f, 0.15f, 1);
-				}else{
-					sr.setColor(0, 0.1f, 0.1f, 1);
-				}
-
+				sr.setColor(noiseMap[x][y], noiseMap[x][y], noiseMap[x][y], 1);
 				sr.rect(SCALAR * x*16, SCALAR * y*16, SCALAR * 16, SCALAR * 16);
 
 
@@ -90,6 +79,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		//higher persistence makes the values tend towards higher values
 		//lower lacunarity is smoother looking - higher lacunarity for things like trees, lower for grass
 
+		//if you double the scale but double the lacunarity, the output is basically  the same. if you double the scale and halve the lacunarity, it's like you quadrupled the scale.
+
 		OpenSimplex2S noise = new OpenSimplex2S();
 		float[][] noiseMap = new float[(int) Dimensions.x][(int) Dimensions.y];
 
@@ -105,8 +96,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 				for (int i = 0; i < octaves; i++) {
 
-					float sampleX = x / scale * frequency;
-					float sampleY = y / scale * frequency;
+					float sampleX = (x-(Dimensions.x/2)) / scale * frequency;
+					float sampleY = (y-(Dimensions.y/2)) / scale * frequency;
 
 					float noiseValue = (noise.noise2_ImproveX(seed, sampleX, sampleY));
 					noiseHeight = noiseValue * amplitude;
