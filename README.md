@@ -101,6 +101,15 @@ noiseMap[x][y] >= 0.65 --> (0.3f, 0.3f, 0.2f, 1) colour <br />
 noiseMap[x][y] >= 0.4 --> (0.05f, 0.15f, 0.15f, 1) colour <br />
 background --> (0, 0.1f, 0.1f, 1) colour <br /><br /><br /><br />
 
+<img src="https://user-images.githubusercontent.com/33546240/174599458-702a5363-c1d9-40a1-ad5a-07e1da50ba27.png" idth="662" height="391" />
+seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 2f, 0.6f, 2, true<br /><br />
+wrapValue(noiseMap[x][y], 2, false) >= 0.95 --> (0.02f, 0.1f, 0.1f, 1) colour <br />
+wrapValue(noiseMap[x][y], 2, false) >= 0.7 --> (0.5f, 0.5f, 0.3f, 1f) colour <br />
+noiseMap[x][y] >= 0.65 --> (0.3f, 0.3f, 0.2f, 1) colour <br />
+noiseMap[x][y] >= 0.4 --> (0.05f, 0.15f, 0.15f, 1) colour <br />
+background --> (0, 0.1f, 0.1f, 1) colour <br /><br /><br /><br />
+
+
 
 
 
