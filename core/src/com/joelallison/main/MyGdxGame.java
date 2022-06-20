@@ -29,7 +29,6 @@ public class MyGdxGame extends ApplicationAdapter {
 	Random random = new Random();
 	long seed = random.nextLong();
 
-	
 	@Override
 	public void create () {
 		sr = new ShapeRenderer();
@@ -49,23 +48,23 @@ public class MyGdxGame extends ApplicationAdapter {
 		camera.zoom = ZOOM;
 		camera.update();
 
-
 		sr.setProjectionMatrix(camera.combined);
 
 
-
-
-		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 1.6f, 0.9f, -1, true);
+		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 2f, 0.3f, 2, true);
 		ScreenUtils.clear(0, 0.1f, 0.1f, 1);
 		sr.begin(ShapeRenderer.ShapeType.Filled);
 		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
 			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
 
-
-				if(noiseMap[x][y] >= 0.8) {
+				if(wrapValue(noiseMap[x][y], 2, false) >= 0.95){
+					sr.setColor(0.02f, 0.1f, 0.1f, 1);
+				}else if(wrapValue(noiseMap[x][y], 2, false) >= 0.7) {
 					sr.setColor(0.5f, 0.5f, 0.3f, 1f);
-				}else if(noiseMap[x][y] >= 0.56){ //higher threshold for less midtones, lower for more midtones
+				}else if(noiseMap[x][y] >= 0.65){
 					sr.setColor(0.3f, 0.3f, 0.2f, 1);
+				}else if(noiseMap[x][y] >= 0.4){ //higher threshold for less midtones, lower for more midtones
+					sr.setColor(0.05f, 0.15f, 0.15f, 1);
 				}else{
 					sr.setColor(0, 0.1f, 0.1f, 1);
 				}
