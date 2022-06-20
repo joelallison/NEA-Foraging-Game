@@ -51,7 +51,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		sr.setProjectionMatrix(camera.combined);
 
 
-		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 1f, 1f, -1, true);
+		float[][] noiseMap = genNoiseMap(1, VISIBLE_WORLD_SIZE, 0, 0, 8f, 32, 1f, 1f, -1, true);
 		ScreenUtils.clear(0, 0.1f, 0.1f, 1);
 		sr.begin(ShapeRenderer.ShapeType.Filled);
 		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
@@ -75,7 +75,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	public static float[][] genNoiseMap (long seed, Vector2 Dimensions, float xOffset, float yOffset, float scale, int octaves, float persistence, float lacunarity, int wrapFactor, boolean invertWrap) {
 		//greater scale zooms in, halved scale from normal could be used for map data. I think scale of 4 is best for most stuff
-		//higher octaves simplifies the noise, 2 is the best option in almost all cases
+		//higher octaves adds more detail to the noise, but 2 is the best option for this [in most cases]
 		//higher persistence makes the values tend towards higher values
 		//lower lacunarity is smoother looking - higher lacunarity for things like trees, lower for grass
 
