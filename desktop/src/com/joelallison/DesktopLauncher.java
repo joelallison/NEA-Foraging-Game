@@ -7,9 +7,7 @@ import com.joelallison.main.MyGdxGame;
 
 import static com.joelallison.main.MyGdxGame.TILE_SIZE;
 import static com.joelallison.main.MyGdxGame.VISIBLE_WORLD_SIZE;
-import static com.joelallison.main.MyGdxGame.SCALAR;
 
-// Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();

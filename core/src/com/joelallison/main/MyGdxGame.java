@@ -17,12 +17,10 @@ import java.util.Random;
 public class MyGdxGame extends ApplicationAdapter {
 	private ShapeRenderer sr;
 
-
 	public static final int TILE_SIZE = 16;
 	public static final float ZOOM = 2f; //After testing, I think that 0.2f should be the max zoomed in, 2f should be the max zoomed out and 0.8f should be default.
 	public static final float SCALAR = 2f;
 	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(7*7, 4*7).scl(SCALAR); //7div4 = 1.75, making this a 1.75:1 aspect ratio. 16div9 = 1.77, meaning that this is very close to standard HDTV aspect.
-
 
 	private OrthographicCamera camera;
 
@@ -32,9 +30,6 @@ public class MyGdxGame extends ApplicationAdapter {
 	@Override
 	public void create () {
 		sr = new ShapeRenderer();
-
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, SCALAR * VISIBLE_WORLD_SIZE.x * TILE_SIZE, SCALAR * VISIBLE_WORLD_SIZE.y * TILE_SIZE);
@@ -51,13 +46,20 @@ public class MyGdxGame extends ApplicationAdapter {
 		sr.setProjectionMatrix(camera.combined);
 
 
-		float[][] noiseMap = genNoiseMap(1, VISIBLE_WORLD_SIZE, 0, 0, 8f, 32, 1f, 1f, -1, true);
+		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, 0, 0, 4f, 2, 2f, 0.8f, -1, true);
+		String[][] map = processMap(noiseMap, 0);
 		ScreenUtils.clear(0, 0.1f, 0.1f, 1);
 		sr.begin(ShapeRenderer.ShapeType.Filled);
+
+
 		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
 			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
 
-				sr.setColor(noiseMap[x][y], noiseMap[x][y], noiseMap[x][y], 1);
+				if(map[x][y] == "x"){
+					sr.setColor(0.3f, 0.3f, 0.2f, 1);
+				}else{
+					sr.setColor(0, 0.1f, 0.1f, 1);
+				}
 				sr.rect(SCALAR * x*16, SCALAR * y*16, SCALAR * 16, SCALAR * 16);
 
 
@@ -71,6 +73,22 @@ public class MyGdxGame extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		sr.dispose();
+	}
+
+	public static String[][] processMap (float[][] map, int mapType) { //convert floats to discrete tiles
+		String[][] outputMap = new String[map.length][map[0].length];
+
+		for (int x = 0; x < map.length; x++) {
+			for (int y = 0; y < map[x].length; y++) {
+				if(map[x][y] >= 0.5){
+					outputMap[x][y] = "x";
+				}else{
+					outputMap[x][y] = "-";
+				}
+			}
+		}
+
+		return outputMap;
 	}
 
 	public static float[][] genNoiseMap (long seed, Vector2 Dimensions, float xOffset, float yOffset, float scale, int octaves, float persistence, float lacunarity, int wrapFactor, boolean invertWrap) {
