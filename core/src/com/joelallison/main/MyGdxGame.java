@@ -66,7 +66,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 
 
-		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, 4f, 2, 2f, 0.8f, -1, true);
+		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, 4f, 2, 2f, 0.6f, 2, true);
 		String[][] map = processMap(noiseMap, 0);
 		ScreenUtils.clear(0, 0.1f, 0.1f, 1);
 		sr.begin(ShapeRenderer.ShapeType.Filled);
@@ -76,6 +76,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
 
 				if(map[x][y] == "x"){
+					sr.setColor(0.5f, 0.5f, 0.3f, 1f);
+				}else if(map[x][y] == "y") {
 					sr.setColor(0.3f, 0.3f, 0.2f, 1);
 				}else{
 					sr.setColor(0, 0.1f, 0.1f, 1);
@@ -100,8 +102,10 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		for (int x = 0; x < map.length; x++) {
 			for (int y = 0; y < map[x].length; y++) {
-				if(map[x][y] >= 0.5){
+				if(wrapValue(map[x][y], 2, false) >= 0.61){
 					outputMap[x][y] = "x";
+				}else if(map[x][y] >= 0.6){
+					outputMap[x][y] = "y";
 				}else{
 					outputMap[x][y] = "-";
 				}
