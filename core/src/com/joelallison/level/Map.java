@@ -86,8 +86,21 @@ public class Map {
 
     }
 
-    public static String[][] combineMaps (ArrayList<String[][]> maps){
+    public static String[][] constructTerrain (TileType[] tilesToGen) {
 
+
+
+        /*for (int i = 0; i < tilesToGen.length; i++) {
+
+            float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGe
+
+
+        }*/
         return null;
+    }
+
+    public static TileType[] sortByPriority(TileType[] tilesToGen) {
+
+        return tilesToGen;
     }
 }
