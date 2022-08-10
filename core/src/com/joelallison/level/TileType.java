@@ -30,9 +30,10 @@ public class TileType {
 
     public float[] bounds;
 
-    public TileType(String TileID, int priority, float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invert) {
+    public TileType(String TileID, int priority, boolean collision, float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invert) {
         this.TileID = TileID;
         this.priority = priority;
+        this.collision = collision;
         this.scaleVal = scaleVal;
         this.octavesVal = octavesVal;
         this.persistenceVal = persistenceVal;

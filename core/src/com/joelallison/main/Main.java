@@ -2,6 +2,7 @@ package com.joelallison.main;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -24,14 +25,13 @@ public class Main extends ApplicationAdapter {
 
 	public TileType[] tilesToGen = new TileType[1];
 	public static final int TILE_SIZE = 16;
-	public static float ZOOM = 0.3f; //default value
 	public static final float SCALAR = 8*7;
 	public static final Vector2 ASPECT_RATIO = new Vector2(7, 4);
 	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(ASPECT_RATIO.x, ASPECT_RATIO.y).scl(SCALAR); //7div4 = 1.75, making this a 1.75:1 aspect ratio. 16div9 = 1.77, meaning that this is very close to standard HDTV aspect.
 
 	int x;
 	int y;
-	public static OrthographicCamera camera;
+	private OrthographicCamera camera;
 
 	Player player;
 
@@ -45,14 +45,18 @@ public class Main extends ApplicationAdapter {
 
 		player = new Player(0, 0);
 
-		tilesToGen[0] = new TileType("tree", 1, 2, 2, 1.7f, 0.7f, -1, false);
-		tilesToGen[0].bounds = new float[] {0, 0.5f, 0.6f, 0.75f};
+		//tree generation
+		tilesToGen[0] = new TileType("tree", 1, false, 1, 2, 1.7f, 0.7f, 2, true);
+		tilesToGen[0].bounds = new float[] {0, 0.38f, 0.4f, 0.6f, 0.75f};
 		tilesToGen[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
 		tilesToGen[0].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[0].getSpriteSheet(), 0, 0, 8, 8),
 				new TextureRegion(tilesToGen[0].getSpriteSheet(), 8, 0, 8, 8),
 				new TextureRegion(tilesToGen[0].getSpriteSheet(), 16, 0, 8, 8),
-				new TextureRegion(tilesToGen[0].getSpriteSheet(), 24, 0, 8, 8)};
+				new TextureRegion(tilesToGen[0].getSpriteSheet(), 24, 0, 8, 8),
+				new TextureRegion(tilesToGen[0].getSpriteSheet(), 32, 0, 8, 8)};
 
+		//rocks generation
+		//tilesToGen
 
 		batch = new SpriteBatch();
 		sr = new ShapeRenderer();
@@ -60,12 +64,16 @@ public class Main extends ApplicationAdapter {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, SCALAR * VISIBLE_WORLD_SIZE.x * TILE_SIZE, SCALAR * VISIBLE_WORLD_SIZE.y * TILE_SIZE);
 		camera.position.set(camera.viewportWidth/2f, camera.viewportHeight/2f, 0);
+		camera.zoom = 0.15f;
 		camera.update();
 	}
 
 	@Override
 	public void render () {
-		player.handleMovement();
+		handleInput();
+		camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 0.4f);
+		batch.setProjectionMatrix(camera.combined);
+		camera.update();
 		x = player.getxPos();
 		y = player.getyPos();
 
@@ -76,25 +84,46 @@ public class Main extends ApplicationAdapter {
 		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
 			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
 
-				batch.draw(tilesToGen[0].sprites[0], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
+				batch.draw(tilesToGen[0].sprites[0], x* TILE_SIZE*SCALAR, y* TILE_SIZE*SCALAR, TILE_SIZE*SCALAR, TILE_SIZE*SCALAR);
 				for (int i = 1; i < tilesToGen[0].sprites.length; i++) {
 					if (noiseMap[x][y] >= tilesToGen[0].bounds[i]){
-						batch.draw(tilesToGen[0].sprites[i], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
+						batch.draw(tilesToGen[0].sprites[i], x* TILE_SIZE*SCALAR, y* TILE_SIZE*SCALAR, TILE_SIZE*SCALAR, TILE_SIZE*SCALAR);
 					}
 				}
 			}
 		}
 
 		batch.end();
-
-		player.zoom();
-		camera.zoom = MathUtils.clamp(camera.zoom, 0.2f, 0.4f);
-		sr.setProjectionMatrix(camera.combined);
-		camera.update();
 	}
 	
 	@Override
 	public void dispose () {
 		sr.dispose();
+	}
+
+	public void handleInput(){
+
+		//movement
+		if(Gdx.input.isKeyPressed(Input.Keys.W)){
+			player.setyPos(player.getyPos() + 1);
+		}
+		else if(Gdx.input.isKeyPressed(Input.Keys.S)){
+			player.setyPos(player.getyPos() - 1);
+		}
+
+		if(Gdx.input.isKeyPressed(Input.Keys.A)){
+			player.setxPos(player.getxPos() - 1);
+		}
+		else if(Gdx.input.isKeyPressed(Input.Keys.D)){
+			player.setxPos(player.getxPos() + 1);
+		}
+
+		//zoom
+		if(Gdx.input.isKeyPressed(Input.Keys.P)){
+			camera.zoom += 0.02;
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.O)){
+			camera.zoom -= 0.02;
+		}
 	}
 }
