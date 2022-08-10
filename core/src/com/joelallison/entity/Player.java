@@ -2,6 +2,7 @@ package com.joelallison.entity;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.joelallison.main.Main;
 
 public class Player extends Entity {
 
@@ -27,7 +28,7 @@ public class Player extends Entity {
         }
     }
 
-    public float zoom() {
+    public void zoom() {
         float zoomMod = 0;
 
         if(Gdx.input.isKeyPressed(Input.Keys.O)){
@@ -38,7 +39,7 @@ public class Player extends Entity {
             zoomMod = zoomAmount;
         }
 
-        return zoomMod;
+        Main.camera.zoom += zoomMod;
     }
 
 }

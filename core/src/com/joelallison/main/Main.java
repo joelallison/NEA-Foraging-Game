@@ -23,15 +23,15 @@ public class Main extends ApplicationAdapter {
 	private SpriteBatch batch;
 
 	public TileType[] tilesToGen = new TileType[1];
-	public static final int TILE_SIZE = 4;
-	public static float ZOOM = 1.2f; //default value
+	public static final int TILE_SIZE = 16;
+	public static float ZOOM = 0.3f; //default value
 	public static final float SCALAR = 8*7;
 	public static final Vector2 ASPECT_RATIO = new Vector2(7, 4);
 	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(ASPECT_RATIO.x, ASPECT_RATIO.y).scl(SCALAR); //7div4 = 1.75, making this a 1.75:1 aspect ratio. 16div9 = 1.77, meaning that this is very close to standard HDTV aspect.
 
 	int x;
 	int y;
-	private OrthographicCamera camera;
+	public static OrthographicCamera camera;
 
 	Player player;
 
@@ -45,12 +45,13 @@ public class Main extends ApplicationAdapter {
 
 		player = new Player(0, 0);
 
-		tilesToGen[0] = new TileType("tree", 1, 4, 2, 1.8f, 1f, -1, false);
-		tilesToGen[0].bounds = new float[] {0.8f, 0.7f, 0.65f};
+		tilesToGen[0] = new TileType("tree", 1, 2, 2, 1.7f, 0.7f, -1, false);
+		tilesToGen[0].bounds = new float[] {0, 0.5f, 0.6f, 0.75f};
 		tilesToGen[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
 		tilesToGen[0].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[0].getSpriteSheet(), 0, 0, 8, 8),
 				new TextureRegion(tilesToGen[0].getSpriteSheet(), 8, 0, 8, 8),
-				new TextureRegion(tilesToGen[0].getSpriteSheet(), 16, 0, 8, 8)};
+				new TextureRegion(tilesToGen[0].getSpriteSheet(), 16, 0, 8, 8),
+				new TextureRegion(tilesToGen[0].getSpriteSheet(), 24, 0, 8, 8)};
 
 
 		batch = new SpriteBatch();
@@ -64,68 +65,36 @@ public class Main extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		camera.zoom = ZOOM;
-		camera.update();
-		ZOOM = ZOOM + player.zoom();
-		ZOOM = MathUtils.clamp(ZOOM, 0.2f, 0.4f);
-		sr.setProjectionMatrix(camera.combined);
-
 		player.handleMovement();
 		x = player.getxPos();
 		y = player.getyPos();
 
-		System.out.println(ZOOM);
-
-
-
 		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
-		String[][] map = processMap(noiseMap, 0);
 		ScreenUtils.clear(0, 0.1f, 0.1f, 1);
-		sr.begin(ShapeRenderer.ShapeType.Filled);
-
+		batch.begin();
 
 		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
 			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
 
-				if(map[x][y] == "x"){
-					sr.setColor(0.5f, 0.5f, 0.3f, 1f);
-				}else if(map[x][y] == "y") {
-					sr.setColor(0.3f, 0.3f, 0.2f, 1);
-				}else{
-					sr.setColor(0, 0.1f, 0.1f, 1);
+				batch.draw(tilesToGen[0].sprites[0], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
+				for (int i = 1; i < tilesToGen[0].sprites.length; i++) {
+					if (noiseMap[x][y] >= tilesToGen[0].bounds[i]){
+						batch.draw(tilesToGen[0].sprites[i], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
+					}
 				}
-				sr.rect(SCALAR * x* TILE_SIZE, SCALAR * y* TILE_SIZE, SCALAR * TILE_SIZE, SCALAR * TILE_SIZE);
-
-
 			}
 		}
 
-		sr.end();
+		batch.end();
 
-
-
+		player.zoom();
+		camera.zoom = MathUtils.clamp(camera.zoom, 0.2f, 0.4f);
+		sr.setProjectionMatrix(camera.combined);
+		camera.update();
 	}
 	
 	@Override
 	public void dispose () {
 		sr.dispose();
 	}
-
-	public static String[][] processMap (float[][] map, int mapType) { //convert floats to discrete tiles
-		String[][] outputMap = new String[map.length][map[0].length];
-
-		for (int x = 0; x < map.length; x++) {
-			for (int y = 0; y < map[x].length; y++) {
-				if(map[x][y] >= 0.5) {
-					outputMap[x][y] = "y";
-				} else {
-					outputMap[x][y] = "-";
-				}
-			}
-		}
-
-		return outputMap;
-	}
-
-
 }
