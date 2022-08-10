@@ -1,12 +1,11 @@
 package com.joelallison;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.joelallison.main.MyGdxGame;
+import com.joelallison.main.Main;
 
-import static com.joelallison.main.MyGdxGame.TILE_SIZE;
-import static com.joelallison.main.MyGdxGame.VISIBLE_WORLD_SIZE;
+import static com.joelallison.main.Main.TILE_SIZE;
+import static com.joelallison.main.Main.VISIBLE_WORLD_SIZE;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
@@ -16,7 +15,7 @@ public class DesktopLauncher {
 		config.setForegroundFPS(60);
 		config.setTitle("Forest Game");
 		config.setWindowIcon("assets/tree.png");
-		new Lwjgl3Application(new MyGdxGame(), config);
+		new Lwjgl3Application(new Main(), config);
 	}
 
 

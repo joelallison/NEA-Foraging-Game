@@ -1,30 +1,26 @@
 package com.joelallison.main;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
-import entity.Player;
-import level.Map;
-import tools.OpenSimplex2S;
+import com.joelallison.entity.Player;
+import com.joelallison.level.Map;
 
 import java.util.Random;
 
-import static level.Map.genNoiseMap;
+import static com.joelallison.level.Map.genNoiseMap;
 
-public class MyGdxGame extends ApplicationAdapter {
+public class Main extends ApplicationAdapter {
 	private ShapeRenderer sr;
 
-	public static final int TILE_SIZE = 16;
-	public static final float ZOOM = 1.2f; //After testing, I think that 0.2f should be the max zoomed in, 2f should be the max zoomed out and 0.8f should be default.
-	public static final float SCALAR = 8f;
-	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(7*7, 4*7).scl(SCALAR); //7div4 = 1.75, making this a 1.75:1 aspect ratio. 16div9 = 1.77, meaning that this is very close to standard HDTV aspect.
+	public static final int TILE_SIZE = 4;
+	public static float ZOOM = 1.2f; //default value
+	public static final float SCALAR = 8*7;
+	public static final Vector2 ASPECT_RATIO = new Vector2(7, 4);
+	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(ASPECT_RATIO.x, ASPECT_RATIO.y).scl(SCALAR); //7div4 = 1.75, making this a 1.75:1 aspect ratio. 16div9 = 1.77, meaning that this is very close to standard HDTV aspect.
 
 	int x;
 	int y;
@@ -55,14 +51,19 @@ public class MyGdxGame extends ApplicationAdapter {
 	public void render () {
 		camera.zoom = ZOOM;
 		camera.update();
-
+		ZOOM = ZOOM + player.zoom();
+		ZOOM = MathUtils.clamp(ZOOM, 0.2f, 0.4f);
 		sr.setProjectionMatrix(camera.combined);
 
 		player.handleMovement();
 		x = player.getxPos();
 		y = player.getyPos();
 
-		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, 4f, 2, 2f, 0.6f, 2, true);
+		System.out.println(ZOOM);
+
+
+
+		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, 8, 2, 1.7f, 0.7f, 1, false);
 		String[][] map = processMap(noiseMap, 0);
 		ScreenUtils.clear(0, 0.1f, 0.1f, 1);
 		sr.begin(ShapeRenderer.ShapeType.Filled);
@@ -78,7 +79,7 @@ public class MyGdxGame extends ApplicationAdapter {
 				}else{
 					sr.setColor(0, 0.1f, 0.1f, 1);
 				}
-				sr.rect(SCALAR * x*16, SCALAR * y*16, SCALAR * 16, SCALAR * 16);
+				sr.rect(SCALAR * x* TILE_SIZE, SCALAR * y* TILE_SIZE, SCALAR * TILE_SIZE, SCALAR * TILE_SIZE);
 
 
 			}
@@ -100,9 +101,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		for (int x = 0; x < map.length; x++) {
 			for (int y = 0; y < map[x].length; y++) {
-				if(Map.wrapValue(map[x][y], 2, false) >= 0.61) {
-					outputMap[x][y] = "x";
-				} else if(map[x][y] >= 0.6) {
+				if(map[x][y] >= 0.5) {
 					outputMap[x][y] = "y";
 				} else {
 					outputMap[x][y] = "-";

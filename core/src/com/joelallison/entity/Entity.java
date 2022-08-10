@@ -1,4 +1,4 @@
-package entity;
+package com.joelallison.entity;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -15,10 +15,10 @@ public class Entity {
     //for handling animations
 
     private int FRAME_COLS, FRAME_ROWS;
-    private Texture[] spriteSheets;
+    private Texture spriteSheet;
     Animation<TextureRegion>[] animations;
-
     float stateTime;
+
 
     public Entity(int xPos, int yPos) {
         this.xPos = xPos;
@@ -57,12 +57,12 @@ public class Entity {
         this.FRAME_ROWS = FRAME_ROWS;
     }
 
-    public Texture[] getSpriteSheets() {
-        return spriteSheets;
+    public Texture getSpriteSheet() {
+        return spriteSheet;
     }
 
-    public void setSpriteSheets(Texture[] spriteSheets) {
-        this.spriteSheets = spriteSheets;
+    public void setSpriteSheets(Texture spriteSheet) {
+        this.spriteSheet = spriteSheet;
     }
 
     public Animation<TextureRegion>[] getAnimations() {

@@ -1,10 +1,11 @@
-package entity;
+package com.joelallison.entity;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.math.Vector2;
 
 public class Player extends Entity {
+
+    private final float zoomAmount = 0.005f;
 
     public Player(int xPos, int yPos){
         super(xPos, yPos);
@@ -24,6 +25,20 @@ public class Player extends Entity {
         else if(Gdx.input.isKeyPressed(Input.Keys.D)){
             xPos++;
         }
+    }
+
+    public float zoom() {
+        float zoomMod = 0;
+
+        if(Gdx.input.isKeyPressed(Input.Keys.O)){
+            zoomMod = 0-zoomAmount;
+        }
+
+        if(Gdx.input.isKeyPressed(Input.Keys.P)){
+            zoomMod = zoomAmount;
+        }
+
+        return zoomMod;
     }
 
 }

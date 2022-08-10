@@ -1,7 +1,8 @@
-package level;
+package com.joelallison.level;
 
 import com.badlogic.gdx.math.Vector2;
 import tools.OpenSimplex2S;
+import java.util.*;
 
 public class Map {
 
@@ -81,5 +82,10 @@ public class Map {
             return Math.abs(((input * factor) - factor/2));
         }
 
+    }
+
+    public static String[][] combineMaps (ArrayList<String[][]> maps){
+
+        return null;
     }
 }
