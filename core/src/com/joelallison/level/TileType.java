@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class TileType {
 
+
+    private String TileID;
     private int priority;
 
     private boolean collision;
@@ -15,25 +17,60 @@ public class TileType {
     private float persistenceVal;
     private float lacunarityVal;
     private int wrapVal;
-    private boolean invertVal;
+    private boolean invert;
 
     //sprite & animation system is slightly different to that of entities,
     //as most tiles don't have any sort of animation.
     private Texture spriteSheet;
-    private Animation<TextureRegion>[] animations;
+
+    public TextureRegion[] sprites;
+    public Animation<TextureRegion[]>[] animations;
     float stateTime;
 
 
-    private TileBounds[] bounds;
+    public float[] bounds;
 
-    public TileType(float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invertVal) {
+    public TileType(String TileID, int priority, float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invert) {
+        this.TileID = TileID;
+        this.priority = priority;
         this.scaleVal = scaleVal;
         this.octavesVal = octavesVal;
         this.persistenceVal = persistenceVal;
         this.lacunarityVal = lacunarityVal;
         this.wrapVal = wrapVal;
-        this.invertVal = invertVal;
+        this.invert = invert;
+    }
 
+    public String getTileID() {
+        return TileID;
+    }
+
+    public void setTileID(String tileID) {
+        TileID = tileID;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public boolean isCollision() {
+        return collision;
+    }
+
+    public void setCollision(boolean collision) {
+        this.collision = collision;
+    }
+
+    public float[] getBounds() {
+        return bounds;
+    }
+
+    public void setBounds(float[] bounds) {
+        this.bounds = bounds;
     }
 
     public float getScaleVal() {
@@ -76,12 +113,12 @@ public class TileType {
         this.wrapVal = wrapVal;
     }
 
-    public boolean isInvertVal() {
-        return invertVal;
+    public boolean doInvert() {
+        return invert;
     }
 
-    public void setInvertVal(boolean invertVal) {
-        this.invertVal = invertVal;
+    public void setInvert(boolean invert) {
+        this.invert = invert;
     }
 
     public Texture getSpriteSheet() {
@@ -90,14 +127,6 @@ public class TileType {
 
     public void setSpriteSheet(Texture spriteSheet) {
         this.spriteSheet = spriteSheet;
-    }
-
-    public Animation<TextureRegion>[] getAnimations() {
-        return animations;
-    }
-
-    public void setAnimations(Animation<TextureRegion>[] animations) {
-        this.animations = animations;
     }
 
     public float getStateTime() {

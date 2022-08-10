@@ -6,6 +6,8 @@ import java.util.*;
 
 public class Map {
 
+    public ArrayList<String[][]> mapsToCombine;
+
     public static float[][] genNoiseMap (long seed, Vector2 Dimensions, float xOffset, float yOffset, float scale, int octaves, float persistence, float lacunarity, int wrapFactor, boolean invertWrap) {
         //greater scale zooms in, halved scale from normal could be used for map data. I think scale of 4 is best for most stuff
         //higher octaves adds more detail to the noise, but 2 is the best option for this [in most cases]

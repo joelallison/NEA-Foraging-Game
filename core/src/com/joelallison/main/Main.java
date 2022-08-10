@@ -1,13 +1,18 @@
 package com.joelallison.main;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.joelallison.entity.Player;
-import com.joelallison.level.Map;
+import com.joelallison.level.TileType;
 
 import java.util.Random;
 
@@ -15,7 +20,9 @@ import static com.joelallison.level.Map.genNoiseMap;
 
 public class Main extends ApplicationAdapter {
 	private ShapeRenderer sr;
+	private SpriteBatch batch;
 
+	public TileType[] tilesToGen = new TileType[1];
 	public static final int TILE_SIZE = 4;
 	public static float ZOOM = 1.2f; //default value
 	public static final float SCALAR = 8*7;
@@ -38,12 +45,20 @@ public class Main extends ApplicationAdapter {
 
 		player = new Player(0, 0);
 
+		tilesToGen[0] = new TileType("tree", 1, 4, 2, 1.8f, 1f, -1, false);
+		tilesToGen[0].bounds = new float[] {0.8f, 0.7f, 0.65f};
+		tilesToGen[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
+		tilesToGen[0].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[0].getSpriteSheet(), 0, 0, 8, 8),
+				new TextureRegion(tilesToGen[0].getSpriteSheet(), 8, 0, 8, 8),
+				new TextureRegion(tilesToGen[0].getSpriteSheet(), 16, 0, 8, 8)};
+
+
+		batch = new SpriteBatch();
 		sr = new ShapeRenderer();
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, SCALAR * VISIBLE_WORLD_SIZE.x * TILE_SIZE, SCALAR * VISIBLE_WORLD_SIZE.y * TILE_SIZE);
 		camera.position.set(camera.viewportWidth/2f, camera.viewportHeight/2f, 0);
-
 		camera.update();
 	}
 
@@ -63,7 +78,7 @@ public class Main extends ApplicationAdapter {
 
 
 
-		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, 8, 2, 1.7f, 0.7f, 1, false);
+		float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
 		String[][] map = processMap(noiseMap, 0);
 		ScreenUtils.clear(0, 0.1f, 0.1f, 1);
 		sr.begin(ShapeRenderer.ShapeType.Filled);
