@@ -12,6 +12,9 @@ public class TileType {
 
     private boolean collision;
 
+    private int xOffset = 0;
+    private int yOffset = 0;
+
     private float scaleVal;
     private int octavesVal;
     private float persistenceVal;
@@ -136,6 +139,22 @@ public class TileType {
 
     public void setStateTime(float stateTime) {
         this.stateTime = stateTime;
+    }
+
+    public int getxOffset() {
+        return xOffset;
+    }
+
+    public void setxOffset(int xOffset) {
+        this.xOffset = xOffset;
+    }
+
+    public int getyOffset() {
+        return yOffset;
+    }
+
+    public void setyOffset(int yOffset) {
+        this.yOffset = yOffset;
     }
 
 }

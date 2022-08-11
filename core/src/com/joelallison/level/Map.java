@@ -4,6 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 import tools.OpenSimplex2S;
 import java.util.*;
 
+import static com.joelallison.main.Main.VISIBLE_WORLD_SIZE;
+
 public class Map {
 
     public ArrayList<String[][]> mapsToCombine;
@@ -86,17 +88,32 @@ public class Map {
 
     }
 
-    public static String[][] constructTerrain (TileType[] tilesToGen) {
+    public static String[][] constructTerrain (int xOffset, int yOffset, long seed, TileType[] tilesToGen) {
 
+        String[][] outputMap = new String[(int) VISIBLE_WORLD_SIZE.x][(int) VISIBLE_WORLD_SIZE.y];
+        for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
+            for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
+                outputMap[x][y] = "-";
+            }
+        }
 
+        for (int i = 0; i < tilesToGen.length; i++) {
 
-        /*for (int i = 0; i < tilesToGen.length; i++) {
+            float[][] currentMapLevel = genNoiseMap(seed, VISIBLE_WORLD_SIZE, xOffset+tilesToGen[i].getxOffset(), yOffset+tilesToGen[i].getyOffset(), tilesToGen[i].getScaleVal(), tilesToGen[i].getOctavesVal(), tilesToGen[i].getPersistenceVal(), tilesToGen[i].getLacunarityVal(), tilesToGen[i].getWrapVal(), tilesToGen[i].doInvert());
 
-            float[][] noiseMap = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGe
+            for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
+                for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
 
+                    for (int j = 0; j < tilesToGen[i].sprites.length; j++) {
+                        if (currentMapLevel[x][y] >= tilesToGen[i].bounds[j]){
+                            outputMap[x][y] = Integer.toString(i) + "x" + Integer.toString(j);
+                        }
+                    }
+                }
+            }
 
-        }*/
-        return null;
+        }
+        return outputMap;
     }
 
     public static TileType[] sortByPriority(TileType[] tilesToGen) {
