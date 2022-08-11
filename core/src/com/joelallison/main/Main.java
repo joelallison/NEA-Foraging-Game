@@ -5,18 +5,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.joelallison.entity.Player;
 import com.joelallison.level.TileType;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-import java.util.*;
 import java.util.Random;
-import java.util.regex.*;
 
 import static com.joelallison.level.Map.*;
 
@@ -24,8 +25,6 @@ public class Main extends ApplicationAdapter {
 	private SpriteBatch batch;
 
 	public TileType[] tilesToGen = new TileType[2];
-
-	public ArrayList<String[][]> mapsToCombine;
 	public static final int TILE_SIZE = 16;
 	public static final float SCALAR = 8*7;
 	public static final Vector2 ASPECT_RATIO = new Vector2(7, 4);
@@ -58,11 +57,13 @@ public class Main extends ApplicationAdapter {
 
 		//rocks generation
 		tilesToGen[1] = new TileType("rock", 2, true, 1, 2, 1.3f, 6f, 2, true);
-		tilesToGen[1].bounds = new float[] {0.95f, 0.995f};
+		tilesToGen[1].bounds = new float[] {0.945f, 0.99f};
 		tilesToGen[1].setSpriteSheet(new Texture(Gdx.files.internal("rock_tileSheet.png")));
 		tilesToGen[1].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[1].getSpriteSheet(), 0, 0, 8, 8), //small rock
 				new TextureRegion(tilesToGen[1].getSpriteSheet(), 8, 0, 8, 8)}; //big rock
 
+
+		//constructTerrain(sortByPriority(tilesToGen));
 
 		batch = new SpriteBatch();
 
@@ -76,7 +77,7 @@ public class Main extends ApplicationAdapter {
 	@Override
 	public void render () {
 		handleInput();
-		camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 0.4f);
+		camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 0.35f);
 		batch.setProjectionMatrix(camera.combined);
 		camera.update();
 		x = player.getxPos();
@@ -84,19 +85,30 @@ public class Main extends ApplicationAdapter {
 
 		ScreenUtils.clear(0.1215686f, 0.09411765f, 0.07843137f, 1);
 
-
-
-		TileType[] sortedTilesToGen = sortByPriority(tilesToGen);
-		String[][] terrain = constructTerrain(x, y, seed, sortByPriority(tilesToGen));
-
+		float[][] noiseMap0 = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
 
 		batch.begin();
 
-		for (int x = 0; x < terrain.length; x++) {
-			for (int y = 0; y < terrain[x].length; y++) {
-				if(terrain[x][y] != "-"){
-					String[] tile = terrain[x][y].split("(?<=\\d)(?=\\D)|(?<=\\D)(?=\\d)");
-					batch.draw(sortedTilesToGen[Integer.parseInt(tile[0])].sprites[Integer.parseInt(tile[2])], x* TILE_SIZE*SCALAR, y* TILE_SIZE*SCALAR, TILE_SIZE*SCALAR, TILE_SIZE*SCALAR);
+		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
+			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
+
+				for (int i = 0; i < tilesToGen[0].sprites.length; i++) {
+					if (noiseMap0[x][y] >= tilesToGen[0].bounds[i]){
+						batch.draw(tilesToGen[0].sprites[i], x* TILE_SIZE*SCALAR, y* TILE_SIZE*SCALAR, TILE_SIZE*SCALAR, TILE_SIZE*SCALAR);
+					}
+				}
+			}
+		}
+
+		float[][] noiseMap1 = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, tilesToGen[1].getScaleVal(), tilesToGen[1].getOctavesVal(), tilesToGen[1].getPersistenceVal(), tilesToGen[1].getLacunarityVal(), tilesToGen[1].getWrapVal(), tilesToGen[1].doInvert());
+
+		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
+			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
+
+				for (int i = 0; i < tilesToGen[1].sprites.length; i++) {
+					if (noiseMap1[x][y] >= tilesToGen[1].bounds[i]){
+						batch.draw(tilesToGen[1].sprites[i], x* TILE_SIZE*SCALAR, y* TILE_SIZE*SCALAR, TILE_SIZE*SCALAR, TILE_SIZE*SCALAR);
+					}
 				}
 			}
 		}
