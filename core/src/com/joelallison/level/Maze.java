@@ -11,6 +11,8 @@ public class Maze {
     private int width;
     private int height;
 
+    private int count = 0;
+
     public int[][] maze;
     public Maze(long seed, int width, int height){
         this.seed = seed;
@@ -51,10 +53,10 @@ public class Maze {
     }
     public void recursion(int r, int c) {
         // 4 random directions
-        Integer[] randDirs = generateRandomDirections();
+        int[] randDirs = generateRandomDirections();
+        count++;
         // Examine each direction
         for (int i = 0; i < randDirs.length; i++) {
-
             switch(randDirs[i]){
                 case 1: // Up
                     //　Whether 2 cells up is out or not
@@ -105,12 +107,27 @@ public class Maze {
      * Generate an array with random directions 1-4
      * @return Array containing 4 directions in random order
      */
-    public Integer[] generateRandomDirections() {
-        ArrayList<Integer> randoms = new ArrayList<Integer>();
-        for (int i = 0; i < 4; i++)
-            randoms.add(i + 1);
-        Collections.shuffle(randoms, new Random(seed));
+    public int[] generateRandomDirections() {
+        return seededFisherYatesShuffle(new int[]{0, 1, 2, 3});
+    }
 
-        return randoms.toArray(new Integer[4]);
+    /* Based on wikipedia description of the 'modern version':
+
+    -- To shuffle an array a of n elements (indices 0..n-1):
+        for i from n−1 downto 1 do
+            j ← random integer such that 0 ≤ j ≤ i
+            exchange a[j] and a[i]
+     */
+    public int[] seededFisherYatesShuffle(int[] arr) {
+        int[] a = arr;
+        for (int i = arr.length-1; i > 1; i--) {
+            count++;
+            int j = (int) (i*Math.abs(OpenSimplex2S.noise2(seed, 128*count, 0)));
+            int temp = a[j];
+            a[j] = a[i];
+            a[i] = temp;
+        }
+
+        return arr;
     }
 }
