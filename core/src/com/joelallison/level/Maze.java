@@ -5,80 +5,112 @@ import tools.OpenSimplex2S;
 import java.util.*;
 
 public class Maze {
-    private Queue<int[]> queue;
+
+    //depth-first search recursive maze generation
     private long seed;
     private int width;
     private int height;
 
-    private Cell[][] grid;
-
+    public int[][] maze;
     public Maze(long seed, int width, int height){
         this.seed = seed;
-        this.width = width;
-        this.height = height;
+        this.width = width + ((width+1)%2);
+        this.height = height + ((height+1)%2);
     }
 
-    //noise2 as random generation, with i as x, and y as 0
-
-    //based on description of a depth-first search algorithm from:
-    //https://www.algosome.com/articles/maze-generation-depth-first.html
-
-    //'N' is currentNode, 'A' is adjacentNode
-
-    public void generateMaze() {
-
-
-        //step 1
-        int[] startPosition = randomlyChooseCell();
-        int[] currentNode = new int[] {startPosition[0], startPosition[1]};
-
-        //step 2
-        queue.add(currentNode);
-        int count = 0;
-        while(!queue.isEmpty()) {
-
-            //step 3
-            grid[currentNode[0]][currentNode[1]].setVisited(true);
-
-            //step 4
-            List<String> availableDirections = Arrays.asList("UP", "RIGHT", "DOWN", "LEFT");
-            if(grid[currentNode[0]+1][currentNode[1]].isVisited()){
-                availableDirections.remove("UP");
-            }if(grid[currentNode[0]][currentNode[1]+1].isVisited()){
-                availableDirections.remove("RIGHT");
-            }if(grid[currentNode[0]-1][currentNode[1]].isVisited()){
-                availableDirections.remove("DOWN");
-            }if(grid[currentNode[0]][currentNode[1]-1].isVisited()){
-                availableDirections.remove("LEFT");
+    public int[][] genMaze(){
+        maze = new int[height][width];
+        // Initialize
+        for (int i = 0; i < height; i++){
+            for (int j = 0; j < width; j++){
+                maze[i][j] = 1;
             }
+        }
 
-            if(availableDirections.size() > 0) {
-                float generatedDirection = (availableDirections.size()*Math.abs(OpenSimplex2S.noise2(seed, count, 0))) - 1;
-                for (int i = availableDirections.size(); i > 0; i--) {
-                    if(generatedDirection >= i) {
-                        String chosenDirection = availableDirections.get(i);
+
+        Random rand = new Random(seed);
+        // r for row、c for column
+        // Generate random r
+        int r = rand.nextInt(height);
+        while (r % 2 == 0) {
+            r = rand.nextInt(height);
+        }
+        // Generate random c
+        int c = rand.nextInt(width);
+        while (c % 2 == 0) {
+            c = rand.nextInt(width);
+        }
+        // Starting cell
+        maze[r][c] = 0;
+
+        System.out.println(r + " " + c);
+        //　Allocate the maze with recursive method
+        recursion(r, c);
+
+        return maze;
+    }
+    public void recursion(int r, int c) {
+        // 4 random directions
+        Integer[] randDirs = generateRandomDirections();
+        // Examine each direction
+        for (int i = 0; i < randDirs.length; i++) {
+
+            switch(randDirs[i]){
+                case 1: // Up
+                    //　Whether 2 cells up is out or not
+                    if (r - 2 <= 0)
+                        continue;
+                    if (maze[r - 2][c] != 0) {
+                        maze[r-2][c] = 0;
+                        maze[r-1][c] = 0;
+                        recursion(r - 2, c);
                     }
-                }
-            }else {
-
+                    break;
+                case 2: // Right
+                    // Whether 2 cells to the right is out or not
+                    if (c + 2 >= width - 1)
+                        continue;
+                    if (maze[r][c + 2] != 0) {
+                        maze[r][c + 2] = 0;
+                        maze[r][c + 1] = 0;
+                        recursion(r, c + 2);
+                    }
+                    break;
+                case 3: // Down
+                    // Whether 2 cells down is out or not
+                    if (r + 2 >= height - 1)
+                        continue;
+                    if (maze[r + 2][c] != 0) {
+                        maze[r+2][c] = 0;
+                        maze[r+1][c] = 0;
+                        recursion(r + 2, c);
+                    }
+                    break;
+                case 4: // Left
+                    // Whether 2 cells to the left is out or not
+                    if (c - 2 <= 0)
+                        continue;
+                    if (maze[r][c - 2] != 0) {
+                        maze[r][c - 2] = 0;
+                        maze[r][c - 1] = 0;
+                        recursion(r, c - 2);
+                    }
+                    break;
             }
-
-
         }
-
 
     }
 
-    public void initializeGrid() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                grid[x][y] = new Cell();
-            }
-        }
-    }
+    /**
+     * Generate an array with random directions 1-4
+     * @return Array containing 4 directions in random order
+     */
+    public Integer[] generateRandomDirections() {
+        ArrayList<Integer> randoms = new ArrayList<Integer>();
+        for (int i = 0; i < 4; i++)
+            randoms.add(i + 1);
+        Collections.shuffle(randoms, new Random(seed));
 
-
-    private int[] randomlyChooseCell() {
-        return new int[] {(int) (width*Math.abs(OpenSimplex2S.noise2(seed, -1, 0))), (int)(height*Math.abs(OpenSimplex2S.noise2(seed, 0, -1)))};
+        return randoms.toArray(new Integer[4]);
     }
 }

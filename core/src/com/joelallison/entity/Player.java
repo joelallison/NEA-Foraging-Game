@@ -6,8 +6,6 @@ import com.joelallison.main.Main;
 
 public class Player extends Entity {
 
-    private final float zoomAmount = 0.005f;
-
     public Player(int xPos, int yPos){
         super(xPos, yPos);
     }
