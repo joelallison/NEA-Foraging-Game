@@ -27,10 +27,9 @@ public class Main extends ApplicationAdapter {
 	public static final Vector2 MAZE_DIMENSIONS = new Vector2(129,129);
 	public static final int SQUARE_TILES_PER_MAZE_CELL = 16;
 	public static final Vector2 WORLD_SIZE = MAZE_DIMENSIONS.scl(SQUARE_TILES_PER_MAZE_CELL);
-	public static final int TILE_SIZE = 4;
-	public static final float SCALAR = 48;
-	public static final Vector2 ASPECT_RATIO = new Vector2(7, 4); //7div4 = 1.75, making this a 1.75:1 aspect ratio. 16div9 = 1.77, meaning that this is very close to standard HDTV aspect.
-	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(ASPECT_RATIO.x, ASPECT_RATIO.y).scl(SCALAR);
+	public static final int TILE_SIZE = 16;
+	public static final Vector2 ASPECT_RATIO = new Vector2(80, 45);
+	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(ASPECT_RATIO.x, ASPECT_RATIO.y);
 
 	int x;
 	int y;
@@ -70,16 +69,16 @@ public class Main extends ApplicationAdapter {
 		batch = new SpriteBatch();
 
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, SCALAR * VISIBLE_WORLD_SIZE.x * TILE_SIZE, SCALAR * VISIBLE_WORLD_SIZE.y * TILE_SIZE);
+		camera.setToOrtho(false, VISIBLE_WORLD_SIZE.x * TILE_SIZE, VISIBLE_WORLD_SIZE.y * TILE_SIZE);
 		camera.position.set(camera.viewportWidth/2f, camera.viewportHeight/2f, 0);
-		camera.zoom = 0.15f;
+		camera.zoom = 0.6f;
 		camera.update();
 	}
 
 	@Override
 	public void render () {
 		handleInput();
-		camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 0.35f);
+		camera.zoom = MathUtils.clamp(camera.zoom, 0.4f, 1f);
 		batch.setProjectionMatrix(camera.combined);
 		camera.update();
 		x = player.getxPos();
@@ -96,7 +95,7 @@ public class Main extends ApplicationAdapter {
 
 				for (int i = 0; i < tilesToGen[0].sprites.length; i++) {
 					if (noiseMap0[x][y] >= tilesToGen[0].bounds[i]){
-						batch.draw(tilesToGen[0].sprites[i], x* TILE_SIZE*SCALAR, y* TILE_SIZE*SCALAR, TILE_SIZE*SCALAR, TILE_SIZE*SCALAR);
+						batch.draw(tilesToGen[0].sprites[i], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
 					}
 				}
 			}
@@ -109,7 +108,7 @@ public class Main extends ApplicationAdapter {
 
 				for (int i = 0; i < tilesToGen[1].sprites.length; i++) {
 					if (noiseMap1[x][y] >= tilesToGen[1].bounds[i]){
-						batch.draw(tilesToGen[1].sprites[i], x* TILE_SIZE*SCALAR, y* TILE_SIZE*SCALAR, TILE_SIZE*SCALAR, TILE_SIZE*SCALAR);
+						batch.draw(tilesToGen[1].sprites[i], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
 					}
 				}
 			}
