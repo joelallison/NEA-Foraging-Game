@@ -8,13 +8,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.joelallison.entity.Player;
 import com.joelallison.level.TileType;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -25,10 +23,14 @@ public class Main extends ApplicationAdapter {
 	private SpriteBatch batch;
 
 	public TileType[] tilesToGen = new TileType[2];
-	public static final int TILE_SIZE = 16;
-	public static final float SCALAR = 8*7;
-	public static final Vector2 ASPECT_RATIO = new Vector2(7, 4);
-	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(ASPECT_RATIO.x, ASPECT_RATIO.y).scl(SCALAR); //7div4 = 1.75, making this a 1.75:1 aspect ratio. 16div9 = 1.77, meaning that this is very close to standard HDTV aspect.
+
+	public static final Vector2 MAZE_DIMENSIONS = new Vector2(129,129);
+	public static final int SQUARE_TILES_PER_MAZE_CELL = 16;
+	public static final Vector2 WORLD_SIZE = MAZE_DIMENSIONS.scl(SQUARE_TILES_PER_MAZE_CELL);
+	public static final int TILE_SIZE = 4;
+	public static final float SCALAR = 48;
+	public static final Vector2 ASPECT_RATIO = new Vector2(7, 4); //7div4 = 1.75, making this a 1.75:1 aspect ratio. 16div9 = 1.77, meaning that this is very close to standard HDTV aspect.
+	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(ASPECT_RATIO.x, ASPECT_RATIO.y).scl(SCALAR);
 
 	int x;
 	int y;

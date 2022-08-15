@@ -10,14 +10,14 @@ import static com.joelallison.main.Main.VISIBLE_WORLD_SIZE;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
-		/*Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode((int) (VISIBLE_WORLD_SIZE.x * TILE_SIZE), (int) (VISIBLE_WORLD_SIZE.y * TILE_SIZE));
 		config.useVsync(true);
 		config.setForegroundFPS(60);
 		config.setTitle("Forest Game");
 		config.setWindowIcon("assets/tree.png");
-		new Lwjgl3Application(new Main(), config);*/
-		Maze maze = new Maze(42069, 255,255);
+		new Lwjgl3Application(new Main(), config);
+		/*Maze maze = new Maze(42069, 129,129);
 
 		int[][] printMaze = maze.genMaze();
 
@@ -26,7 +26,7 @@ public class DesktopLauncher {
 				System.out.print(i);
 			}
 			System.out.println();
-		}
+		}*/
 	}
 
 
