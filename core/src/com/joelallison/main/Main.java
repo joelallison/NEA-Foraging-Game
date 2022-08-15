@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -14,7 +13,6 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.joelallison.entity.Player;
 import com.joelallison.level.TileType;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import static com.joelallison.level.Map.*;
@@ -29,7 +27,6 @@ public class Main extends ApplicationAdapter {
 	public static final Vector2 WORLD_SIZE = MAZE_DIMENSIONS.scl(SQUARE_TILES_PER_MAZE_CELL);
 	public static final int TILE_SIZE = 16;
 	public static final Vector2 ASPECT_RATIO = new Vector2(80, 45);
-	public static final Vector2 VISIBLE_WORLD_SIZE = new Vector2(ASPECT_RATIO.x, ASPECT_RATIO.y);
 
 	int x;
 	int y;
@@ -69,9 +66,9 @@ public class Main extends ApplicationAdapter {
 		batch = new SpriteBatch();
 
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, VISIBLE_WORLD_SIZE.x * TILE_SIZE, VISIBLE_WORLD_SIZE.y * TILE_SIZE);
+		camera.setToOrtho(false, ASPECT_RATIO.x * TILE_SIZE, ASPECT_RATIO.y * TILE_SIZE);
 		camera.position.set(camera.viewportWidth/2f, camera.viewportHeight/2f, 0);
-		camera.zoom = 0.6f;
+		camera.zoom = 0.6f; //default
 		camera.update();
 	}
 
@@ -86,12 +83,12 @@ public class Main extends ApplicationAdapter {
 
 		ScreenUtils.clear(0.1215686f, 0.09411765f, 0.07843137f, 1);
 
-		float[][] noiseMap0 = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
+		float[][] noiseMap0 = genNoiseMap(seed, ASPECT_RATIO, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
 
 		batch.begin();
 
-		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
-			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
+		for (int x = 0; x < ASPECT_RATIO.x; x++) {
+			for (int y = 0; y < ASPECT_RATIO.y; y++) {
 
 				for (int i = 0; i < tilesToGen[0].sprites.length; i++) {
 					if (noiseMap0[x][y] >= tilesToGen[0].bounds[i]){
@@ -101,10 +98,10 @@ public class Main extends ApplicationAdapter {
 			}
 		}
 
-		float[][] noiseMap1 = genNoiseMap(seed, VISIBLE_WORLD_SIZE, x, y, tilesToGen[1].getScaleVal(), tilesToGen[1].getOctavesVal(), tilesToGen[1].getPersistenceVal(), tilesToGen[1].getLacunarityVal(), tilesToGen[1].getWrapVal(), tilesToGen[1].doInvert());
+		float[][] noiseMap1 = genNoiseMap(seed, ASPECT_RATIO, x, y, tilesToGen[1].getScaleVal(), tilesToGen[1].getOctavesVal(), tilesToGen[1].getPersistenceVal(), tilesToGen[1].getLacunarityVal(), tilesToGen[1].getWrapVal(), tilesToGen[1].doInvert());
 
-		for (int x = 0; x < VISIBLE_WORLD_SIZE.x; x++) {
-			for (int y = 0; y < VISIBLE_WORLD_SIZE.y; y++) {
+		for (int x = 0; x < ASPECT_RATIO.x; x++) {
+			for (int y = 0; y < ASPECT_RATIO.y; y++) {
 
 				for (int i = 0; i < tilesToGen[1].sprites.length; i++) {
 					if (noiseMap1[x][y] >= tilesToGen[1].bounds[i]){
