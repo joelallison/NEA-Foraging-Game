@@ -16,9 +16,7 @@ public class DesktopLauncher {
 		config.setTitle("Forest Game");
 		config.setWindowIcon("assets/tree.png");
 		new Lwjgl3Application(new Main(), config);
-		/*Maze maze = new Maze(42069, 129,129);
-
-		int[][] printMaze = maze.genMaze();
+		/*
 
 		for (int[] row:printMaze) {
 			for (int i:row) {

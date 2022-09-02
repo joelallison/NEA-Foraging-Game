@@ -9,18 +9,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.joelallison.entity.Player;
-import com.joelallison.level.TileType;
+import com.joelallison.level.Level;
 
 import java.util.Random;
 
-import static com.joelallison.level.Map.*;
-
 public class Main extends ApplicationAdapter {
 	private SpriteBatch batch;
-
-	public TileType[] tilesToGen = new TileType[2];
 
 	public static final Vector2 MAZE_DIMENSIONS = new Vector2(129,129);
 	public static final int SQUARE_TILES_PER_MAZE_CELL = 16;
@@ -30,6 +27,10 @@ public class Main extends ApplicationAdapter {
 
 	int x;
 	int y;
+
+	int[][] outputMaze;
+
+	private Stage stage;
 	private OrthographicCamera camera;
 
 	Player player;
@@ -44,27 +45,11 @@ public class Main extends ApplicationAdapter {
 
 		player = new Player(0, 0);
 
-		//tree generation
-		tilesToGen[0] = new TileType("tree", 1, false, 8, 2, 1.55f, 1.1f, -1, true);
-		tilesToGen[0].bounds = new float[] {0.38f, 0.4f, 0.6f, 0.7f};
-		tilesToGen[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
-		tilesToGen[0].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[0].getSpriteSheet(), 0, 0, 8, 8), //plant
-				new TextureRegion(tilesToGen[0].getSpriteSheet(), 8, 0, 8, 8), //bush
-				new TextureRegion(tilesToGen[0].getSpriteSheet(), 16, 0, 8, 8), //dark green tree
-				new TextureRegion(tilesToGen[0].getSpriteSheet(), 24, 0, 8, 8)}; //light green tree
-
-		//rocks generation
-		tilesToGen[1] = new TileType("rock", 2, true, 1, 2, 1.3f, 6f, 2, true);
-		tilesToGen[1].bounds = new float[] {0.945f, 0.99f};
-		tilesToGen[1].setSpriteSheet(new Texture(Gdx.files.internal("rock_tileSheet.png")));
-		tilesToGen[1].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[1].getSpriteSheet(), 0, 0, 8, 8), //small rock
-				new TextureRegion(tilesToGen[1].getSpriteSheet(), 8, 0, 8, 8)}; //big rock
-
-
-		//constructTerrain(sortByPriority(tilesToGen));
+		String[][] level = Level.compositeLevel();
 
 		batch = new SpriteBatch();
 
+		stage = new Stage();
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, ASPECT_RATIO.x * TILE_SIZE, ASPECT_RATIO.y * TILE_SIZE);
 		camera.position.set(camera.viewportWidth/2f, camera.viewportHeight/2f, 0);
@@ -83,10 +68,13 @@ public class Main extends ApplicationAdapter {
 
 		ScreenUtils.clear(0.1215686f, 0.09411765f, 0.07843137f, 1);
 
-		float[][] noiseMap0 = genNoiseMap(seed, ASPECT_RATIO, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
+
+		//float[][] noiseMap0 = genNoiseMap(seed, ASPECT_RATIO, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
+		//float[][] noiseMap1 = genNoiseMap(seed, ASPECT_RATIO, x, y, tilesToGen[1].getScaleVal(), tilesToGen[1].getOctavesVal(), tilesToGen[1].getPersistenceVal(), tilesToGen[1].getLacunarityVal(), tilesToGen[1].getWrapVal(), tilesToGen[1].doInvert());
 
 		batch.begin();
 
+		/*
 		for (int x = 0; x < ASPECT_RATIO.x; x++) {
 			for (int y = 0; y < ASPECT_RATIO.y; y++) {
 
@@ -98,8 +86,6 @@ public class Main extends ApplicationAdapter {
 			}
 		}
 
-		float[][] noiseMap1 = genNoiseMap(seed, ASPECT_RATIO, x, y, tilesToGen[1].getScaleVal(), tilesToGen[1].getOctavesVal(), tilesToGen[1].getPersistenceVal(), tilesToGen[1].getLacunarityVal(), tilesToGen[1].getWrapVal(), tilesToGen[1].doInvert());
-
 		for (int x = 0; x < ASPECT_RATIO.x; x++) {
 			for (int y = 0; y < ASPECT_RATIO.y; y++) {
 
@@ -109,7 +95,7 @@ public class Main extends ApplicationAdapter {
 					}
 				}
 			}
-		}
+		}*/
 
 		batch.end();
 	}
