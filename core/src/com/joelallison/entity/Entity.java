@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import java.util.HashMap;
 
 
 public class Entity {
@@ -12,17 +13,20 @@ public class Entity {
     protected int xPos;
     protected int yPos;
 
-    //for handling animations
+    //animations
+    protected int FRAME_COLS, FRAME_ROWS;
+    protected Texture spriteSheet;
 
-    private int FRAME_COLS, FRAME_ROWS;
-    private Texture spriteSheet;
-    Animation<TextureRegion>[] animations;
-    float stateTime;
+    protected static HashMap<String, Animation<TextureRegion>> animations = new HashMap<String, Animation<TextureRegion>>();
 
 
-    public Entity(int xPos, int yPos) {
+    public Entity(int xPos, int yPos, Texture spriteSheet, int FRAME_COLS, int FRAME_ROWS) {
         this.xPos = xPos;
         this.yPos = yPos;
+        this.spriteSheet = spriteSheet;
+        this.FRAME_COLS = FRAME_COLS;
+        this.FRAME_ROWS = FRAME_ROWS;
+
     }
 
     public int getxPos() {
@@ -41,43 +45,11 @@ public class Entity {
         this.yPos = yPos;
     }
 
-    public int getFRAME_COLS() {
-        return FRAME_COLS;
-    }
-
-    public void setFRAME_COLS(int FRAME_COLS) {
-        this.FRAME_COLS = FRAME_COLS;
-    }
-
-    public int getFRAME_ROWS() {
-        return FRAME_ROWS;
-    }
-
-    public void setFRAME_ROWS(int FRAME_ROWS) {
-        this.FRAME_ROWS = FRAME_ROWS;
-    }
-
-    public Texture getSpriteSheet() {
-        return spriteSheet;
-    }
-
-    public void setSpriteSheets(Texture spriteSheet) {
-        this.spriteSheet = spriteSheet;
-    }
-
-    public Animation<TextureRegion>[] getAnimations() {
+    public HashMap<String, Animation<TextureRegion>> getAnimations() {
         return animations;
     }
 
-    public void setAnimations(Animation<TextureRegion>[] animations) {
+    public void setAnimations(HashMap<String, Animation<TextureRegion>> animations) {
         this.animations = animations;
-    }
-
-    public float getStateTime() {
-        return stateTime;
-    }
-
-    public void setStateTime(float stateTime) {
-        this.stateTime = stateTime;
     }
 }

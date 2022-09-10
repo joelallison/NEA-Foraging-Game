@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import tools.OpenSimplex2S;
 import java.util.*;
 
-import static com.joelallison.main.Main.ASPECT_RATIO;
+import static com.joelallison.main.Main.VISIBLE_WORLD_DIMENSIONS;
 
 public class Map {
 
@@ -90,19 +90,19 @@ public class Map {
 
     public static String[][] constructTerrain (int xOffset, int yOffset, long seed, TileType[] tilesToGen) {
 
-        String[][] outputMap = new String[(int) ASPECT_RATIO.x][(int) ASPECT_RATIO.y];
-        for (int x = 0; x < ASPECT_RATIO.x; x++) {
-            for (int y = 0; y < ASPECT_RATIO.y; y++) {
+        String[][] outputMap = new String[(int) VISIBLE_WORLD_DIMENSIONS.x][(int) VISIBLE_WORLD_DIMENSIONS.y];
+        for (int x = 0; x < VISIBLE_WORLD_DIMENSIONS.x; x++) {
+            for (int y = 0; y < VISIBLE_WORLD_DIMENSIONS.y; y++) {
                 outputMap[x][y] = "-";
             }
         }
 
         for (int i = 0; i < tilesToGen.length; i++) {
 
-            float[][] currentMapLevel = genNoiseMap(seed, ASPECT_RATIO, xOffset+tilesToGen[i].getxOffset(), yOffset+tilesToGen[i].getyOffset(), tilesToGen[i].getScaleVal(), tilesToGen[i].getOctavesVal(), tilesToGen[i].getPersistenceVal(), tilesToGen[i].getLacunarityVal(), tilesToGen[i].getWrapVal(), tilesToGen[i].doInvert());
+            float[][] currentMapLevel = genNoiseMap(seed, VISIBLE_WORLD_DIMENSIONS, xOffset+tilesToGen[i].getxOffset(), yOffset+tilesToGen[i].getyOffset(), tilesToGen[i].getScaleVal(), tilesToGen[i].getOctavesVal(), tilesToGen[i].getPersistenceVal(), tilesToGen[i].getLacunarityVal(), tilesToGen[i].getWrapVal(), tilesToGen[i].doInvert());
 
-            for (int x = 0; x < ASPECT_RATIO.x; x++) {
-                for (int y = 0; y < ASPECT_RATIO.y; y++) {
+            for (int x = 0; x < VISIBLE_WORLD_DIMENSIONS.x; x++) {
+                for (int y = 0; y < VISIBLE_WORLD_DIMENSIONS.y; y++) {
 
                     for (int j = 0; j < tilesToGen[i].sprites.length; j++) {
                         if (currentMapLevel[x][y] >= tilesToGen[i].bounds[j]){
