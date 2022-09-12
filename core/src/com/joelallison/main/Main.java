@@ -26,8 +26,8 @@ public class Main extends ApplicationAdapter {
 	public static final Vector2 MAZE_DIMENSIONS = new Vector2(129,129);
 	public static final int SQUARE_TILES_PER_MAZE_CELL = 16;
 	public static final Vector2 WORLD_SIZE = MAZE_DIMENSIONS.scl(SQUARE_TILES_PER_MAZE_CELL);
-	public static final int TILE_SIZE = 16;
-	public static final Vector2 VISIBLE_WORLD_DIMENSIONS = new Vector2(80, 45);
+	public static final int TILE_SIZE = 32;
+	public static final Vector2 VISIBLE_WORLD_DIMENSIONS = new Vector2(16, 9);
 
 	int x;
 	int y;
@@ -89,7 +89,7 @@ public class Main extends ApplicationAdapter {
 		stateTime += Gdx.graphics.getDeltaTime();
 
 		player.handleInput();
-		camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 5f);
+		camera.zoom = MathUtils.clamp(camera.zoom, 0.4f, 1f);
 		batch.setProjectionMatrix(camera.combined);
 		camera.update();
 		x = player.getxPos();
@@ -112,7 +112,7 @@ public class Main extends ApplicationAdapter {
 			}
 		}
 
-		/*for (int x = 0; x < VISIBLE_WORLD_DIMENSIONS.x; x++) {
+		for (int x = 0; x < VISIBLE_WORLD_DIMENSIONS.x; x++) {
 			for (int y = 0; y < VISIBLE_WORLD_DIMENSIONS.y; y++) {
 
 				for (int i = 0; i < tilesToGen[1].sprites.length; i++) {
@@ -121,9 +121,9 @@ public class Main extends ApplicationAdapter {
 					}
 				}
 			}
-		}*/
+		}
 
-		//batch.draw(Player.getFrame(stateTime, true), camera.viewportWidth / 2, camera.viewportHeight / 2, 8, 8);
+		batch.draw(Player.getFrame(stateTime, true), camera.viewportWidth / 2, camera.viewportHeight / 2, 16, 16);
 
 		batch.end();
 	}
