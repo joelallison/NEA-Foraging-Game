@@ -3,6 +3,7 @@ package com.joelallison;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.joelallison.main.Main;
+import com.joelallison.screens.Opening;
 
 import static com.joelallison.main.Main.TILE_SIZE;
 import static com.joelallison.main.Main.VISIBLE_WORLD_DIMENSIONS;
@@ -15,15 +16,7 @@ public class DesktopLauncher {
 		config.setForegroundFPS(60);
 		config.setTitle("Forest Game");
 		config.setWindowIcon("assets/tree.png");
-		new Lwjgl3Application(new Main(), config);
-		/*
-
-		for (int[] row:printMaze) {
-			for (int i:row) {
-				System.out.print(i);
-			}
-			System.out.println();
-		}*/
+		new Lwjgl3Application(new Opening(), config);
 	}
 
 
