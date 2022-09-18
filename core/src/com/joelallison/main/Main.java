@@ -23,18 +23,11 @@ public class Main extends ApplicationAdapter {
 
 	public TileType[] tilesToGen = new TileType[2];
 
-	public static final Vector2 MAZE_DIMENSIONS = new Vector2(129,129);
-	public static final int SQUARE_TILES_PER_MAZE_CELL = 16;
-	public static final Vector2 WORLD_SIZE = MAZE_DIMENSIONS.scl(SQUARE_TILES_PER_MAZE_CELL);
 	public static final int TILE_SIZE = 32;
-	public static final Vector2 VISIBLE_WORLD_DIMENSIONS = new Vector2(16, 9);
+	public static final Vector2 VISIBLE_WORLD_DIMENSIONS = new Vector2(48, 27);
 
 	int x;
 	int y;
-
-	int[][] outputMaze;
-
-	//private Stage stage;
 	public static OrthographicCamera camera;
 
 	Player player;
@@ -64,7 +57,7 @@ public class Main extends ApplicationAdapter {
 
 		//rocks generation
 		tilesToGen[1] = new TileType("rock", 2, true, 1, 2, 1.3f, 6f, 2, true);
-		tilesToGen[1].bounds = new float[] {0.945f, 0.99f};
+		tilesToGen[1].bounds = new float[] {0.985f, 0.99f};
 		tilesToGen[1].setSpriteSheet(new Texture(Gdx.files.internal("rock_tileSheet.png")));
 		tilesToGen[1].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[1].getSpriteSheet(), 0, 0, 8, 8), //small rock
 				new TextureRegion(tilesToGen[1].getSpriteSheet(), 8, 0, 8, 8)}; //big rock
@@ -78,7 +71,7 @@ public class Main extends ApplicationAdapter {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE);
 		camera.position.set(camera.viewportWidth/2f, camera.viewportHeight/2f, 0);
-		camera.zoom = 0.25f; //default
+		camera.zoom = 0.5f; //default
 		camera.update();
 		stateTime = 0f;
 	}
@@ -89,7 +82,7 @@ public class Main extends ApplicationAdapter {
 		stateTime += Gdx.graphics.getDeltaTime();
 
 		player.handleInput();
-		camera.zoom = MathUtils.clamp(camera.zoom, 0.4f, 1f);
+		camera.zoom = MathUtils.clamp(camera.zoom, 0.2f, 1f);
 		batch.setProjectionMatrix(camera.combined);
 		camera.update();
 		x = player.getxPos();
@@ -123,7 +116,7 @@ public class Main extends ApplicationAdapter {
 			}
 		}
 
-		batch.draw(Player.getFrame(stateTime, true), camera.viewportWidth / 2, camera.viewportHeight / 2, 16, 16);
+		//batch.draw(Player.getFrame(stateTime, true), camera.viewportWidth / 2, camera.viewportHeight / 2, 16, 16);
 
 		batch.end();
 	}

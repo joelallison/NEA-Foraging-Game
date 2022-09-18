@@ -18,7 +18,7 @@ public class Player extends Entity {
     public void initAnimations() {
         TextureRegion[][] tmp = TextureRegion.split(spriteSheet, spriteSheet.getWidth() / FRAME_COLS, spriteSheet.getHeight() / FRAME_ROWS);
 
-        animations.put("walk", new Animation<TextureRegion>(1f/12f,
+        animations.put("walk", new Animation<TextureRegion>(1f/1.5f,
                 new TextureRegion[]{tmp[0][0], tmp[0][1], tmp[0][2]}
         ));
     }
