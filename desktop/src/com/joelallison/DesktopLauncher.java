@@ -16,7 +16,7 @@ public class DesktopLauncher {
 		config.setForegroundFPS(60);
 		config.setTitle("Forest Game");
 		config.setWindowIcon("assets/tree.png");
-		new Lwjgl3Application(new Opening(), config);
+		new Lwjgl3Application(new Main(), config);
 	}
 
 

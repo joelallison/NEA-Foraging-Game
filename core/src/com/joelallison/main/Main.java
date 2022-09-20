@@ -9,8 +9,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.joelallison.entity.Player;
-import com.joelallison.level.Level;
 import com.joelallison.level.TileType;
 
 
@@ -29,6 +29,7 @@ public class Main extends ApplicationAdapter {
 	int x;
 	int y;
 	public static OrthographicCamera camera;
+	private ExtendViewport viewport;
 
 	Player player;
 
@@ -69,10 +70,9 @@ public class Main extends ApplicationAdapter {
 
 		//stage = new Stage();
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE);
-		camera.position.set(camera.viewportWidth/2f, camera.viewportHeight/2f, 0);
+		viewport = new ExtendViewport(VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE, camera);
+		viewport.getCamera().position.set(VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE / 2, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE / 2, 0);
 		camera.zoom = 0.5f; //default
-		camera.update();
 		stateTime = 0f;
 	}
 
@@ -82,8 +82,9 @@ public class Main extends ApplicationAdapter {
 		stateTime += Gdx.graphics.getDeltaTime();
 
 		player.handleInput();
+		viewport.apply();
 		camera.zoom = MathUtils.clamp(camera.zoom, 0.2f, 1f);
-		batch.setProjectionMatrix(camera.combined);
+		batch.setProjectionMatrix(viewport.getCamera().combined);
 		camera.update();
 		x = player.getxPos();
 		y = player.getyPos();
@@ -119,6 +120,11 @@ public class Main extends ApplicationAdapter {
 		//batch.draw(Player.getFrame(stateTime, true), camera.viewportWidth / 2, camera.viewportHeight / 2, 16, 16);
 
 		batch.end();
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		viewport.update(width, height);
 	}
 	
 	@Override
