@@ -24,7 +24,7 @@ public class Main extends ApplicationAdapter {
 	public TileType[] tilesToGen = new TileType[2];
 
 	public static final int TILE_SIZE = 32;
-	public static final Vector2 VISIBLE_WORLD_DIMENSIONS = new Vector2(48, 27);
+	public static final Vector2 VISIBLE_WORLD_DIMENSIONS = new Vector2(32, 32);
 
 	int x;
 	int y;
@@ -64,15 +64,14 @@ public class Main extends ApplicationAdapter {
 				new TextureRegion(tilesToGen[1].getSpriteSheet(), 8, 0, 8, 8)}; //big rock
 
 
-		//String[][] level = Level.compositeLevel(seed, VISIBLE_WORLD_DIMENSIONS, x, y);
-
 		batch = new SpriteBatch();
 
-		//stage = new Stage();
+		//camera and viewport setup
 		camera = new OrthographicCamera();
 		viewport = new ExtendViewport(VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE, camera);
 		viewport.getCamera().position.set(VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE / 2, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE / 2, 0);
-		camera.zoom = 0.5f; //default
+		camera.zoom = 0.5f; //this is the default value
+
 		stateTime = 0f;
 	}
 
