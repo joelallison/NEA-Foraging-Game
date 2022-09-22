@@ -1,7 +1,9 @@
 package com.joelallison.main;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,8 +20,8 @@ import static com.joelallison.level.Map.*;
 
 import java.util.Random;
 
-public class Main extends ApplicationAdapter {
-	private SpriteBatch batch;
+public class Main extends Game {
+	public SpriteBatch batch;
 
 	public TileType[] tilesToGen = new TileType[2];
 
@@ -29,7 +31,7 @@ public class Main extends ApplicationAdapter {
 	int x;
 	int y;
 	public static OrthographicCamera camera;
-	private ExtendViewport viewport;
+	ExtendViewport viewport;
 
 	Player player;
 
@@ -38,8 +40,9 @@ public class Main extends ApplicationAdapter {
 
 	float stateTime;
 
+
 	@Override
-	public void create () {
+	public void create(){
 		x = 0;
 		y = 0;
 
@@ -62,7 +65,6 @@ public class Main extends ApplicationAdapter {
 		tilesToGen[1].setSpriteSheet(new Texture(Gdx.files.internal("rock_tileSheet.png")));
 		tilesToGen[1].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[1].getSpriteSheet(), 0, 0, 8, 8), //small rock
 				new TextureRegion(tilesToGen[1].getSpriteSheet(), 8, 0, 8, 8)}; //big rock
-
 
 		batch = new SpriteBatch();
 
@@ -128,8 +130,6 @@ public class Main extends ApplicationAdapter {
 	
 	@Override
 	public void dispose () {
-		batch.dispose();
-
 		for (TileType x:tilesToGen) {
 			x.getSpriteSheet().dispose();
 		}
