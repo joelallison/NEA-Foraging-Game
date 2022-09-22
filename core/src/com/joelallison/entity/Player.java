@@ -5,7 +5,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.joelallison.main.Main;
+import com.joelallison.main.GameScreen;
+import com.joelallison.main.Init;
 
 public class Player extends Entity {
 
@@ -42,10 +43,10 @@ public class Player extends Entity {
 
         //zoom
         if(Gdx.input.isKeyPressed(Input.Keys.P)){
-            Main.camera.zoom += 0.02;
+            Init.camera.zoom += 0.02;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.O)){
-            Main.camera.zoom -= 0.02;
+            Init.camera.zoom -= 0.02;
         }
     }
 

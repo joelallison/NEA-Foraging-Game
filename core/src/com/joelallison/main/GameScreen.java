@@ -1,9 +1,7 @@
 package com.joelallison.main;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,13 +13,12 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.joelallison.entity.Player;
 import com.joelallison.level.TileType;
 
-
 import static com.joelallison.level.Map.*;
 
 import java.util.Random;
 
-public class Main extends Game {
-	public SpriteBatch batch;
+public class GameScreen implements Screen {
+	final Init system;
 
 	public TileType[] tilesToGen = new TileType[2];
 
@@ -30,8 +27,6 @@ public class Main extends Game {
 
 	int x;
 	int y;
-	public static OrthographicCamera camera;
-	ExtendViewport viewport;
 
 	Player player;
 
@@ -41,8 +36,9 @@ public class Main extends Game {
 	float stateTime;
 
 
-	@Override
-	public void create(){
+	public GameScreen(final Init system) {
+		this.system = system;
+
 		x = 0;
 		y = 0;
 
@@ -50,6 +46,19 @@ public class Main extends Game {
 		player = new Player(0, 0, new Texture(Gdx.files.internal("player_tileSheet.png")), 3, 1);
 		player.initAnimations();
 
+		generateTiles();
+
+		system.batch = new SpriteBatch();
+
+		//camera and viewport setup
+		system.viewport = new ExtendViewport(VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE, system.camera);
+		system.viewport.getCamera().position.set(VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE / 2, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE / 2, 0);
+		system.camera.zoom = 0.5f; //this is the default value
+
+		stateTime = 0f;
+	}
+
+	public void generateTiles() {
 		//tree generation
 		tilesToGen[0] = new TileType("tree", 1, false, 8, 2, 1.55f, 1.1f, -1, true);
 		tilesToGen[0].bounds = new float[] {0.38f, 0.4f, 0.6f, 0.7f};
@@ -66,42 +75,33 @@ public class Main extends Game {
 		tilesToGen[1].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[1].getSpriteSheet(), 0, 0, 8, 8), //small rock
 				new TextureRegion(tilesToGen[1].getSpriteSheet(), 8, 0, 8, 8)}; //big rock
 
-		batch = new SpriteBatch();
 
-		//camera and viewport setup
-		camera = new OrthographicCamera();
-		viewport = new ExtendViewport(VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE, camera);
-		viewport.getCamera().position.set(VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE / 2, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE / 2, 0);
-		camera.zoom = 0.5f; //this is the default value
-
-		stateTime = 0f;
 	}
 
 	@Override
-	public void render () {
+	public void render(float delta) {
 		ScreenUtils.clear(0.1215686f, 0.09411765f, 0.07843137f, 1);
 		stateTime += Gdx.graphics.getDeltaTime();
 
 		player.handleInput();
-		viewport.apply();
-		camera.zoom = MathUtils.clamp(camera.zoom, 0.2f, 1f);
-		batch.setProjectionMatrix(viewport.getCamera().combined);
-		camera.update();
+		system.viewport.apply();
+		system.camera.zoom = MathUtils.clamp(system.camera.zoom, 0.2f, 1f);
+		system.batch.setProjectionMatrix(system.viewport.getCamera().combined);
+		system.camera.update();
 		x = player.getxPos();
 		y = player.getyPos();
-
 
 		float[][] noiseMap0 = genNoiseMap(seed, VISIBLE_WORLD_DIMENSIONS, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
 		float[][] noiseMap1 = genNoiseMap(seed, VISIBLE_WORLD_DIMENSIONS, x, y, tilesToGen[1].getScaleVal(), tilesToGen[1].getOctavesVal(), tilesToGen[1].getPersistenceVal(), tilesToGen[1].getLacunarityVal(), tilesToGen[1].getWrapVal(), tilesToGen[1].doInvert());
 
-		batch.begin();
+		system.batch.begin();
 
 		for (int x = 0; x < VISIBLE_WORLD_DIMENSIONS.x; x++) {
 			for (int y = 0; y < VISIBLE_WORLD_DIMENSIONS.y; y++) {
 
 				for (int i = 0; i < tilesToGen[0].sprites.length; i++) {
 					if (noiseMap0[x][y] >= tilesToGen[0].bounds[i]){
-						batch.draw(tilesToGen[0].sprites[i], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
+						system.batch.draw(tilesToGen[0].sprites[i], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
 					}
 				}
 			}
@@ -112,7 +112,7 @@ public class Main extends Game {
 
 				for (int i = 0; i < tilesToGen[1].sprites.length; i++) {
 					if (noiseMap1[x][y] >= tilesToGen[1].bounds[i]){
-						batch.draw(tilesToGen[1].sprites[i], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
+						system.batch.draw(tilesToGen[1].sprites[i], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
 					}
 				}
 			}
@@ -120,12 +120,29 @@ public class Main extends Game {
 
 		//batch.draw(Player.getFrame(stateTime, true), camera.viewportWidth / 2, camera.viewportHeight / 2, 16, 16);
 
-		batch.end();
+		system.batch.end();
+	}
+
+	@Override
+	public void show() {
+		// when the screen is shown
+	}
+
+	@Override
+	public void hide() {
+	}
+
+	@Override
+	public void pause() {
+	}
+
+	@Override
+	public void resume() {
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		viewport.update(width, height);
+		system.viewport.update(width, height);
 	}
 	
 	@Override
