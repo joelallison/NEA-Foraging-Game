@@ -4,9 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class TileType {
-
-
+public class Tile {
     private String TileID;
     private int priority;
 
@@ -33,7 +31,7 @@ public class TileType {
 
     public float[] bounds;
 
-    public TileType(String TileID, int priority, boolean collision, float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invert) {
+    public Tile(String TileID, int priority, boolean collision, float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invert) {
         this.TileID = TileID;
         this.priority = priority;
         this.collision = collision;

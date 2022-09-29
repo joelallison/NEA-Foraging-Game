@@ -10,11 +10,11 @@ import static com.joelallison.level.Map.*;
 
 public class Level {
 
-    public static TileType[] tilesToGen = new TileType[3];
+    public static Tile[] tilesToGen = new Tile[3];
 
     public Level() {
         //tree generation
-        tilesToGen[0] = new TileType("tree", 1, false, 8, 2, 1.55f, 1.1f, -1, true);
+        tilesToGen[0] = new Tile("tree", 1, false, 8, 2, 1.55f, 1.1f, -1, true);
         tilesToGen[0].bounds = new float[] {0.38f, 0.4f, 0.6f, 0.7f};
         tilesToGen[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
         tilesToGen[0].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[0].getSpriteSheet(), 0, 0, 8, 8), //plant
@@ -23,7 +23,7 @@ public class Level {
                 new TextureRegion(tilesToGen[0].getSpriteSheet(), 24, 0, 8, 8)}; //light green tree
 
         //rocks generation
-        tilesToGen[1] = new TileType("rock", 2, true, 1, 2, 1.3f, 6f, 2, true);
+        tilesToGen[1] = new Tile("rock", 2, true, 1, 2, 1.3f, 6f, 2, true);
         tilesToGen[1].bounds = new float[] {0.945f, 0.99f};
         tilesToGen[1].setSpriteSheet(new Texture(Gdx.files.internal("rock_tileSheet.png")));
         tilesToGen[1].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[1].getSpriteSheet(), 0, 0, 8, 8), //small rock

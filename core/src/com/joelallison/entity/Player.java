@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.joelallison.main.GameScreen;
 import com.joelallison.main.Init;
 
@@ -12,8 +13,8 @@ public class Player extends Entity {
 
     float stateTime;
 
-    public Player(int xPos, int yPos, Texture spriteSheet, int FRAME_COLS, int FRAME_ROWS){
-        super(xPos, yPos, spriteSheet, FRAME_COLS, FRAME_ROWS);
+    public Player(Vector2 position, Texture spriteSheet, int FRAME_COLS, int FRAME_ROWS){
+        super(position, spriteSheet, FRAME_COLS, FRAME_ROWS);
     }
 
     public void initAnimations() {
@@ -24,21 +25,22 @@ public class Player extends Entity {
         ));
     }
 
-    public void handleInput(){
+    
+    public void handleInput() {
 
         //movement
-        if(Gdx.input.isKeyPressed(Input.Keys.W)){
-            setyPos(getyPos() + 1);
+        if(Gdx.input.isKeyPressed(Input.Keys.W)) {
+            setPosition(new Vector2(getPosition().x, getPosition().y + 1));
         }
-        else if(Gdx.input.isKeyPressed(Input.Keys.S)){
-            setyPos(getyPos() - 1);
+        else if(Gdx.input.isKeyPressed(Input.Keys.S)) {
+            setPosition(new Vector2(getPosition().x, getPosition().y - 1));
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.A)){
-            setxPos(getxPos() - 1);
+        if(Gdx.input.isKeyPressed(Input.Keys.A)) {
+            setPosition(new Vector2(getPosition().x - 1, getPosition().y));
         }
-        else if(Gdx.input.isKeyPressed(Input.Keys.D)){
-            setxPos(getxPos() + 1);
+        else if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+            setPosition(new Vector2(getPosition().x + 1, getPosition().y));
         }
 
         //zoom

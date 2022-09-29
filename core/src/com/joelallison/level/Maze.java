@@ -5,8 +5,8 @@ import tools.OpenSimplex2S;
 import java.util.*;
 
 public class Maze {
-
     //depth-first search recursive maze generation
+
     private long seed;
     private int width;
     private int height;
@@ -29,10 +29,9 @@ public class Maze {
             }
         }
 
-
         Random rand = new Random(seed);
         // r for row、c for column
-        // Generate random r
+        // Generate random odd number r
         int r = rand.nextInt(height);
         while (r % 2 == 0) {
             r = rand.nextInt(height);
@@ -51,7 +50,7 @@ public class Maze {
 
         return maze;
     }
-    public void recursion(int r, int c) {
+    private void recursion(int r, int c) {
         // 4 random directions
         Integer[] randDirs = generateRandomDirections();
         count++;
@@ -101,14 +100,9 @@ public class Maze {
                     break;
             }
         }
-
     }
 
-    /**
-     * Generate an array with random directions 1-4
-     * @return Array containing 4 directions in random order
-     */
-    public Integer[] generateRandomDirections() {
+    private Integer[] generateRandomDirections() {
         ArrayList<Integer> randoms = new ArrayList<Integer>();
         for (int i = 0; i < 4; i++)
             randoms.add(i + 1);

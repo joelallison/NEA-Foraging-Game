@@ -13,6 +13,7 @@ public class DesktopLauncher {
 		config.setWindowedMode((int) (VISIBLE_WORLD_DIMENSIONS.x*TILE_SIZE), (int) (VISIBLE_WORLD_DIMENSIONS.y*TILE_SIZE));
 		config.useVsync(true);
 		config.setForegroundFPS(60);
+
 		config.setTitle("World Gen Tool");
 		config.setWindowIcon("assets/tree.png");
 		new Lwjgl3Application(new Init(), config);
