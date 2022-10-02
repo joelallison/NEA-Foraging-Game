@@ -7,10 +7,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.joelallison.entity.Player;
 import com.joelallison.level.Tile;
+import com.joelallison.ui.GameUI;
 
 import static com.joelallison.level.Map.*;
 
@@ -26,8 +28,7 @@ public class GameScreen implements Screen {
 	public static final Vector2 ASPECT_RATIO = new Vector2(4, 3);
 	public static final Vector2 VISIBLE_WORLD_DIMENSIONS = new Vector2(CHUNK_SIZE*ASPECT_RATIO.x, CHUNK_SIZE*ASPECT_RATIO.y);
 
-	int x;
-	int y;
+	int xPos, yPos;
 
 	Player player;
 
@@ -36,15 +37,17 @@ public class GameScreen implements Screen {
 
 	float stateTime;
 
+	Stage UIStage;
+
 
 	public GameScreen(final Init system) {
 		this.system = system;
 
-		x = 0;
-		y = 0;
+		xPos = 0;
+		yPos = 0;
 
 		//declare player stuff
-		player = new Player(new Vector2(0, 0), new Texture(Gdx.files.internal("player_tileSheet.png")), 3, 1);
+		player = new Player(0, 0, new Texture(Gdx.files.internal("player_tileSheet.png")), 3, 1);
 		player.initAnimations();
 
 		generateTiles();
@@ -57,6 +60,8 @@ public class GameScreen implements Screen {
 		system.camera.zoom = 0.5f; //this is the default value
 
 		stateTime = 0f;
+
+		UIStage = GameUI.generateUIStage(system.batch, "game");
 	}
 
 	public void generateTiles() {
@@ -89,12 +94,12 @@ public class GameScreen implements Screen {
 		system.camera.zoom = MathUtils.clamp(system.camera.zoom, 0.2f, 1f);
 		system.batch.setProjectionMatrix(system.viewport.getCamera().combined);
 		system.camera.update();
-		x = (int) player.getPosition().x;
-		y = (int) player.getPosition().y;
+		xPos = player.getxPosition();
+		yPos = player.getyPosition();
 
 		Vector2 chunksToLoad = goingToNewChunk(player);
 
-		float[][] noiseMap0 = genNoiseMap(seed, VISIBLE_WORLD_DIMENSIONS, x, y, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
+		float[][] noiseMap0 = genNoiseMap(seed, VISIBLE_WORLD_DIMENSIONS, xPos, yPos, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
 		//float[][] noiseMap1 = genNoiseMap(seed, VISIBLE_WORLD_DIMENSIONS, x, y, tilesToGen[1].getScaleVal(), tilesToGen[1].getOctavesVal(), tilesToGen[1].getPersistenceVal(), tilesToGen[1].getLacunarityVal(), tilesToGen[1].getWrapVal(), tilesToGen[1].doInvert());
 
 		system.batch.begin();
@@ -109,6 +114,8 @@ public class GameScreen implements Screen {
 				}
 			}
 		}
+
+		UIStage.draw();
 
 		/*for (int x = 0; x < VISIBLE_WORLD_DIMENSIONS.x; x++) {
 			for (int y = 0; y < VISIBLE_WORLD_DIMENSIONS.y; y++) {
@@ -130,19 +137,23 @@ public class GameScreen implements Screen {
 	public Vector2 goingToNewChunk(Player player) {
 		Vector2 chunkDirection = new Vector2(0, 0);
 
-		System.out.println(Math.abs(player.getPosition().x) + " --> " + (Math.abs(player.getPosition().x % CHUNK_SIZE)) +  " --> " + (Math.floor(Math.abs(player.getPosition().x / CHUNK_SIZE))) * CHUNK_SIZE + "... " + Math.signum(player.getPosition().x));
+
 
 		//finds out if player is halfway or more through their current chunk, and then declares chunk[s] to get as chunks in the direction of travel.
-		if (Math.abs(player.getPosition().x % CHUNK_SIZE) >=  CHUNK_SIZE / 2){
+		if (Math.abs(player.getxPosition() % CHUNK_SIZE) >=  CHUNK_SIZE / 2){
 			//(Math.floor(Math.abs(player.getPosition().x / CHUNK_SIZE))) * CHUNK_SIZE)
-			// chunkDirection.x = Math.signum(
-			System.out.println("halfway through chunk x");
+			chunkDirection.x = Math.signum(player.getxPosition() - customRound(player.getxPosition(),CHUNK_SIZE));
+			System.out.println(player.getxPosition() + " - " + (customRound(player.getxPosition() - CHUNK_SIZE / 2,CHUNK_SIZE) + CHUNK_SIZE / 2) + " = " + (player.getxPosition() - (customRound(player.getxPosition()	 - CHUNK_SIZE / 2,CHUNK_SIZE) + CHUNK_SIZE / 2)));
 		}
-		if (Math.abs(player.getPosition().y % CHUNK_SIZE) >= (Math.floor(Math.abs(player.getPosition().y / CHUNK_SIZE))) * CHUNK_SIZE){
-			chunkDirection.y = Math.signum(player.getPosition().y);
+		if (Math.abs(player.getyPosition() % CHUNK_SIZE) >= (Math.floor(Math.abs(player.getyPosition() / CHUNK_SIZE))) * CHUNK_SIZE){
+			chunkDirection.y = Math.signum(player.getyPosition());
 		}
 
 		return chunkDirection;
+	}
+
+	private int customRound(float input, int multiple) {
+		return multiple * Math.round(input/multiple);
 	}
 
 
@@ -166,7 +177,11 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
+
 		system.viewport.update(width, height);
+		system.camera.position.set(VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE / 2, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE / 2, 0);
+		system.camera.update();
+
 	}
 	
 	@Override
@@ -174,5 +189,7 @@ public class GameScreen implements Screen {
 		for (Tile x:tilesToGen) {
 			x.getSpriteSheet().dispose();
 		}
+
+		UIStage.dispose();
 	}
 }

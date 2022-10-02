@@ -13,8 +13,8 @@ public class Player extends Entity {
 
     float stateTime;
 
-    public Player(Vector2 position, Texture spriteSheet, int FRAME_COLS, int FRAME_ROWS){
-        super(position, spriteSheet, FRAME_COLS, FRAME_ROWS);
+    public Player(int xPosition, int yPosition, Texture spriteSheet, int FRAME_COLS, int FRAME_ROWS){
+        super(xPosition, yPosition, spriteSheet, FRAME_COLS, FRAME_ROWS);
     }
 
     public void initAnimations() {
@@ -30,17 +30,17 @@ public class Player extends Entity {
 
         //movement
         if(Gdx.input.isKeyPressed(Input.Keys.W)) {
-            setPosition(new Vector2(getPosition().x, getPosition().y + 1));
+            setyPosition(yPosition + 1);
         }
         else if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-            setPosition(new Vector2(getPosition().x, getPosition().y - 1));
+            setyPosition(yPosition - 1);
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-            setPosition(new Vector2(getPosition().x - 1, getPosition().y));
+            setxPosition(xPosition - 1);
         }
         else if(Gdx.input.isKeyPressed(Input.Keys.D)) {
-            setPosition(new Vector2(getPosition().x + 1, getPosition().y));
+            setxPosition(xPosition + 1);
         }
 
         //zoom

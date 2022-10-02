@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class Entity {
     //entity position
 
-    protected Vector2 position;
+    protected int xPosition, yPosition;
 
     //animations
     protected int FRAME_COLS, FRAME_ROWS;
@@ -20,22 +20,30 @@ public class Entity {
     protected static HashMap<String, Animation<TextureRegion>> animations = new HashMap<String, Animation<TextureRegion>>();
 
 
-    public Entity(Vector2 position, Texture spriteSheet, int FRAME_COLS, int FRAME_ROWS) {
-        this.position = position;
+    public Entity(int xPosition, int yPosition, Texture spriteSheet, int FRAME_COLS, int FRAME_ROWS) {
+        this.xPosition = xPosition;
+        this.yPosition = yPosition;
         this.spriteSheet = spriteSheet;
         this.FRAME_COLS = FRAME_COLS;
         this.FRAME_ROWS = FRAME_ROWS;
 
     }
 
-    public Vector2 getPosition() {
-        return position;
+    public int getxPosition() {
+        return xPosition;
     }
 
-    public void setPosition(Vector2 position) {
-        this.position = position;
+    public void setxPosition(int xPosition) {
+        this.xPosition = xPosition;
     }
 
+    public int getyPosition() {
+        return yPosition;
+    }
+
+    public void setyPosition(int yPosition) {
+        this.yPosition = yPosition;
+    }
     public HashMap<String, Animation<TextureRegion>> getAnimations() {
         return animations;
     }
