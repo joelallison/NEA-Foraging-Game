@@ -10,7 +10,7 @@ import static com.joelallison.main.GameScreen.VISIBLE_WORLD_DIMENSIONS;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setWindowedMode((int) (VISIBLE_WORLD_DIMENSIONS.x*TILE_SIZE), (int) (VISIBLE_WORLD_DIMENSIONS.y*TILE_SIZE));
+		config.setWindowedMode((int) (VISIBLE_WORLD_DIMENSIONS.x*TILE_SIZE + TILE_SIZE*4), (int) (VISIBLE_WORLD_DIMENSIONS.y*TILE_SIZE + TILE_SIZE*4));
 		config.useVsync(true);
 		config.setForegroundFPS(60);
 

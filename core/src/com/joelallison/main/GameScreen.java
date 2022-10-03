@@ -11,8 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.joelallison.entity.Player;
-import com.joelallison.level.Tile;
-import com.joelallison.ui.GameUI;
+import com.joelallison.level.Layer;
 
 import static com.joelallison.level.Map.*;
 
@@ -21,10 +20,16 @@ import java.util.Random;
 public class GameScreen implements Screen {
 	final Init system;
 
-	public Tile[] tilesToGen = new Tile[2];
+	public Layer[] tileLayers = new Layer[2];
 
 	public static final int TILE_SIZE = 32;
 	public static final int CHUNK_SIZE = 8;
+
+	//padding values are in tiles
+	public static final int X_PADDING = 4;
+	public static final int Y_PADDING = 4;
+
+
 	public static final Vector2 ASPECT_RATIO = new Vector2(4, 3);
 	public static final Vector2 VISIBLE_WORLD_DIMENSIONS = new Vector2(CHUNK_SIZE*ASPECT_RATIO.x, CHUNK_SIZE*ASPECT_RATIO.y);
 
@@ -36,8 +41,6 @@ public class GameScreen implements Screen {
 	long seed = random.nextLong();
 
 	float stateTime;
-
-	Stage UIStage;
 
 
 	public GameScreen(final Init system) {
@@ -61,25 +64,25 @@ public class GameScreen implements Screen {
 
 		stateTime = 0f;
 
-		UIStage = GameUI.generateUIStage(system.batch, "game");
+		system.UIStage = UserInterface.generateUIStage(system.batch, "game");
 	}
 
 	public void generateTiles() {
 		//tree generation
-		tilesToGen[0] = new Tile("tree", 1, false, 8, 2, 1.55f, 1.1f, -1, true);
-		tilesToGen[0].bounds = new float[] {0.38f, 0.4f, 0.6f, 0.7f};
-		tilesToGen[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
-		tilesToGen[0].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[0].getSpriteSheet(), 0, 0, 8, 8), //plant
-				new TextureRegion(tilesToGen[0].getSpriteSheet(), 8, 0, 8, 8), //bush
-				new TextureRegion(tilesToGen[0].getSpriteSheet(), 16, 0, 8, 8), //dark green tree
-				new TextureRegion(tilesToGen[0].getSpriteSheet(), 24, 0, 8, 8)}; //light green tree
+		tileLayers[0] = new Layer("tree", 1, false, 8, 2, 1.55f, 1.1f, -1, true);
+		tileLayers[0].bounds = new float[] {0.38f, 0.4f, 0.6f, 0.7f};
+		tileLayers[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
+		tileLayers[0].sprites = new TextureRegion[] {new TextureRegion(tileLayers[0].getSpriteSheet(), 0, 0, 8, 8), //plant
+				new TextureRegion(tileLayers[0].getSpriteSheet(), 8, 0, 8, 8), //bush
+				new TextureRegion(tileLayers[0].getSpriteSheet(), 16, 0, 8, 8), //dark green tree
+				new TextureRegion(tileLayers[0].getSpriteSheet(), 24, 0, 8, 8)}; //light green tree
 
 		//rocks generation
-		tilesToGen[1] = new Tile("rock", 2, true, 1, 2, 1.3f, 6f, 2, true);
-		tilesToGen[1].bounds = new float[] {0.985f, 0.99f};
-		tilesToGen[1].setSpriteSheet(new Texture(Gdx.files.internal("rock_tileSheet.png")));
-		tilesToGen[1].sprites = new TextureRegion[] {new TextureRegion(tilesToGen[1].getSpriteSheet(), 0, 0, 8, 8), //small rock
-				new TextureRegion(tilesToGen[1].getSpriteSheet(), 8, 0, 8, 8)}; //big rock
+		tileLayers[1] = new Layer("rock", 2, true, 1, 2, 1.3f, 6f, 2, true);
+		tileLayers[1].bounds = new float[] {0.985f, 0.99f};
+		tileLayers[1].setSpriteSheet(new Texture(Gdx.files.internal("rock_tileSheet.png")));
+		tileLayers[1].sprites = new TextureRegion[] {new TextureRegion(tileLayers[1].getSpriteSheet(), 0, 0, 8, 8), //small rock
+				new TextureRegion(tileLayers[1].getSpriteSheet(), 8, 0, 8, 8)}; //big rock
 
 
 	}
@@ -97,25 +100,22 @@ public class GameScreen implements Screen {
 		xPos = player.getxPosition();
 		yPos = player.getyPosition();
 
-		Vector2 chunksToLoad = goingToNewChunk(player);
-
-		float[][] noiseMap0 = genNoiseMap(seed, VISIBLE_WORLD_DIMENSIONS, xPos, yPos, tilesToGen[0].getScaleVal(), tilesToGen[0].getOctavesVal(), tilesToGen[0].getPersistenceVal(), tilesToGen[0].getLacunarityVal(), tilesToGen[0].getWrapVal(), tilesToGen[0].doInvert());
+		float[][] noiseMap0 = genNoiseMap(seed, VISIBLE_WORLD_DIMENSIONS, xPos, yPos, tileLayers[0].getScaleVal(), tileLayers[0].getOctavesVal(), tileLayers[0].getPersistenceVal(), tileLayers[0].getLacunarityVal(), tileLayers[0].getWrapVal(), tileLayers[0].doInvert());
 		//float[][] noiseMap1 = genNoiseMap(seed, VISIBLE_WORLD_DIMENSIONS, x, y, tilesToGen[1].getScaleVal(), tilesToGen[1].getOctavesVal(), tilesToGen[1].getPersistenceVal(), tilesToGen[1].getLacunarityVal(), tilesToGen[1].getWrapVal(), tilesToGen[1].doInvert());
 
 		system.batch.begin();
 
-		for (int x = 0; x < VISIBLE_WORLD_DIMENSIONS.x; x++) {
-			for (int y = 0; y < VISIBLE_WORLD_DIMENSIONS.y; y++) {
+		for (int x = 0 + (int) (VISIBLE_WORLD_DIMENSIONS.x * 0.1); x < VISIBLE_WORLD_DIMENSIONS.x - (int) (VISIBLE_WORLD_DIMENSIONS.x * 0.1); x++) {
+			for (int y = 0 + (int) (VISIBLE_WORLD_DIMENSIONS.y * 0.1); y < VISIBLE_WORLD_DIMENSIONS.y - (int) (VISIBLE_WORLD_DIMENSIONS.y * 0.1); y++) {
 
-				for (int i = 0; i < tilesToGen[0].sprites.length; i++) {
-					if (noiseMap0[x][y] >= tilesToGen[0].bounds[i]){
-						system.batch.draw(tilesToGen[0].sprites[i], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
+				for (int i = 0; i < tileLayers[0].sprites.length; i++) {
+					if (noiseMap0[x][y] >= tileLayers[0].bounds[i]) {
+						system.batch.draw(tileLayers[0].sprites[i], x* TILE_SIZE, y* TILE_SIZE, TILE_SIZE, TILE_SIZE);
 					}
 				}
+
 			}
 		}
-
-		UIStage.draw();
 
 		/*for (int x = 0; x < VISIBLE_WORLD_DIMENSIONS.x; x++) {
 			for (int y = 0; y < VISIBLE_WORLD_DIMENSIONS.y; y++) {
@@ -128,13 +128,15 @@ public class GameScreen implements Screen {
 			}
 		}*/
 
-
 		system.batch.end();
+
+		system.UIStage.act();
+		system.UIStage.draw();
 	}
 
 
 	//using Vector2 to describe the direction of the chunk that the player is about to go into (relative to the player)
-	public Vector2 goingToNewChunk(Player player) {
+	/*public Vector2 goingToNewChunk(Player player) {
 		Vector2 chunkDirection = new Vector2(0, 0);
 
 
@@ -150,7 +152,7 @@ public class GameScreen implements Screen {
 		}
 
 		return chunkDirection;
-	}
+	}*/
 
 	private int customRound(float input, int multiple) {
 		return multiple * Math.round(input/multiple);
@@ -177,7 +179,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-
 		system.viewport.update(width, height);
 		system.camera.position.set(VISIBLE_WORLD_DIMENSIONS.x * TILE_SIZE / 2, VISIBLE_WORLD_DIMENSIONS.y * TILE_SIZE / 2, 0);
 		system.camera.update();
@@ -186,10 +187,8 @@ public class GameScreen implements Screen {
 	
 	@Override
 	public void dispose () {
-		for (Tile x:tilesToGen) {
+		for (Layer x: tileLayers) {
 			x.getSpriteSheet().dispose();
 		}
-
-		UIStage.dispose();
 	}
 }

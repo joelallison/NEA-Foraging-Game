@@ -88,7 +88,7 @@ public class Map {
 
     }
 
-    public static String[][] constructTerrain (int xOffset, int yOffset, long seed, Tile[] tilesToGen) {
+    public static String[][] constructTerrain (int xOffset, int yOffset, long seed, Layer[] tilesToGen) {
 
         String[][] outputMap = new String[(int) VISIBLE_WORLD_DIMENSIONS.x][(int) VISIBLE_WORLD_DIMENSIONS.y];
         for (int x = 0; x < VISIBLE_WORLD_DIMENSIONS.x; x++) {
@@ -116,7 +116,7 @@ public class Map {
         return outputMap;
     }
 
-    public static Tile[] sortByPriority(Tile[] tilesToGen) {
+    public static Layer[] sortByPriority(Layer[] tilesToGen) {
 
         return tilesToGen;
     }

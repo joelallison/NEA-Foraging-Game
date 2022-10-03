@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class Tile {
+public class Layer {
     private String TileID;
-    private int priority;
+    private int layerHeight;
 
     private boolean collision;
 
@@ -28,12 +28,11 @@ public class Tile {
     public Animation<TextureRegion[]>[] animations;
     float stateTime;
 
-
     public float[] bounds;
 
-    public Tile(String TileID, int priority, boolean collision, float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invert) {
+    public Layer(String TileID, int priority, boolean collision, float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invert) {
         this.TileID = TileID;
-        this.priority = priority;
+        this.layerHeight = priority;
         this.collision = collision;
         this.scaleVal = scaleVal;
         this.octavesVal = octavesVal;
@@ -51,12 +50,12 @@ public class Tile {
         TileID = tileID;
     }
 
-    public int getPriority() {
-        return priority;
+    public int getLayerHeight() {
+        return layerHeight;
     }
 
-    public void setPriority(int priority) {
-        this.priority = priority;
+    public void setLayerHeight(int layerHeight) {
+        this.layerHeight = layerHeight;
     }
 
     public boolean isCollision() {
