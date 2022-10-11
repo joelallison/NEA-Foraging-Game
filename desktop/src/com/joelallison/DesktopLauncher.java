@@ -2,6 +2,7 @@ package com.joelallison;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.joelallison.level.FileHandling;
 import com.joelallison.main.Init;
 
 import static com.joelallison.main.GameScreen.TILE_SIZE;
@@ -13,6 +14,9 @@ public class DesktopLauncher {
 		config.setWindowedMode((int) (VISIBLE_WORLD_DIMENSIONS.x*TILE_SIZE + TILE_SIZE*4), (int) (VISIBLE_WORLD_DIMENSIONS.y*TILE_SIZE + TILE_SIZE*4));
 		config.useVsync(true);
 		config.setForegroundFPS(60);
+
+
+		FileHandling.createFile("aaaaa.txt");
 
 		config.setTitle("World Gen Tool");
 		config.setWindowIcon("assets/tree.png");
