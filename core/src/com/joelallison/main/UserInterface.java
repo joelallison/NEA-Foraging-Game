@@ -1,25 +1,36 @@
 package com.joelallison.main;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Timer;
 
 public class UserInterface {
+
+    private static Dialog endDialog;
     private static Skin defaultSkin, commodoreSkin, chosenSkin;
     private static Stage stage;
 
     public static Stage generateUIStage(SpriteBatch sb, String scene) {
+
         defaultSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
+
+
         commodoreSkin = new Skin(Gdx.files.internal("data/commodore64UI/uiskin.json"));
 
         chosenSkin = defaultSkin;
 
         stage = new Stage();
+
+        Gdx.input.setInputProcessor(stage);
 
         switch(scene) {
             case "game":
@@ -29,9 +40,6 @@ public class UserInterface {
                 loginStage(scene);
                 break;
         }
-
-        Gdx.input.setInputProcessor(stage);
-
 
         return stage;
     }
@@ -71,5 +79,38 @@ public class UserInterface {
         });
 
         stage.addActor(edit);
+
+        endDialog = new Dialog("End Game", chosenSkin)
+        {
+            @Override
+            protected void result(Object object)
+            {
+                System.out.println("Option: " + object);
+                Timer.schedule(new Timer.Task()
+                {
+
+                    @Override
+                    public void run()
+                    {
+                        endDialog.show(stage);
+                    }
+                }, 1);
+            };
+        };
+
+        endDialog.button("Option 1", 1L);
+        endDialog.button("Option 2", 2L);
+
+        Timer.schedule(new Timer.Task()
+        {
+
+            @Override
+            public void run()
+            {
+                endDialog.show(stage);
+            }
+        }, 1);
+
+
     }
 }
