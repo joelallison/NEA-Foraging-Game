@@ -39,7 +39,7 @@ public class UserInterface {
     private static void loginStage(String scene) {
         final Label title = new Label("Procedural Level Gen Tool", commodoreSkin, "default");
         title.setFontScale(2, 2);
-        title.setX(Gdx.graphics.getWidth() * 0.5f);
+        title.setX((Gdx.graphics.getWidth() * 0.5f) - (title.getWidth() / 2));
         title.setY(Gdx.graphics.getHeight() * 0.8f);
 
         stage.addActor(title);
