@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class FileHandling {
@@ -21,33 +23,53 @@ public class FileHandling {
         }
     }
 
-    public static void writeToFile(String filename, String textToWrite) {
+    public static void writeToFile(String filename, String[] text) {
         try {
-            FileWriter myWriter = new FileWriter(filename);
-            myWriter.write(textToWrite);
+            FileWriter myWriter = new FileWriter(filename, true);
+
+            for (int i = 0; i < text.length - 1; i++) {
+                myWriter.write(text[i] + "\n");
+            } myWriter.write(text[text.length-1]); //so that last line doesn't have \n
+
             myWriter.close();
-            System.out.println("Successfully wrote to the file.");
+            //System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
     }
 
-    public static void readFromFile(String filename) {
+    public static List<String> readFromFile(String filename) {
+        List<String> fileText = new ArrayList<String>();
         try {
             File file = new File("filename.txt");
             Scanner myReader = new Scanner(file);
             while (myReader.hasNextLine()) {
-                String data = myReader.nextLine();
-                System.out.println(data);
+                String currentLine = myReader.nextLine();
+                fileText.add(currentLine);
             }
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+
+        return fileText;
     }
 
+    public String[] RGBA2dArrayToStringArray(RGBA[][] inputArray) {
+        String[] outputArray = new String[inputArray.length];
+        String line = "";
+
+        for (int i = 0; i < inputArray.length; i++) {
+            for (int j = 0; j < inputArray[i].length; j++) {
+                line = line + inputArray[i][j].toString();
+            }
+            outputArray[i] = line;
+        }
+
+        return outputArray;
+    }
 
     class RGBA {
         public int r;
@@ -62,8 +84,13 @@ public class FileHandling {
             this.a = a;
         }
 
+        public String toString(){
+            return intToBinaryString(r) + intToBinaryString(g) + intToBinaryString(b) + intToBinaryString(a);
+        }
+
         public String intToBinaryString(int i) {
             return String.format("%32s", Integer.toBinaryString(i)).replaceAll(" ", "0");
         }
+
     }
 }

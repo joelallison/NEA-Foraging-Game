@@ -20,7 +20,6 @@ public class UserInterface {
     private static Stage stage;
 
     public static Stage generateUIStage(SpriteBatch sb, String scene) {
-
         defaultSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
 
 

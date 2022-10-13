@@ -41,4 +41,12 @@ public class Queue {
     public int size(){
         return itemsInArray;
     }
+
+    public boolean isEmpty(){
+        return itemsInArray == 0;
+    }
+
+    public boolean isFull(){
+        return itemsInArray == size;
+    }
 }

@@ -16,7 +16,8 @@ public class DesktopLauncher {
 		config.setForegroundFPS(60);
 
 
-		FileHandling.createFile("aaaaa.txt");
+		//FileHandling.createFile("aaaaa.txt");
+		FileHandling.writeToFile("aaaaa.txt", new String[]{"AWANFHIAUHKBWKFAKB!!!!", "hi", "nice to meet you"});
 
 		config.setTitle("World Gen Tool");
 		config.setWindowIcon("assets/tree.png");
