@@ -3,7 +3,10 @@ package com.joelallison;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.joelallison.level.FileHandling;
+import com.joelallison.level.Maze;
 import com.joelallison.main.Init;
+
+import java.util.Arrays;
 
 import static com.joelallison.main.GameScreen.TILE_SIZE;
 import static com.joelallison.main.GameScreen.VISIBLE_WORLD_DIMENSIONS;
@@ -17,7 +20,18 @@ public class DesktopLauncher {
 
 
 		//FileHandling.createFile("aaaaa.txt");
-		FileHandling.writeToFile("aaaaa.txt", new String[]{"AWANFHIAUHKBWKFAKB!!!!", "hi", "nice to meet you"});
+		Maze maze = new Maze(32L, 32, 32);
+		maze.genMaze();
+		String[] mazeArray = new String[maze.maze.length];
+		for (int i = 0; i < maze.maze.length; i++) {
+			String mazeLine = "";
+			for (int j = 0; j < maze.maze[i].length; j++) {
+				mazeLine = mazeLine + maze.maze[i][j];
+			}mazeArray[i] = mazeLine + "\n";
+		}
+
+		FileHandling.writeToFile("Maze.txt", mazeArray);
+
 
 		config.setTitle("World Gen Tool");
 		config.setWindowIcon("assets/tree.png");

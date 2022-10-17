@@ -1,6 +1,6 @@
 package com.joelallison;
 
-public class Queue {
+public class Queue { //static circular queue
 
     private String[] array;
 
