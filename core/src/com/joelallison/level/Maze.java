@@ -6,6 +6,7 @@ import java.util.*;
 
 public class Maze {
     //depth-first search recursive maze generation
+    //I've found that this has a limit of 857x857
 
     private long seed;
     private int width;

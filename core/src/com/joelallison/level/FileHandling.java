@@ -71,6 +71,46 @@ public class FileHandling {
         return outputArray;
     }
 
+    public static String[] mazeToStringArray(int[][] maze, String format, boolean invert) {
+        String[] outputArray;
+
+        String[] mazeArray = new String[maze.length];
+
+        int modVal = 0;
+        if(invert) { modVal = -1; }
+
+        for (int i = 0; i < maze.length; i++) {
+            String mazeLine = "";
+            for (int j = 0; j < maze[i].length; j++) {
+                mazeLine = mazeLine + Math.abs(modVal + maze[i][j]) + " ";
+            } mazeArray[i] = mazeLine;
+        }
+
+        switch(format) {
+            case "rgba":
+                outputArray = new String[mazeArray.length + 1]; //CHANGE THIS
+
+                break;
+            case "pgm":
+                outputArray = new String[mazeArray.length + 3];
+
+                //PGM format header
+                outputArray[0] = "P2";
+                outputArray[1] = maze[0].length + " " + maze.length;
+                outputArray[2] = "1";
+
+                for (int i = 0; i < mazeArray.length; i++) {
+                    outputArray[i+3] = mazeArray[i];
+                }
+
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + format);
+        }
+
+        return outputArray;
+    }
+
     class RGBA {
         public int r;
         public int g;

@@ -20,17 +20,12 @@ public class DesktopLauncher {
 
 
 		//FileHandling.createFile("aaaaa.txt");
-		Maze maze = new Maze(32L, 32, 32);
+		int size = 128;
+		Maze maze = new Maze(777, size,  size);
 		maze.genMaze();
-		String[] mazeArray = new String[maze.maze.length];
-		for (int i = 0; i < maze.maze.length; i++) {
-			String mazeLine = "";
-			for (int j = 0; j < maze.maze[i].length; j++) {
-				mazeLine = mazeLine + maze.maze[i][j];
-			}mazeArray[i] = mazeLine + "\n";
-		}
 
-		FileHandling.writeToFile("Maze.txt", mazeArray);
+
+		FileHandling.writeToFile("Maze.txt", FileHandling.mazeToStringArray(maze.maze, "pgm", true));
 
 
 		config.setTitle("World Gen Tool");
