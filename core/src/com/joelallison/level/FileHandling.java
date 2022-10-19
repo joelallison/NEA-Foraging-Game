@@ -86,21 +86,42 @@ public class FileHandling {
             } mazeArray[i] = mazeLine;
         }
 
+        outputArray = toFileFormat(mazeArray, format, true);
+
+
+
+        return outputArray;
+    }
+
+    public static String[] toFileFormat(String[] inputArray, String format, boolean bigEndian) {
+        String[] outputArray;
+
         switch(format) {
+            //RGBA has 4 separate values at each position, so it can be used for tilemaps with layers to them. (with a limit of 4 layers)
+            //using RGBA is a common practice (by indie game developers especially).
+            //RGBA32 format is used in BMP files, but can also be used in other file formats.
+            //In my case, I only want to use RGBA in BMP files, so I will put the BMP file header inside the RGBA conversion.
             case "rgba":
-                outputArray = new String[mazeArray.length + 1]; //CHANGE THIS
+                outputArray = new String[inputArray.length + 1];
+
+                //BMP files are little-endian, meaning that the least significant bit is first [etc.]
+
+
+
+
+
 
                 break;
-            case "pgm":
-                outputArray = new String[mazeArray.length + 3];
+            case "pgm": //converts to PGM file format
+                outputArray = new String[inputArray.length + 3]; //the header is three lines long
 
                 //PGM format header
                 outputArray[0] = "P2";
-                outputArray[1] = maze[0].length + " " + maze.length;
+                outputArray[1] = inputArray[0].length() + " " + inputArray.length;
                 outputArray[2] = "1";
 
-                for (int i = 0; i < mazeArray.length; i++) {
-                    outputArray[i+3] = mazeArray[i];
+                for (int i = 0; i < inputArray.length; i++) {
+                    outputArray[i+3] = inputArray[i];
                 }
 
                 break;
@@ -125,12 +146,18 @@ public class FileHandling {
         }
 
         public String toString(){
-            return intToBinaryString(r) + intToBinaryString(g) + intToBinaryString(b) + intToBinaryString(a);
-        }
-
-        public String intToBinaryString(int i) {
-            return String.format("%32s", Integer.toBinaryString(i)).replaceAll(" ", "0");
+            return intToBinaryString(r, 32) + intToBinaryString(g, 32) + intToBinaryString(b, 32) + intToBinaryString(a, 32);
         }
 
     }
+
+    public String reverseString(String inputString) {
+        StringBuilder sb = new StringBuilder(inputString);
+        return sb.reverse().toString();
+    }
+
+    public String intToBinaryString(int i, int bits) {
+        return String.format("%" + bits + "s", Integer.toBinaryString(i)).replaceAll(" ", "0");
+    }
+
 }

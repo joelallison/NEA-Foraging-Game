@@ -25,8 +25,9 @@ public class DesktopLauncher {
 		maze.genMaze();
 
 
-		FileHandling.writeToFile("Maze.txt", FileHandling.mazeToStringArray(maze.maze, "pgm", true));
+		//FileHandling.writeToFile("Maze.txt", FileHandling.mazeToStringArray(maze.maze, "pgm", true));
 
+		System.out.println();
 
 		config.setTitle("World Gen Tool");
 		config.setWindowIcon("assets/tree.png");
