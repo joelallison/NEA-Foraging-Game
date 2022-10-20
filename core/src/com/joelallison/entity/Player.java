@@ -5,9 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.joelallison.main.GameScreen;
-import com.joelallison.main.Init;
+import com.joelallison.screens.Init;
 
 public class Player extends Entity {
 

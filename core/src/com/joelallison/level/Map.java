@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import tools.OpenSimplex2S;
 import java.util.*;
 
-import static com.joelallison.main.GameScreen.VISIBLE_WORLD_DIMENSIONS;
+import static com.joelallison.screens.GameScreen.VISIBLE_WORLD_DIMENSIONS;
 
 public class Map {
 

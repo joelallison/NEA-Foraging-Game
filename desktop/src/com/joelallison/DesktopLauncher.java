@@ -2,14 +2,11 @@ package com.joelallison;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.joelallison.level.FileHandling;
 import com.joelallison.level.Maze;
-import com.joelallison.main.Init;
+import com.joelallison.screens.Init;
 
-import java.util.Arrays;
-
-import static com.joelallison.main.GameScreen.TILE_SIZE;
-import static com.joelallison.main.GameScreen.VISIBLE_WORLD_DIMENSIONS;
+import static com.joelallison.screens.GameScreen.TILE_SIZE;
+import static com.joelallison.screens.GameScreen.VISIBLE_WORLD_DIMENSIONS;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
@@ -24,10 +21,7 @@ public class DesktopLauncher {
 		Maze maze = new Maze(777, size,  size);
 		maze.genMaze();
 
-
 		//FileHandling.writeToFile("Maze.txt", FileHandling.mazeToStringArray(maze.maze, "pgm", true));
-
-		System.out.println();
 
 		config.setTitle("World Gen Tool");
 		config.setWindowIcon("assets/tree.png");
