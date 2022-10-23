@@ -71,18 +71,20 @@ public class FileHandling {
         return outputArray;
     }
 
-    public static String[] mazeToStringArray(int[][] maze, String format, boolean invert) {
+    public static String[] mazeToStringArray(int[][] maze, String format, boolean pad, boolean invert) {
         String[] outputArray;
 
         String[] mazeArray = new String[maze.length];
 
+        String padding = "";
+        if(pad) { padding = " "; }
         int modVal = 0;
         if(invert) { modVal = -1; }
 
         for (int i = 0; i < maze.length; i++) {
             String mazeLine = "";
             for (int j = 0; j < maze[i].length; j++) {
-                mazeLine = mazeLine + Math.abs(modVal + maze[i][j]) + " ";
+                mazeLine = mazeLine + Math.abs(modVal + maze[i][j]) + padding;
             } mazeArray[i] = mazeLine;
         }
 
@@ -117,7 +119,7 @@ public class FileHandling {
 
                 //PGM format header
                 outputArray[0] = "P2";
-                outputArray[1] = inputArray[0].length() + " " + inputArray.length;
+                outputArray[1] = (inputArray[0].length() / 2) + " " + inputArray.length; //div2 is because of the added space character between each character
                 outputArray[2] = "1";
 
                 for (int i = 0; i < inputArray.length; i++) {

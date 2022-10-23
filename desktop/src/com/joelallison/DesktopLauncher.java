@@ -2,6 +2,8 @@ package com.joelallison;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.joelallison.generation.FileHandling;
+import com.joelallison.generation.Maze;
 import com.joelallison.screens.Init;
 
 import static com.joelallison.screens.GameScreen.ASPECT_RATIO;
@@ -15,11 +17,11 @@ public class DesktopLauncher {
 
 
 		//FileHandling.createFile("aaaaa.txt");
-		/*int size = 128;
-		Maze maze = new Maze(777, size,  size);
-		maze.genMaze();*/
+		int size = 33;
+		Maze maze = new Maze(1, size,  size);
+		maze.genMaze();
 
-		//FileHandling.writeToFile("Maze.txt", FileHandling.mazeToStringArray(maze.maze, "pgm", true));
+		FileHandling.writeToFile("Maze.txt", FileHandling.mazeToStringArray(maze.maze, "pgm", true, true));
 
 		config.setTitle("World Gen Tool");
 		config.setWindowIcon("assets/tree.png");
