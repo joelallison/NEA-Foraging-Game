@@ -10,9 +10,11 @@ import com.joelallison.screens.Init;
 public class Player extends Entity {
 
     float stateTime;
+    final Init system;
 
-    public Player(int xPosition, int yPosition, Texture spriteSheet, int FRAME_COLS, int FRAME_ROWS){
+    public Player(int xPosition, int yPosition, Texture spriteSheet, int FRAME_COLS, int FRAME_ROWS, Init system){
         super(xPosition, yPosition, spriteSheet, FRAME_COLS, FRAME_ROWS);
+        this.system = system;
     }
 
     public void initAnimations() {
@@ -42,11 +44,11 @@ public class Player extends Entity {
         }
 
         //zoom
-        if(Gdx.input.isKeyPressed(Input.Keys.P)){
-            Init.camera.zoom += 0.02;
+        if(Gdx.input.isKeyPressed(Input.Keys.P)) {
+            system.camera.zoom += 0.02;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.O)){
-            Init.camera.zoom -= 0.02;
+            system.camera.zoom -= 0.02;
         }
     }
 

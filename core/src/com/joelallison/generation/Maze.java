@@ -1,6 +1,4 @@
-package com.joelallison.level;
-
-import tools.OpenSimplex2S;
+package com.joelallison.generation;
 
 import java.util.*;
 

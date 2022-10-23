@@ -1,4 +1,4 @@
-package com.joelallison.users;
+package com.joelallison.user;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;

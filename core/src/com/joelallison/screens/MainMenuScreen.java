@@ -10,9 +10,7 @@ public class MainMenuScreen implements Screen {
 
     public MainMenuScreen(final Init system) {
         this.system = system;
-
         system.UIStage = UserInterface.generateUIStage(system.batch, "login");
-
     }
 
     @Override

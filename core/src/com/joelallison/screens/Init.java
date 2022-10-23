@@ -1,6 +1,7 @@
 package com.joelallison.screens;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -10,13 +11,14 @@ public class Init extends Game {
 
     SpriteBatch batch;
     Stage UIStage;
-
-    public static OrthographicCamera camera;
-    ExtendViewport viewport;
+    public ExtendViewport viewport;
+    public OrthographicCamera camera;
 
     public void create() {
+        camera = new OrthographicCamera(1280, 720);
+        viewport = new ExtendViewport(1280, 720, camera);
+
         batch = new SpriteBatch();
-        camera = new OrthographicCamera();
         UIStage = new Stage();
         this.setScreen(new MainMenuScreen(this));
         dispose();

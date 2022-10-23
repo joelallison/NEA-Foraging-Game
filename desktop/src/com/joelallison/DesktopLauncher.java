@@ -2,24 +2,22 @@ package com.joelallison;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.joelallison.level.Maze;
 import com.joelallison.screens.Init;
 
-import static com.joelallison.screens.GameScreen.TILE_SIZE;
-import static com.joelallison.screens.GameScreen.VISIBLE_WORLD_DIMENSIONS;
+import static com.joelallison.screens.GameScreen.ASPECT_RATIO;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setWindowedMode((int) (VISIBLE_WORLD_DIMENSIONS.x*TILE_SIZE + TILE_SIZE*4), (int) (VISIBLE_WORLD_DIMENSIONS.y*TILE_SIZE + TILE_SIZE*4));
+		config.setWindowedMode((int) ASPECT_RATIO.x * 320, (int) ASPECT_RATIO.y * 320);
 		config.useVsync(true);
 		config.setForegroundFPS(60);
 
 
 		//FileHandling.createFile("aaaaa.txt");
-		int size = 128;
+		/*int size = 128;
 		Maze maze = new Maze(777, size,  size);
-		maze.genMaze();
+		maze.genMaze();*/
 
 		//FileHandling.writeToFile("Maze.txt", FileHandling.mazeToStringArray(maze.maze, "pgm", true));
 

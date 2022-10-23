@@ -11,15 +11,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
+
 public class UserInterface {
 
-    private static Dialog endDialog;
+    private static Dialog dialog;
     private static Skin defaultSkin, commodoreSkin, chosenSkin;
     private static Stage stage;
 
     public static Stage generateUIStage(SpriteBatch sb, String scene) {
         defaultSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
-
 
         commodoreSkin = new Skin(Gdx.files.internal("data/commodore64UI/uiskin.json"));
 
@@ -55,9 +57,9 @@ public class UserInterface {
         file.setSize(55f, 25f);
         file.setPosition(0, Gdx.graphics.getHeight() - file.getHeight());
 
-        file.addListener(new ClickListener(){
+        file.addListener(new ClickListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y){
+            public void clicked(InputEvent event, float x, float y) {
                 file.setText("Bingus!");
             }
         });
@@ -68,46 +70,20 @@ public class UserInterface {
         edit.setSize(55f, 25f);
         edit.setPosition(0 + file.getWidth(), Gdx.graphics.getHeight() - edit.getHeight());
 
-        edit.addListener(new ClickListener(){
+        edit.addListener(new ClickListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y){
+            public void clicked(InputEvent event, float x, float y) {
                 edit.setText("Bingus?");
             }
         });
 
         stage.addActor(edit);
 
-        endDialog = new Dialog("End Game", chosenSkin)
-        {
-            @Override
-            protected void result(Object object)
-            {
-                System.out.println("Option: " + object);
-                Timer.schedule(new Timer.Task()
-                {
 
-                    @Override
-                    public void run()
-                    {
-                        endDialog.show(stage);
-                    }
-                }, 1);
-            };
-        };
-
-        endDialog.button("Option 1", 1L);
-        endDialog.button("Option 2", 2L);
-
-        Timer.schedule(new Timer.Task()
-        {
-
-            @Override
-            public void run()
-            {
-                endDialog.show(stage);
-            }
-        }, 1);
 
 
     }
+
+
+
 }

@@ -1,4 +1,4 @@
-package com.joelallison.users;
+package com.joelallison.user;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

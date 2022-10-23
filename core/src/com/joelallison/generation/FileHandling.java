@@ -1,4 +1,4 @@
-package com.joelallison.level;
+package com.joelallison.generation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
