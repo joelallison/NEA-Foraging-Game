@@ -67,7 +67,7 @@ public class GameScreen implements Screen {
 
 	public void generateTiles() {
 		//tree generation
-		tileLayers[0] = new TerrainLayer("tree", 1, false, 8, 2, 1.55f, 1.1f, -1, true);
+		tileLayers[0] = new TerrainLayer("tree", 8, 2, 1.55f, 1.1f, -1, true);
 		tileLayers[0].bounds = new float[] {0.38f, 0.4f, 0.6f, 0.7f};
 		tileLayers[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
 		tileLayers[0].sprites = new TextureRegion[] {new TextureRegion(tileLayers[0].getSpriteSheet(), 0, 0, 8, 8), //plant
@@ -76,7 +76,7 @@ public class GameScreen implements Screen {
 				new TextureRegion(tileLayers[0].getSpriteSheet(), 24, 0, 8, 8)}; //light green tree
 
 		//rocks generation
-		tileLayers[1] = new TerrainLayer("rock", 2, true, 1, 2, 1.3f, 6f, 2, true);
+		tileLayers[1] = new TerrainLayer("rock", 1, 2, 1.3f, 6f, 2, true);
 		tileLayers[1].bounds = new float[] {0.985f, 0.99f};
 		tileLayers[1].setSpriteSheet(new Texture(Gdx.files.internal("rock_tileSheet.png")));
 		tileLayers[1].sprites = new TextureRegion[] {new TextureRegion(tileLayers[1].getSpriteSheet(), 0, 0, 8, 8), //small rock

@@ -119,7 +119,7 @@ public class FileHandling {
 
                 //PGM format header
                 outputArray[0] = "P2";
-                outputArray[1] = (inputArray[0].length() / 2) + " " + inputArray.length; //div2 is because of the added space character between each character
+                outputArray[1] = (inputArray[0].length() / 2) + " " + inputArray.length; //div2 is because of the added space character between each character needed for PGM
                 outputArray[2] = "1";
 
                 for (int i = 0; i < inputArray.length; i++) {

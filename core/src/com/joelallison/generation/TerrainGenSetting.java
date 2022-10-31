@@ -14,9 +14,6 @@ public class TerrainGenSetting extends GenSetting {
 
     public static class TerrainLayer {
         private String TileID;
-        private int layerHeight; //not implemented yet
-        private boolean collision; //not implemented yet
-
         private int xOffset = 0;
         private int yOffset = 0;
 
@@ -37,10 +34,8 @@ public class TerrainGenSetting extends GenSetting {
 
         public float[] bounds;
 
-        public TerrainLayer(String TileID, int priority, boolean collision, float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invert) {
+        public TerrainLayer(String TileID, float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invert) {
             this.TileID = TileID;
-            this.layerHeight = priority;
-            this.collision = collision;
             this.scaleVal = scaleVal;
             this.octavesVal = octavesVal;
             this.persistenceVal = persistenceVal;
@@ -55,22 +50,6 @@ public class TerrainGenSetting extends GenSetting {
 
         public void setTileID(String tileID) {
             TileID = tileID;
-        }
-
-        public int getLayerHeight() {
-            return layerHeight;
-        }
-
-        public void setLayerHeight(int layerHeight) {
-            this.layerHeight = layerHeight;
-        }
-
-        public boolean isCollision() {
-            return collision;
-        }
-
-        public void setCollision(boolean collision) {
-            this.collision = collision;
         }
 
         public float[] getBounds() {
