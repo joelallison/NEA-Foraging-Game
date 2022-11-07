@@ -15,8 +15,8 @@ public class Init extends Game {
     public OrthographicCamera camera;
 
     public void create() {
-        camera = new OrthographicCamera(1280, 720);
-        viewport = new ExtendViewport(1280, 720, camera);
+        camera = new OrthographicCamera(1920, 1080);
+        viewport = new ExtendViewport(1920, 1080, camera);
 
         batch = new SpriteBatch();
         UIStage = new Stage();

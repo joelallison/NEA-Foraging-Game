@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class TerrainGenSetting extends GenSetting {
-    protected TerrainLayer[] layers;
+    public TerrainLayer[] layers;
 
     public TerrainGenSetting(String name, Long seed, int layerCount) {
         super(name, seed);
@@ -14,9 +14,6 @@ public class TerrainGenSetting extends GenSetting {
 
     public static class TerrainLayer {
         private String TileID;
-        private int xOffset = 0;
-        private int yOffset = 0;
-
         private float scaleVal;
         private int octavesVal;
         private float persistenceVal;
@@ -29,7 +26,6 @@ public class TerrainGenSetting extends GenSetting {
         private Texture spriteSheet;
 
         public TextureRegion[] sprites;
-        public Animation<TextureRegion[]>[] animations;
         float stateTime;
 
         public float[] bounds;
@@ -114,30 +110,6 @@ public class TerrainGenSetting extends GenSetting {
 
         public void setSpriteSheet(Texture spriteSheet) {
             this.spriteSheet = spriteSheet;
-        }
-
-        public float getStateTime() {
-            return stateTime;
-        }
-
-        public void setStateTime(float stateTime) {
-            this.stateTime = stateTime;
-        }
-
-        public int getxOffset() {
-            return xOffset;
-        }
-
-        public void setxOffset(int xOffset) {
-            this.xOffset = xOffset;
-        }
-
-        public int getyOffset() {
-            return yOffset;
-        }
-
-        public void setyOffset(int yOffset) {
-            this.yOffset = yOffset;
         }
 
     }

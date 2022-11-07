@@ -2,8 +2,9 @@ package com.joelallison.generation;
 
 import java.util.*;
 
-public class Maze {
-    //depth-first search recursive maze generation
+public class Maze extends GenSetting{
+    //depth-first search (recursive) maze generation
+    //(the stack typical of a DFS is via the call stack)
     //I've found that this has a limit of 857x857, due to a StackOverflowError.
     //While I'd love to write an algorithm without this limitation, I would say that an 857x857 maze is pretty good!
 
@@ -14,8 +15,8 @@ public class Maze {
     private int count = 0;
 
     public int[][] maze;
-    public Maze(long seed, int width, int height){
-        this.seed = seed;
+    public Maze(String name, long seed, int width, int height) {
+        super(name, seed);
 
         //each 'wall' and 'path' tiles are full cells, so the maze needs to be an odd width and height
         //this means that, in a way, the maze is half the dimensions that were specified.
@@ -23,9 +24,9 @@ public class Maze {
         this.height = height + ((height+1)%2); //ensures height is odd
     }
 
-    public int[][] genMaze() {
+    public void genMaze() {
         maze = new int[height][width];
-        // Initialize
+        // initialize the 2D array with 1s
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 maze[i][j] = 1;
@@ -54,8 +55,6 @@ public class Maze {
         System.out.println(r + " " + c);
         //recursively carve out the maze
         recursion(r, c);
-
-        return maze;
     }
     private void recursion(int r, int c) {
         //put up, down, left, right in a random (seeded) order
@@ -105,17 +104,17 @@ public class Maze {
                         recursion(r, c - 2);
                     }
                     break;
-            }
+            }//recursively backtracks just due to trying directions again and again
         }
     }
 
     private Integer[] generateRandomDirections() {
-        ArrayList<Integer> randoms = new ArrayList<Integer>();
+        ArrayList<Integer> randoms = new ArrayList<>();
         for (int i = 0; i < 4; i++)
             randoms.add(i + 1);
 
         //this allows the maze generation to be seeded
-        Collections.shuffle(randoms, new Random(seed+count*1024));
+        Collections.shuffle(randoms, new Random(seed+count*1024L));
 
         return randoms.toArray(new Integer[4]);
     }

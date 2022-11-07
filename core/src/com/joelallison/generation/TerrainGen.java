@@ -2,6 +2,7 @@ package com.joelallison.generation;
 
 import com.badlogic.gdx.math.Vector2;
 import tools.OpenSimplex2S;
+import tools.SimplexNoise_octave;
 
 public class TerrainGen {
 
@@ -18,8 +19,10 @@ public class TerrainGen {
         float minNoiseHeight = Float.MIN_VALUE;
         float maxNoiseHeight = Float.MAX_VALUE;
 
-        for (int y = (int) yOffset; y < Dimensions.y + yOffset; y++) {
-            for (int x = (int) xOffset; x < Dimensions.x + xOffset; x++) {
+        //SimplexNoise_octave noise = new SimplexNoise_octave((int) seed);
+
+        for (int y = yOffset; y < Dimensions.y + yOffset; y++) {
+            for (int x = xOffset; x < Dimensions.x + xOffset; x++) {
 
                 float amplitude = 1;
                 float frequency = 1;
@@ -31,6 +34,7 @@ public class TerrainGen {
                     float sampleY = (y-(Dimensions.y/2)) / scale * frequency;
 
                     float noiseValue = (OpenSimplex2S.noise2_ImproveX(seed, sampleX, sampleY));
+                    //float noiseValue = (float) (noise.noise(sampleX, sampleY));
                     noiseHeight = noiseValue * amplitude;
 
                     amplitude *= persistence;

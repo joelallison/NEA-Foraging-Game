@@ -1,6 +1,6 @@
 package com.joelallison.generation;
 
-public class GenSetting {
+abstract class GenSetting {
     protected String name;
     protected Long seed;
 

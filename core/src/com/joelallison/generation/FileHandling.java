@@ -8,7 +8,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class FileHandling {
+public abstract class FileHandling {
+
+    public static void readJSONTileData(String filename) {
+
+        //this first part is similar to the readFromFile method, but reads the file all onto one line.
+        StringBuilder fileText = new StringBuilder();
+        try {
+            File file = new File(filename);
+            Scanner myReader = new Scanner(file);
+            while (myReader.hasNextLine()) {
+                String currentLine = myReader.nextLine();
+                fileText.append(currentLine);
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
+        String json = fileText.toString();
+
+    }
     public static void createFile(String filename) {
         try {
             File file = new File(filename);
@@ -25,7 +46,7 @@ public class FileHandling {
 
     public static void writeToFile(String filename, String[] text) {
         try {
-            FileWriter myWriter = new FileWriter(filename, true);
+            FileWriter myWriter = new FileWriter(filename, false);
 
             for (int i = 0; i < text.length - 1; i++) {
                 myWriter.write(text[i] + "\n");
@@ -42,7 +63,7 @@ public class FileHandling {
     public static List<String> readFromFile(String filename) {
         List<String> fileText = new ArrayList<String>();
         try {
-            File file = new File("filename.txt");
+            File file = new File(filename);
             Scanner myReader = new Scanner(file);
             while (myReader.hasNextLine()) {
                 String currentLine = myReader.nextLine();

@@ -9,7 +9,6 @@ buildscript {
     }
     dependencies {
 
-
     }
 }
 
@@ -59,7 +58,6 @@ project(":core") {
     apply plugin: "java-library"
 
     dependencies {
-        // https://mavenlibs.com/maven/dependency/com.sun.mail/javax.mail
         implementation group: 'com.sun.mail', name: 'jakarta.mail', version: '1.6.3'
         implementation 'org.postgresql:postgresql:42.5.0'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"

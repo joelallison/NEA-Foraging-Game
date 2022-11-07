@@ -4,10 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
 
@@ -53,6 +50,7 @@ public class UserInterface {
     }
 
     private static void gameStage(String scene) {
+        //toolbar
         final TextButton file = new TextButton("File", chosenSkin, "default");
         file.setSize(55f, 25f);
         file.setPosition(0, Gdx.graphics.getHeight() - file.getHeight());
@@ -78,6 +76,17 @@ public class UserInterface {
         });
 
         stage.addActor(edit);
+
+
+
+
+        //box to edit parameters of generation
+        final Window parameters = new Window("Edit parameters", chosenSkin);
+        parameters.setSize(100f, 100f);
+        parameters.setPosition(100, 500);
+        parameters.setMovable(false);
+
+        stage.addActor(parameters);
 
 
 
