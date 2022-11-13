@@ -11,13 +11,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public abstract class UserInterface {
     protected static Stage stage;
     protected static Skin chosenSkin;
-    protected static String[] values;
+    protected static String[] values = new String[20];
 
     public static Stage genStage() {
+        values[0] = "0.2f";
+        values[1] = "2";
+
         setupSkins();
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
-        values = new String[1];
 
         return stage;
     }

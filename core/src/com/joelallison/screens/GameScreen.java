@@ -82,11 +82,12 @@ public class GameScreen implements Screen {
 		stateTime = 0f;
 
 		system.UIStage = GameInterface.genStage();
+		GameInterface.genUI();
 	}
 
 	public void generateTiles() {
 		//tree generation
-		terrainGen.layers[0] = new TerrainLayer("tree", Float.parseFloat(GameInterface.getValues()[0]), 2, 1.55f, 1.1f, -1, true);
+		terrainGen.layers[0] = new TerrainLayer("tree", Float.parseFloat(GameInterface.getValues()[0]), Integer.parseInt(GameInterface.getValues()[1]), 1.55f, 1.1f, -1, true);
 		terrainGen.layers[0].bounds = new float[] {0f, 0.38f, 0.4f, 0.6f, 0.7f};
 		terrainGen.layers[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
 		terrainGen.layers[0].sprites = new TextureRegion[] {new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 0, 0, 8, 8), //plant
@@ -141,6 +142,8 @@ public class GameScreen implements Screen {
 		}
 
 		system.batch.end();
+
+		GameInterface.update();
 
 		system.UIStage.act();
 		system.UIStage.draw();
