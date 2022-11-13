@@ -14,6 +14,8 @@ import com.joelallison.display.Tileset;
 import com.joelallison.entity.Player;
 import com.joelallison.generation.TerrainGenSetting;
 import com.joelallison.generation.TerrainGenSetting.TerrainLayer;
+import com.joelallison.screens.UserInterface.GameInterface;
+import com.joelallison.screens.UserInterface.UserInterface;
 
 import static com.joelallison.generation.TerrainGen.*;
 
@@ -75,28 +77,23 @@ public class GameScreen implements Screen {
 
 		//tilesets[2]
 
-
-
-
-
-		generateTiles();
-
 		system.batch = new SpriteBatch();
 
 		stateTime = 0f;
 
-		system.UIStage = UserInterface.generateUIStage(system.batch, "game");
+		system.UIStage = GameInterface.genStage();
 	}
 
 	public void generateTiles() {
 		//tree generation
-		terrainGen.layers[0] = new TerrainLayer("tree", 1f, 2, 2f, 0.4f, 2, false);
-		terrainGen.layers[0].bounds = new float[] {0.38f, 0.4f, 0.6f, 0.7f};
+		terrainGen.layers[0] = new TerrainLayer("tree", Float.parseFloat(GameInterface.getValues()[0]), 2, 1.55f, 1.1f, -1, true);
+		terrainGen.layers[0].bounds = new float[] {0f, 0.38f, 0.4f, 0.6f, 0.7f};
 		terrainGen.layers[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
 		terrainGen.layers[0].sprites = new TextureRegion[] {new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 0, 0, 8, 8), //plant
 				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 8, 0, 8, 8), //bush
 				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 16, 0, 8, 8), //dark green tree
-				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 24, 0, 8, 8)}; //light green tree
+				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 24, 0, 8, 8),
+				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 32, 0, 8, 8)}; //light green tree
 
 		//rocks generation
 		/*terrainGen.layers[1] = new TerrainLayer("rock", 1, 2, 1.3f, 6f, 2, true);
@@ -121,6 +118,8 @@ public class GameScreen implements Screen {
 		xPos = player.getxPosition();
 		yPos = player.getyPosition();
 
+		generateTiles();
+
 		float[][] noiseMap0 = genTerrain(seed, MAP_DIMENSIONS, xPos, yPos, terrainGen.layers[0].getScaleVal(), terrainGen.layers[0].getOctavesVal(), terrainGen.layers[0].getPersistenceVal(), terrainGen.layers[0].getLacunarityVal(), terrainGen.layers[0].getWrapVal(), terrainGen.layers[0].doInvert());
 
 		//clipping mask for rendering
@@ -129,26 +128,22 @@ public class GameScreen implements Screen {
 
 		system.batch.begin();
 
-			for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
-				for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
+		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
+			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
 
-					for (int i = 0; i < terrainGen.layers[0].sprites.length; i++) {
-						if (noiseMap0[x][y] >= terrainGen.layers[0].bounds[i]) {
-							system.batch.draw(terrainGen.layers[0].sprites[i], x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-						}
+				for (int i = 0; i < terrainGen.layers[0].sprites.length; i++) {
+					if (noiseMap0[x][y] >= terrainGen.layers[0].bounds[i]) {
+						system.batch.draw(terrainGen.layers[0].sprites[i], x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 					}
-
 				}
+
 			}
+		}
 
 		system.batch.end();
 
 		system.UIStage.act();
 		system.UIStage.draw();
-	}
-
-	private int customRound(float input, int multiple) {
-		return multiple * Math.round(input/multiple);
 	}
 
 	@Override

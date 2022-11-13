@@ -2,6 +2,8 @@ package com.joelallison.screens;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.joelallison.screens.UserInterface.GameInterface;
+import com.joelallison.screens.UserInterface.UserInterface;
 
 
 public class MainMenuScreen implements Screen {
@@ -10,7 +12,8 @@ public class MainMenuScreen implements Screen {
 
     public MainMenuScreen(final Init system) {
         this.system = system;
-        system.UIStage = UserInterface.generateUIStage(system.batch, "login");
+        system.UIStage = GameInterface.genStage();
+        GameInterface.genUI();
     }
 
     @Override

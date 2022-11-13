@@ -1,8 +1,11 @@
 package com.joelallison.generation;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import tools.OpenSimplex2S;
-import tools.SimplexNoise_octave;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class TerrainGen {
 
@@ -16,13 +19,11 @@ public class TerrainGen {
 
         float[][] noiseMap = new float[(int) Dimensions.x][(int) Dimensions.y];
 
-        float minNoiseHeight = Float.MIN_VALUE;
-        float maxNoiseHeight = Float.MAX_VALUE;
+        float minNoiseHeight = Float.MAX_VALUE;
+        float maxNoiseHeight = Float.MIN_VALUE;
 
-        //SimplexNoise_octave noise = new SimplexNoise_octave((int) seed);
-
-        for (int y = yOffset; y < Dimensions.y + yOffset; y++) {
-            for (int x = xOffset; x < Dimensions.x + xOffset; x++) {
+        for (int y = (int) yOffset; y < Dimensions.y + yOffset; y++) {
+            for (int x = (int) xOffset; x < Dimensions.x + xOffset; x++) {
 
                 float amplitude = 1;
                 float frequency = 1;
@@ -33,8 +34,7 @@ public class TerrainGen {
                     float sampleX = (x-(Dimensions.x/2)) / scale * frequency;
                     float sampleY = (y-(Dimensions.y/2)) / scale * frequency;
 
-                    float noiseValue = (OpenSimplex2S.noise2_ImproveX(seed, sampleX, sampleY));
-                    //float noiseValue = (float) (noise.noise(sampleX, sampleY));
+                    float noiseValue = (OpenSimplex2S.noise2_ImproveX(seed, sampleX, sampleY) * 2 - 1);
                     noiseHeight = noiseValue * amplitude;
 
                     amplitude *= persistence;
@@ -54,17 +54,16 @@ public class TerrainGen {
         if(wrapFactor != -1){
             for (int y = 0; y < Dimensions.y; y++) { //normalises the noise
                 for (int x = 0; x < Dimensions.x; x++) {
-                    noiseMap[x][y] = wrapValue((float) (inverseLERP(noiseMap[x][y], minNoiseHeight, maxNoiseHeight) * Math.pow(10, 38)), wrapFactor, invertWrap); //not sure why it's out by x10^-38 but I fixed it
+                    noiseMap[x][y] = wrapValue((inverseLERP(noiseMap[x][y], minNoiseHeight, maxNoiseHeight)), wrapFactor, invertWrap);
                 }
             }
         }else{
             for (int y = 0; y < Dimensions.y; y++) { //normalises the noise
                 for (int x = 0; x < Dimensions.x; x++) {
-                    noiseMap[x][y] = (float) (inverseLERP(noiseMap[x][y], minNoiseHeight, maxNoiseHeight) * Math.pow(10, 38)); //not sure why it's out by x10^-38 but I fixed it
+                    noiseMap[x][y] = (inverseLERP(noiseMap[x][y], minNoiseHeight, maxNoiseHeight));
                 }
             }
         }
-
 
 
 
@@ -77,11 +76,11 @@ public class TerrainGen {
         return (x - a) / (b - a);
     }
 
-    public static float wrapValue(float input, int factor, boolean invert){
-        if(invert){
-            return ((Math.abs(((input * factor) - factor/2)))*-1)+1;
-        }else{
-            return Math.abs(((input * factor) - factor/2));
+    public static float wrapValue(float input, int factor, boolean invert) {
+        if (invert) {
+            return ((Math.abs(((input * factor) - factor / 2))) * -1) + 1;
+        } else {
+            return Math.abs(((input * factor) - factor / 2));
         }
 
     }

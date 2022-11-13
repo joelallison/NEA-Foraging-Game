@@ -20,7 +20,7 @@
     }
   },
   com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle: {
-    default-horizontal: { background: progress-bar, knobBefore: progress-bar-knob }
+    default-horizontal: { background: progress-bar, knobBefore: progress-bar-knob },
     default-vertical: { background: progress-bar, knobBefore: progress-bar-knob }
   },
   com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {

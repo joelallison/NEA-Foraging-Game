@@ -513,7 +513,7 @@ public class OpenSimplex2S {
         long xsvp = xsb * PRIME_X, ysvp = ysb * PRIME_Y, zsvp = zsb * PRIME_Z, wsvp = wsb * PRIME_W;
 
         // Index into initial table.
-        int index = ((fastFloor(xs * 4) & 3) << 0)
+        int index = ((fastFloor(xs * 4) & 3))
                 | ((fastFloor(ys * 4) & 3) << 2)
                 | ((fastFloor(zs * 4) & 3) << 4)
                 | ((fastFloor(ws * 4) & 3) << 6);
@@ -545,7 +545,7 @@ public class OpenSimplex2S {
         hash *= HASH_MULTIPLIER;
         hash ^= hash >> (64 - N_GRADS_2D_EXPONENT + 1);
         int gi = (int)hash & ((N_GRADS_2D - 1) << 1);
-        return GRADIENTS_2D[gi | 0] * dx + GRADIENTS_2D[gi | 1] * dy;
+        return GRADIENTS_2D[gi] * dx + GRADIENTS_2D[gi | 1] * dy;
     }
 
     private static float grad(long seed, long xrvp, long yrvp, long zrvp, float dx, float dy, float dz) {
@@ -553,7 +553,7 @@ public class OpenSimplex2S {
         hash *= HASH_MULTIPLIER;
         hash ^= hash >> (64 - N_GRADS_3D_EXPONENT + 2);
         int gi = (int)hash & ((N_GRADS_3D - 1) << 2);
-        return GRADIENTS_3D[gi | 0] * dx + GRADIENTS_3D[gi | 1] * dy + GRADIENTS_3D[gi | 2] * dz;
+        return GRADIENTS_3D[gi] * dx + GRADIENTS_3D[gi | 1] * dy + GRADIENTS_3D[gi | 2] * dz;
     }
 
     private static float grad(long seed, long xsvp, long ysvp, long zsvp, long wsvp, float dx, float dy, float dz, float dw) {
@@ -561,7 +561,7 @@ public class OpenSimplex2S {
         hash *= HASH_MULTIPLIER;
         hash ^= hash >> (64 - N_GRADS_4D_EXPONENT + 2);
         int gi = (int)hash & ((N_GRADS_4D - 1) << 2);
-        return (GRADIENTS_4D[gi | 0] * dx + GRADIENTS_4D[gi | 1] * dy) + (GRADIENTS_4D[gi | 2] * dz + GRADIENTS_4D[gi | 3] * dw);
+        return (GRADIENTS_4D[gi] * dx + GRADIENTS_4D[gi | 1] * dy) + (GRADIENTS_4D[gi | 2] * dz + GRADIENTS_4D[gi | 3] * dw);
     }
 
     private static int fastFloor(double x) {
@@ -1108,7 +1108,7 @@ public class OpenSimplex2S {
         };
         LatticeVertex4D[] latticeVerticesByCode = new LatticeVertex4D[256];
         for (int i = 0; i < 256; i++) {
-            int cx = ((i >> 0) & 3) - 1;
+            int cx = ((i) & 3) - 1;
             int cy = ((i >> 2) & 3) - 1;
             int cz = ((i >> 4) & 3) - 1;
             int cw = ((i >> 6) & 3) - 1;
