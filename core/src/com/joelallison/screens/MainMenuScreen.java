@@ -12,8 +12,6 @@ public class MainMenuScreen implements Screen {
 
     public MainMenuScreen(final Init system) {
         this.system = system;
-        system.UIStage = GameInterface.genStage();
-        GameInterface.genUI();
     }
 
     @Override
@@ -46,13 +44,13 @@ public class MainMenuScreen implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(0.1215686f, 0.09411765f, 0.07843137f, 1);
 
-        system.UIStage.act();
-        system.UIStage.draw();
+        //system.UIStage.act();
+        //system.UIStage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        system.UIStage.getViewport().update(width, height, true);
+        //
     }
 
     @Override

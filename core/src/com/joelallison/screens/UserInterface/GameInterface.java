@@ -6,21 +6,22 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 
 import java.text.DecimalFormat;
 
-public abstract class GameInterface extends UserInterface {
+public class GameInterface extends UserInterface {
 
-    static Label scaleLabel = new Label("Scale:", chosenSkin);
-    static Label octavesLabel = new Label("Octaves:", chosenSkin);
-    static Label persistenceLabel = new Label("Persistence:", chosenSkin);
-    static Label lacunarityLabel = new Label("Lacunarity:", chosenSkin);
-    static Label wrapFactorLabel = new Label("Wrapping amount:", chosenSkin);
-    static CheckBox invertCheck = new CheckBox("Invert the wrap:", chosenSkin);
-    static DecimalFormat floatFormat = new DecimalFormat("##0.00");
-    static DecimalFormat intFormat = new DecimalFormat("00000");
+    Label scaleLabel = new Label("Scale:", chosenSkin);
+    Label octavesLabel = new Label("Octaves:", chosenSkin);
+    Label lacunarityLabel = new Label("Lacunarity:", chosenSkin);
+    Label wrapFactorLabel = new Label("Wrap factor:", chosenSkin);
+    Label invertLabel = new Label("Invert:", chosenSkin);
+    CheckBox invertCheck = new CheckBox("", chosenSkin);
+    DecimalFormat floatFormat = new DecimalFormat("##0.00");
+    DecimalFormat intFormat = new DecimalFormat("00000");
 
-    public static void genUI(){
+    public void genUI(){
         //toolbar
         final TextButton file = new TextButton("File", chosenSkin, "default");
         file.setSize(55f, 25f);
@@ -48,18 +49,18 @@ public abstract class GameInterface extends UserInterface {
 
         stage.addActor(edit);
 
-        //box to edit parameters of generation
-        final Window parameters = new Window("Edit parameters:", chosenSkin);
-        parameters.setSize(250f, 500f);
-        parameters.setPosition(5f ,200f);
-        parameters.setMovable(false);
+        //box to edit leftPanel of generation
+        final Window leftPanel = new Window("Generation parameters:", chosenSkin);
+        leftPanel.setSize(250f, 500f);
+        leftPanel.setPosition(5f ,200f);
+        leftPanel.setMovable(false);
 
-        scaleLabel = new Label("Scale:", chosenSkin);
-        scaleLabel.setPosition(parameters.getX(), parameters.getY() + parameters.getHeight() / 2);
-        parameters.addActor(scaleLabel);
+        scaleLabel.setPosition(leftPanel.getX(), leftPanel.getY() + leftPanel.getHeight() / 2);
+        leftPanel.addActor(scaleLabel);
 
-        final Slider scaleSlider = new Slider(0.0005f, 256f, 0.0001f, false, chosenSkin);
+        final Slider scaleSlider = new Slider(0.005f, 256f, 0.001f, false, chosenSkin);
         scaleSlider.setPosition(scaleLabel.getX() + 44f, scaleLabel.getY()-2);
+        scaleSlider.setValue(Float.parseFloat(values[0]));
 
         scaleSlider.addListener(new ChangeListener() {
             @Override
@@ -68,14 +69,15 @@ public abstract class GameInterface extends UserInterface {
             }
         });
 
-        parameters.addActor(scaleSlider);
+        leftPanel.addActor(scaleSlider);
 
-        octavesLabel = new Label("Octaves:", chosenSkin);
-        octavesLabel.setPosition(parameters.getX(), (parameters.getY() + parameters.getHeight() / 2) - 24);
-        parameters.addActor(octavesLabel);
+        octavesLabel.setPosition(leftPanel.getX(), (leftPanel.getY() + leftPanel.getHeight() / 2) - 24);
+        leftPanel.addActor(octavesLabel);
 
-        final Slider octavesSlider = new Slider(1, 128, 1, false, chosenSkin);
-        octavesSlider.setPosition(octavesLabel.getX() + 44f, octavesLabel.getY()-2);
+        final Slider octavesSlider = new Slider(1, 3, 1, false, chosenSkin);
+        octavesSlider.setPosition(octavesLabel.getX() + 64f, octavesLabel.getY()-2);
+        octavesSlider.setWidth(120f);
+        octavesSlider.setValue(Float.parseFloat(values[1]));
 
         octavesSlider.addListener(new ChangeListener() {
             @Override
@@ -84,13 +86,72 @@ public abstract class GameInterface extends UserInterface {
             }
         });
 
-        parameters.addActor(octavesSlider);
+        leftPanel.addActor(octavesSlider);
 
-        stage.addActor(parameters);
+        lacunarityLabel.setPosition(leftPanel.getX(), (leftPanel.getY() + leftPanel.getHeight() / 2) - 48);
+        leftPanel.addActor(lacunarityLabel);
+
+        final Slider lacunaritySlider = new Slider(0.01f, 10f, 0.01f, false, chosenSkin);
+        lacunaritySlider.setPosition(lacunarityLabel.getX() + 80f, lacunarityLabel.getY()-2);
+        lacunaritySlider.setWidth(108f);
+        lacunaritySlider.setValue(Float.parseFloat(values[2]));
+
+        lacunaritySlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                values[2] = Float.toString(lacunaritySlider.getValue());
+            }
+        });
+
+        leftPanel.addActor(lacunaritySlider);
+
+        wrapFactorLabel.setPosition(leftPanel.getX(), (leftPanel.getY() + leftPanel.getHeight() / 2) - 72);
+        leftPanel.addActor(wrapFactorLabel);
+
+        final Slider wrapFactorSlider = new Slider(1, 20, 1, false, chosenSkin);
+        wrapFactorSlider.setPosition(wrapFactorLabel.getX() + 92f, wrapFactorLabel.getY()-2);
+        wrapFactorSlider.setWidth(96f);
+        wrapFactorSlider.setValue(Float.parseFloat(values[3]));
+
+        wrapFactorSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                values[3] = Integer.toString((int) wrapFactorSlider.getValue());
+            }
+        });
+
+        leftPanel.addActor(wrapFactorSlider);
+
+
+        invertLabel.setPosition(leftPanel.getX(), (leftPanel.getY() + leftPanel.getHeight() / 2) - 96);
+        leftPanel.addActor(invertLabel);
+        invertCheck.setPosition(leftPanel.getX() + 48, (leftPanel.getY()-2 + leftPanel.getHeight() / 2) - 96);
+        invertCheck.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                values[4] = Boolean.toString(invertCheck.isChecked());
+            }
+        });
+
+        leftPanel.addActor(invertCheck);
+
+        stage.addActor(leftPanel);
     }
 
-    public static void update() {
+    public void update() {
         scaleLabel.setText("Scale:                                      " + floatFormat.format(Float.parseFloat(values[0])));
         octavesLabel.setText("Octaves:                                 " + intFormat.format(Integer.parseInt(values[1])));
+        lacunarityLabel.setText("Lacunarity:                             " + floatFormat.format(Float.parseFloat(values[2])));
+        wrapFactorLabel.setText("Wrap Factor:                            " + floatFormat.format(Integer.parseInt(values[3])));
+
+    }
+
+    @Override
+    public void valuesDeclaration(){
+        values[0] = "20f"; //scale
+        values[1] = "2"; //octaves
+        values[2] = "2f"; //lacunarity
+        values[3] = "1"; //wrap factor
+        values[4] = "false"; //invert?
     }
 }

@@ -4,12 +4,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import tools.OpenSimplex2S;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 public class TerrainGen {
 
-    public static float[][] genTerrain(long seed, Vector2 Dimensions, int xOffset, int yOffset, float scale, int octaves, float persistence, float lacunarity, int wrapFactor, boolean invertWrap) {
+    public static float[][] genTerrain(long seed, Vector2 Dimensions, int xOffset, int yOffset, float scale, int octaves, float lacunarity, int wrapFactor, boolean invertWrap) {
         //greater scale zooms in, halved scale from normal could be used for map data. I think scale of 4 is best for most stuff
         //higher octaves adds more detail to the noise, but 2 is the best option for this [in most cases]
         //higher persistence makes the values tend towards higher values
@@ -22,8 +19,8 @@ public class TerrainGen {
         float minNoiseHeight = Float.MAX_VALUE;
         float maxNoiseHeight = Float.MIN_VALUE;
 
-        for (int y = (int) yOffset; y < Dimensions.y + yOffset; y++) {
-            for (int x = (int) xOffset; x < Dimensions.x + xOffset; x++) {
+        for (int y = yOffset; y < Dimensions.y + yOffset; y++) {
+            for (int x = xOffset; x < Dimensions.x + xOffset; x++) {
 
                 float amplitude = 1;
                 float frequency = 1;
@@ -37,7 +34,6 @@ public class TerrainGen {
                     float noiseValue = (OpenSimplex2S.noise2_ImproveX(seed, sampleX, sampleY) * 2 - 1);
                     noiseHeight = noiseValue * amplitude;
 
-                    amplitude *= persistence;
                     frequency *= lacunarity;
                 }
 

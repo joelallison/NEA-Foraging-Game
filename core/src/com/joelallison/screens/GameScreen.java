@@ -1,7 +1,9 @@
 package com.joelallison.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -42,11 +44,13 @@ public class GameScreen implements Screen {
 	Player player;
 
 	Random random = new Random();
-	long seed = random.nextLong();
+	long seed = /*random.nextLong()*/ 3L;
 
 	float stateTime;
 
 	Tileset[] tilesets = new Tileset[3];
+
+	GameInterface gi = new GameInterface();
 
 
 	public GameScreen(final Init system) {
@@ -81,20 +85,20 @@ public class GameScreen implements Screen {
 
 		stateTime = 0f;
 
-		system.UIStage = GameInterface.genStage();
-		GameInterface.genUI();
+		system.UIStage = gi.genStage();
+		gi.genUI();
 	}
 
 	public void generateTiles() {
 		//tree generation
-		terrainGen.layers[0] = new TerrainLayer("tree", Float.parseFloat(GameInterface.getValues()[0]), Integer.parseInt(GameInterface.getValues()[1]), 1.55f, 1.1f, -1, true);
-		terrainGen.layers[0].bounds = new float[] {0f, 0.38f, 0.4f, 0.6f, 0.7f};
+		terrainGen.layers[0] = new TerrainLayer("tree", Float.parseFloat(gi.getValues()[0]), Integer.parseInt(gi.getValues()[1]), Float.parseFloat(gi.getValues()[2]), Integer.parseInt(gi.getValues()[3]), Boolean.parseBoolean(gi.getValues()[4]));
+		terrainGen.layers[0].bounds = new float[] {0.38f, 0.4f, 0.6f, 0.7f};
+		terrainGen.layers[0].color = new Color(0.1215686f, 0.09411765f, 0.07843137f, 1);
 		terrainGen.layers[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
 		terrainGen.layers[0].sprites = new TextureRegion[] {new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 0, 0, 8, 8), //plant
 				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 8, 0, 8, 8), //bush
 				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 16, 0, 8, 8), //dark green tree
-				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 24, 0, 8, 8),
-				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 32, 0, 8, 8)}; //light green tree
+				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 24, 0, 8, 8)}; //light green tree
 
 		//rocks generation
 		/*terrainGen.layers[1] = new TerrainLayer("rock", 1, 2, 1.3f, 6f, 2, true);
@@ -107,7 +111,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		ScreenUtils.clear(0.1215686f, 0.09411765f, 0.07843137f, 1);
 		stateTime += Gdx.graphics.getDeltaTime();
 
 		system.viewport.apply();
@@ -120,8 +123,9 @@ public class GameScreen implements Screen {
 		yPos = player.getyPosition();
 
 		generateTiles();
+		ScreenUtils.clear(terrainGen.layers[0].color);
 
-		float[][] noiseMap0 = genTerrain(seed, MAP_DIMENSIONS, xPos, yPos, terrainGen.layers[0].getScaleVal(), terrainGen.layers[0].getOctavesVal(), terrainGen.layers[0].getPersistenceVal(), terrainGen.layers[0].getLacunarityVal(), terrainGen.layers[0].getWrapVal(), terrainGen.layers[0].doInvert());
+		float[][] noiseMap0 = genTerrain(seed, MAP_DIMENSIONS, xPos, yPos, terrainGen.layers[0].getScaleVal(), terrainGen.layers[0].getOctavesVal(), terrainGen.layers[0].getLacunarityVal(), terrainGen.layers[0].getWrapVal(), terrainGen.layers[0].doInvert());
 
 		//clipping mask for rendering
 		//Rectangle scissors = new Rectangle();
@@ -143,7 +147,7 @@ public class GameScreen implements Screen {
 
 		system.batch.end();
 
-		GameInterface.update();
+		gi.update();
 
 		system.UIStage.act();
 		system.UIStage.draw();

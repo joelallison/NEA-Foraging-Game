@@ -1,5 +1,6 @@
 package com.joelallison.generation;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -16,7 +17,6 @@ public class TerrainGenSetting extends GenSetting {
         private String TileID;
         private float scaleVal;
         private int octavesVal;
-        private float persistenceVal;
         private float lacunarityVal;
         private int wrapVal;
         private boolean invert;
@@ -25,16 +25,16 @@ public class TerrainGenSetting extends GenSetting {
         //as most tiles don't have any sort of animation.
         private Texture spriteSheet;
 
+        public Color color;
         public TextureRegion[] sprites;
         float stateTime;
 
         public float[] bounds;
 
-        public TerrainLayer(String TileID, float scaleVal, int octavesVal, float persistenceVal, float lacunarityVal, int wrapVal, boolean invert) {
+        public TerrainLayer(String TileID, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
             this.TileID = TileID;
             this.scaleVal = scaleVal;
             this.octavesVal = octavesVal;
-            this.persistenceVal = persistenceVal;
             this.lacunarityVal = lacunarityVal;
             this.wrapVal = wrapVal;
             this.invert = invert;
@@ -70,14 +70,6 @@ public class TerrainGenSetting extends GenSetting {
 
         public void setOctavesVal(int octavesVal) {
             this.octavesVal = octavesVal;
-        }
-
-        public float getPersistenceVal() {
-            return persistenceVal;
-        }
-
-        public void setPersistenceVal(float persistenceVal) {
-            this.persistenceVal = persistenceVal;
         }
 
         public float getLacunarityVal() {

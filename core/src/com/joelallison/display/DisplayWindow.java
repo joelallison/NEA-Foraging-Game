@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import com.google.gson.*;
+
 public class DisplayWindow {
     private Vector2 coordinates = new Vector2(0, 0);
     private Vector2 chunkCoords;
