@@ -144,6 +144,8 @@ public class GameInterface extends UserInterface {
         lacunarityLabel.setText("Lacunarity:                             " + floatFormat.format(Float.parseFloat(values[2])));
         wrapFactorLabel.setText("Wrap Factor:                            " + floatFormat.format(Integer.parseInt(values[3])));
 
+        //if showLeft then show left panel etc.
+
     }
 
     @Override

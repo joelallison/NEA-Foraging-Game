@@ -12,8 +12,11 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.google.gson.Gson;
+import com.joelallison.display.JsonToObject;
 import com.joelallison.display.Tileset;
 import com.joelallison.entity.Player;
+import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainGenSetting;
 import com.joelallison.generation.TerrainGenSetting.TerrainLayer;
 import com.joelallison.screens.UserInterface.GameInterface;
@@ -68,7 +71,7 @@ public class GameScreen implements Screen {
 		player = new Player(0, 0, new Texture(Gdx.files.internal("tree_tileSheet.png")), 3, 1, system);
 		player.initAnimations();
 
-		tilesets[0] = new Tileset("Trees & Rocks", new Texture(Gdx.files.internal("tree_tileSheet.png")), 8);
+		/*tilesets[0] = new Tileset("Trees & Rocks","tree_tileSheet.png", 8);
 		tilesets[0].map.put("ground", new TextureRegion(tilesets[0].getSpriteSheet(), 0, 0, tilesets[0].tileSize, tilesets[0].tileSize));
 		tilesets[0].map.put("plant", new TextureRegion(tilesets[0].getSpriteSheet(), 8, 0, tilesets[0].tileSize, tilesets[0].tileSize));
 		tilesets[0].map.put("bush", new TextureRegion(tilesets[0].getSpriteSheet(), 16, 0, tilesets[0].tileSize, tilesets[0].tileSize));
@@ -77,9 +80,12 @@ public class GameScreen implements Screen {
 		tilesets[0].map.put("rock_1", new TextureRegion(tilesets[0].getSpriteSheet(), 40, 0, tilesets[0].tileSize, tilesets[0].tileSize));
 		tilesets[0].map.put("rock_2", new TextureRegion(tilesets[0].getSpriteSheet(), 48, 0, tilesets[0].tileSize, tilesets[0].tileSize));
 
-		tilesets[1] = new Tileset("Kenney Micro Roguelike COLOUR", new Texture(Gdx.files.internal("tree_tileSheet.png")), 8);
 
-		//tilesets[2]
+		//tilesets[0] = JsonToObject.getTilesetObject(FileHandling.readJSONTileData("core/src/com/joelallison/display/tilesets1.json"));
+
+		tilesets[1] = new Tileset("Kenney Micro Roguelike COLOUR", "tree_tileSheet.png", 8);
+
+		//tilesets[2]*/
 
 		system.batch = new SpriteBatch();
 

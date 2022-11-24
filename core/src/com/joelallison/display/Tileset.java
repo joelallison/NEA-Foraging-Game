@@ -1,5 +1,6 @@
 package com.joelallison.display;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.joelallison.generation.FileHandling;
@@ -13,26 +14,42 @@ import static com.badlogic.gdx.graphics.g2d.ParticleEmitter.SpawnShape.line;
 
 public class Tileset {
     private String name;
-    private Texture spriteSheet;
+    private String spriteSheet;
     public int tileSize;
-    public HashMap<String, TextureRegion> map = new HashMap<String, TextureRegion>();
+    public HashMap<String, Tile> map = new HashMap<String, Tile>();
 
-    public Tileset(String name, Texture spriteSheet, int tileSize) {
+    public Tileset(String name, String spriteSheet, int tileSize) {
         this.name = name;
         this.spriteSheet = spriteSheet;
         this.tileSize = tileSize;
     }
 
-    public void initFromJSON(String filename) {
+    public static class Tile {
+        int cornerX;
+        int cornerY;
+        int tileSize;
+        public Tile(int cornerX, int cornerY, int tileSize) {
+            this.cornerX = cornerX;
+            this.cornerY = cornerY;
+            this.tileSize = tileSize;
+        }
 
     }
 
-    public Texture getSpriteSheet() {
+    public String getSpriteSheet() {
         return spriteSheet;
     }
 
-    public void setSpriteSheet(Texture spriteSheet) {
+    public void setSpriteSheet(String spriteSheet) {
         this.spriteSheet = spriteSheet;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

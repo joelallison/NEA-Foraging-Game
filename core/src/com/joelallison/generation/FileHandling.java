@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public abstract class FileHandling {
 
-    public static void readJSONTileData(String filename) {
+    public static String readJSONTileData(String filename) {
 
         //this first part is similar to the readFromFile method, but reads the file all onto one line.
         StringBuilder fileText = new StringBuilder();
@@ -27,8 +27,8 @@ public abstract class FileHandling {
             e.printStackTrace();
         }
 
-        String json = fileText.toString();
 
+        return fileText.toString();
     }
     public static void createFile(String filename) {
         try {
