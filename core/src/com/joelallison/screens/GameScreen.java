@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -12,7 +11,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
 import com.joelallison.display.Tileset;
-import com.joelallison.entity.Player;
+import com.joelallison.user.Player;
 import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainGenSetting;
 import com.joelallison.generation.TerrainGenSetting.TerrainLayer;
@@ -57,8 +56,7 @@ public class GameScreen implements Screen {
 		yPos = 0;
 
 		//declare player stuff
-		player = new Player(0, 0, new Texture(Gdx.files.internal("tree_tileSheet.png")), 3, 1, system);
-		player.initAnimations();
+		player = new Player(0, 0, system);
 
 		tilesets = gson.fromJson(FileHandling.readJSONTileData("core/src/com/joelallison/display/tilesets.json"), Tileset[].class);
 		for (Tileset t : tilesets) { t.initTexture(); }
