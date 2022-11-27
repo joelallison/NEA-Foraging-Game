@@ -1,30 +1,24 @@
 package com.joelallison.screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
-import com.joelallison.display.JsonToObject;
 import com.joelallison.display.Tileset;
 import com.joelallison.entity.Player;
 import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainGenSetting;
 import com.joelallison.generation.TerrainGenSetting.TerrainLayer;
 import com.joelallison.screens.UserInterface.GameInterface;
-import com.joelallison.screens.UserInterface.UserInterface;
 
 import static com.joelallison.generation.TerrainGen.*;
-
-import java.util.Random;
 
 public class GameScreen implements Screen {
 	final Init system;
@@ -32,7 +26,7 @@ public class GameScreen implements Screen {
 	ExtendViewport levelViewport;
 	OrthographicCamera levelCamera;
 
-	public TerrainGenSetting terrainGen = new TerrainGenSetting("terrain", 0L, 2);
+	public TerrainGenSetting terrainGen = new TerrainGenSetting("terrain", 3L, 2);
 
 	public static final int TILE_SIZE = 32;
 	public static final int CHUNK_SIZE = 7;
@@ -46,16 +40,11 @@ public class GameScreen implements Screen {
 
 	Player player;
 
-	Random random = new Random();
-	long seed = /*random.nextLong()*/ 3L;
-
 	float stateTime;
 
-	Tileset[] tilesets = new Tileset[3];
-
+	Gson gson = new Gson();
+	Tileset[] tilesets;
 	GameInterface gi = new GameInterface();
-
-
 	public GameScreen(final Init system) {
 		this.system = system;
 		system.camera.zoom = 0.5f;
@@ -71,21 +60,8 @@ public class GameScreen implements Screen {
 		player = new Player(0, 0, new Texture(Gdx.files.internal("tree_tileSheet.png")), 3, 1, system);
 		player.initAnimations();
 
-		/*tilesets[0] = new Tileset("Trees & Rocks","tree_tileSheet.png", 8);
-		tilesets[0].map.put("ground", new TextureRegion(tilesets[0].getSpriteSheet(), 0, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-		tilesets[0].map.put("plant", new TextureRegion(tilesets[0].getSpriteSheet(), 8, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-		tilesets[0].map.put("bush", new TextureRegion(tilesets[0].getSpriteSheet(), 16, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-		tilesets[0].map.put("tree_1", new TextureRegion(tilesets[0].getSpriteSheet(), 24, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-		tilesets[0].map.put("tree_2", new TextureRegion(tilesets[0].getSpriteSheet(), 32, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-		tilesets[0].map.put("rock_1", new TextureRegion(tilesets[0].getSpriteSheet(), 40, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-		tilesets[0].map.put("rock_2", new TextureRegion(tilesets[0].getSpriteSheet(), 48, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-
-
-		//tilesets[0] = JsonToObject.getTilesetObject(FileHandling.readJSONTileData("core/src/com/joelallison/display/tilesets1.json"));
-
-		tilesets[1] = new Tileset("Kenney Micro Roguelike COLOUR", "tree_tileSheet.png", 8);
-
-		//tilesets[2]*/
+		tilesets = gson.fromJson(FileHandling.readJSONTileData("core/src/com/joelallison/display/tilesets.json"), Tileset[].class);
+		for (Tileset t : tilesets) { t.initTexture(); }
 
 		system.batch = new SpriteBatch();
 
@@ -96,23 +72,15 @@ public class GameScreen implements Screen {
 	}
 
 	public void generateTiles() {
-		//tree generation
 		terrainGen.layers[0] = new TerrainLayer("tree", Float.parseFloat(gi.getValues()[0]), Integer.parseInt(gi.getValues()[1]), Float.parseFloat(gi.getValues()[2]), Integer.parseInt(gi.getValues()[3]), Boolean.parseBoolean(gi.getValues()[4]));
-		terrainGen.layers[0].bounds = new float[] {0.38f, 0.4f, 0.6f, 0.7f};
-		terrainGen.layers[0].color = new Color(0.1215686f, 0.09411765f, 0.07843137f, 1);
-		terrainGen.layers[0].setSpriteSheet(new Texture(Gdx.files.internal("tree_tileSheet.png")));
-		terrainGen.layers[0].sprites = new TextureRegion[] {new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 0, 0, 8, 8), //plant
-				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 8, 0, 8, 8), //bush
-				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 16, 0, 8, 8), //dark green tree
-				new TextureRegion(terrainGen.layers[0].getSpriteSheet(), 24, 0, 8, 8)}; //light green tree
-
-		//rocks generation
-		/*terrainGen.layers[1] = new TerrainLayer("rock", 1, 2, 1.3f, 6f, 2, true);
-		terrainGen.layers[1].bounds = new float[] {0.985f, 0.99f};
-		terrainGen.layers[1].setSpriteSheet(new Texture(Gdx.files.internal("rock_tileSheet.png")));
-		terrainGen.layers[1].sprites = new TextureRegion[] {new TextureRegion(terrainGen.layers[1].getSpriteSheet(), 0, 0, 8, 8), //small rock
-				new TextureRegion(terrainGen.layers[1].getSpriteSheet(), 8, 0, 8, 8)}; //big rock */
-
+		terrainGen.layers[0].tileset = tilesets[0];
+		terrainGen.layers[0].tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
+		terrainGen.layers[0].tileBounds = new Tileset.TileBound[] {
+				new Tileset.TileBound("plant", 0.38f),
+				new Tileset.TileBound("bush", 0.4f),
+				new Tileset.TileBound("tree_1", 0.6f),
+				new Tileset.TileBound("tree_2", 0.7f)
+		};
 	}
 
 	@Override
@@ -129,9 +97,9 @@ public class GameScreen implements Screen {
 		yPos = player.getyPosition();
 
 		generateTiles();
-		ScreenUtils.clear(terrainGen.layers[0].color);
+		ScreenUtils.clear(terrainGen.layers[0].tileset.getColor());
 
-		float[][] noiseMap0 = genTerrain(seed, MAP_DIMENSIONS, xPos, yPos, terrainGen.layers[0].getScaleVal(), terrainGen.layers[0].getOctavesVal(), terrainGen.layers[0].getLacunarityVal(), terrainGen.layers[0].getWrapVal(), terrainGen.layers[0].doInvert());
+		float[][] noiseMap0 = genTerrain(terrainGen.getSeed(), MAP_DIMENSIONS, xPos, yPos, terrainGen.layers[0].getScaleVal(), terrainGen.layers[0].getOctavesVal(), terrainGen.layers[0].getLacunarityVal(), terrainGen.layers[0].getWrapVal(), terrainGen.layers[0].doInvert());
 
 		//clipping mask for rendering
 		//Rectangle scissors = new Rectangle();
@@ -141,13 +109,11 @@ public class GameScreen implements Screen {
 
 		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
 			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
-
-				for (int i = 0; i < terrainGen.layers[0].sprites.length; i++) {
-					if (noiseMap0[x][y] >= terrainGen.layers[0].bounds[i]) {
-						system.batch.draw(terrainGen.layers[0].sprites[i], x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+				for (int i = 0; i < terrainGen.layers[0].tileBounds.length; i++) {
+					if (noiseMap0[x][y] >= terrainGen.layers[0].tileBounds[i].lowerBound) {
+						system.batch.draw(terrainGen.layers[0].getTextureFromIndex(i), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 					}
 				}
-
 			}
 		}
 
@@ -187,7 +153,7 @@ public class GameScreen implements Screen {
 	@Override
 	public void dispose () {
 		for (TerrainLayer x: terrainGen.layers) {
-			x.getSpriteSheet().dispose();
+			x.tileset.getSpriteSheet().dispose();
 		}
 	}
 }

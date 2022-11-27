@@ -139,10 +139,17 @@ public class GameInterface extends UserInterface {
     }
 
     public void update() {
+        if (Integer.parseInt(values[1]) < 2) { //lacunarity has no effect if octaves is less than 2, this visual update attempts to indicate that to the user
+            lacunarityLabel.setColor(0.45f, 0.45f, 0.45f, 1);
+        } else {
+            lacunarityLabel.setColor(1, 1, 1, 1);
+        }
+
         scaleLabel.setText("Scale:                                      " + floatFormat.format(Float.parseFloat(values[0])));
         octavesLabel.setText("Octaves:                                 " + intFormat.format(Integer.parseInt(values[1])));
         lacunarityLabel.setText("Lacunarity:                             " + floatFormat.format(Float.parseFloat(values[2])));
         wrapFactorLabel.setText("Wrap Factor:                            " + floatFormat.format(Integer.parseInt(values[3])));
+
 
         //if showLeft then show left panel etc.
 

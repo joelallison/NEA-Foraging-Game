@@ -1,18 +1,26 @@
-{
-  "tilesets": [
-    {"name": "Trees & Rocks",
-      "spriteSheet": "tree_tileSheet.png",
-      "tileSize": 8,
-      "map" : {
-        "ground" :[0,0],
-        "plant" :[8,0],
-        "bush" : [16,0],
-        "tree_1" : [24,0],
-        "tree_2" : [32, 0],
-        "rock_1" : [40, 0],
-        "rock_2" : [48, 0]
-        }
+[
+  {
+    "name": "Trees & Rocks",
+    "spriteSheet": "tree_tileSheet.png",
+    "tileSize": 8,
+    "map": {
+      "plant": {
+        "cornerX": 0,
+        "cornerY": 0
+      },
+      "bush": {
+        "cornerX": 1,
+        "cornerY": 0
+      },
+      "tree_1": {
+        "cornerX": 2,
+        "cornerY": 0
+      },
+      "tree_2": {
+        "cornerX": 3,
+        "cornerY": 0
+      }
     }
-  ]
+  }
+]
 
-}

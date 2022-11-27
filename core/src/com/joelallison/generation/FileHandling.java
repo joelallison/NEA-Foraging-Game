@@ -120,7 +120,7 @@ public abstract class FileHandling {
         String[] outputArray;
 
         switch(format) {
-            //RGBA has 4 separate values at each position, so it can be used for tilemaps with layers to them. (with a limit of 4 layers)
+            //RGBA has 4 separate values at each position, so it can be used for tilemaps with tileBounds to them. (with a limit of 4 tileBounds)
             //using RGBA is a common practice (by indie game developers especially).
             //RGBA32 format is used in BMP files, but can also be used in other file formats.
             //In my case, I only want to use RGBA in BMP files, so I will put the BMP file header inside the RGBA conversion.

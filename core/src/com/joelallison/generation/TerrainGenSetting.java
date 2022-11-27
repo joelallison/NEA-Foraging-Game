@@ -1,9 +1,10 @@
 package com.joelallison.generation;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.joelallison.display.Tileset;
+
+import java.util.HashMap;
 
 public class TerrainGenSetting extends GenSetting {
     public TerrainLayer[] layers;
@@ -15,21 +16,13 @@ public class TerrainGenSetting extends GenSetting {
 
     public static class TerrainLayer {
         private String TileID;
+        public Tileset tileset;
         private float scaleVal;
         private int octavesVal;
         private float lacunarityVal;
         private int wrapVal;
         private boolean invert;
-
-        //sprite & animation system is slightly different to that of entities,
-        //as most tiles don't have any sort of animation.
-        private Texture spriteSheet;
-
-        public Color color;
-        public TextureRegion[] sprites;
-        float stateTime;
-
-        public float[] bounds;
+        public Tileset.TileBound[] tileBounds;
 
         public TerrainLayer(String TileID, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
             this.TileID = TileID;
@@ -40,20 +33,15 @@ public class TerrainGenSetting extends GenSetting {
             this.invert = invert;
         }
 
+        public TextureRegion getTextureFromIndex(int i) {
+            return this.tileset.getTileTexture(this.tileset.map.get(this.tileBounds[i].name));
+        }
         public String getTileID() {
             return TileID;
         }
 
         public void setTileID(String tileID) {
             TileID = tileID;
-        }
-
-        public float[] getBounds() {
-            return bounds;
-        }
-
-        public void setBounds(float[] bounds) {
-            this.bounds = bounds;
         }
 
         public float getScaleVal() {
@@ -95,15 +83,6 @@ public class TerrainGenSetting extends GenSetting {
         public void setInvert(boolean invert) {
             this.invert = invert;
         }
-
-        public Texture getSpriteSheet() {
-            return spriteSheet;
-        }
-
-        public void setSpriteSheet(Texture spriteSheet) {
-            this.spriteSheet = spriteSheet;
-        }
-
     }
 
 }

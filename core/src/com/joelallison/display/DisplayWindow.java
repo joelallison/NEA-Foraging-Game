@@ -36,39 +36,17 @@ public class DisplayWindow {
 
     private Tileset[] tilesets = new Tileset[3];
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Tileset[] tilesets = new Tileset[3];
-
-        Gson gson = new Gson();
-
-        //tilesets[0] = new Tileset("Trees & Rocks", "tree_tileSheet.png", 8);
-        tilesets[0] = JsonToObject.getTilesetObject("{\"name\":\"Trees \\u0026 Rocks\",\"spriteSheet\":\"tree_tileSheet.png\",\"tileSize\":8,\"map\":{\"ground\":{\"cornerX\":0,\"cornerY\":0,\"tileSize\":8}}}");
-        //tilesets[0].map.put("ground", new Tileset.Tile(0, 0, tilesets[0].tileSize));
-
-        System.out.println("-->    " + tilesets[0].getName());
     }
 
     public DisplayWindow(Tileset chosenTileset, String[][] map) {
         Gson gson = new Gson();
         this.chosenTileset = chosenTileset;
         this.map = map;
-
-        tilesets[0] = new Tileset("Trees & Rocks", "tree_tileSheet.png", 8);
-        /*tilesets[0].map.put("ground", new TextureRegion(tilesets[0].getSpriteSheet(), 0, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-        tilesets[0].map.put("plant", new TextureRegion(tilesets[0].getSpriteSheet(), 8, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-        tilesets[0].map.put("bush", new TextureRegion(tilesets[0].getSpriteSheet(), 16, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-        tilesets[0].map.put("tree_1", new TextureRegion(tilesets[0].getSpriteSheet(), 24, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-        tilesets[0].map.put("tree_2", new TextureRegion(tilesets[0].getSpriteSheet(), 32, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-        tilesets[0].map.put("rock_1", new TextureRegion(tilesets[0].getSpriteSheet(), 40, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-        tilesets[0].map.put("rock_2", new TextureRegion(tilesets[0].getSpriteSheet(), 48, 0, tilesets[0].tileSize, tilesets[0].tileSize));
-
-
-
-        tilesets[1] = new Tileset("Kenney Micro Roguelike COLOUR", "tree_tileSheet.png", 8);*/
     }
     public void drawView() {
         chunkCoords = new Vector2(customRound(coordinates.x, CHUNK_SIZE), customRound(coordinates.y, CHUNK_SIZE));
-
     }
 
     private int customRound(float input, int multiple) {

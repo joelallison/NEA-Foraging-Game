@@ -9,6 +9,14 @@ abstract class GenSetting {
         this.seed = seed;
     }
 
+    public Long getSeed() {
+        return seed;
+    }
+
+    public void setSeed(Long seed) {
+        this.seed = seed;
+    }
+
     public String getName() {
         return name;
     }
