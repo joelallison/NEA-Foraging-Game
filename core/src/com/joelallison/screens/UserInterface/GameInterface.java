@@ -1,6 +1,8 @@
 package com.joelallison.screens.UserInterface;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -22,38 +24,27 @@ public class GameInterface extends UserInterface {
     DecimalFormat intFormat = new DecimalFormat("00000");
 
     public void genUI(){
-        //toolbar
-        final TextButton file = new TextButton("File", chosenSkin, "default");
-        file.setSize(55f, 25f);
-        file.setPosition(0, Gdx.graphics.getHeight() - file.getHeight());
-
-        file.addListener(new ClickListener() {
+        stage.addActor(constructMenuBar(new MenuMethod[]{new MenuMethod("File", true, new Runnable() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                file.setText("Bingus!");
+            public void run() {
+                System.out.println("test");
             }
-        });
+        }),
+                new MenuMethod("Edit", true, new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("other test");
+                    }
+                })
 
-        stage.addActor(file);
-
-        final TextButton edit = new TextButton("Edit", chosenSkin, "default");
-        edit.setSize(55f, 25f);
-        edit.setPosition(0 + file.getWidth(), Gdx.graphics.getHeight() - edit.getHeight());
-
-        edit.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                edit.setText("Bingus?");
-            }
-        });
-
-        stage.addActor(edit);
+        }, new Vector2(600, 600)));
 
         //box to edit leftPanel of generation
         final Window leftPanel = new Window("Generation parameters:", chosenSkin);
         leftPanel.setSize(250f, 500f);
         leftPanel.setPosition(5f ,200f);
         leftPanel.setMovable(false);
+        leftPanel.setClip(true);
 
         scaleLabel.setPosition(leftPanel.getX(), leftPanel.getY() + leftPanel.getHeight() / 2);
         leftPanel.addActor(scaleLabel);

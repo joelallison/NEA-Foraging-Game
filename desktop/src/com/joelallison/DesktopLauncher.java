@@ -25,7 +25,7 @@ public class DesktopLauncher {
 		FileHandling.readJSONTileData("core/src/com/joelallison/display/tilesets.json");
 
 		config.setTitle("World Gen Tool");
-		config.setWindowIcon("assets/tree.png");
+		//config.setWindowIcon("assets/tree.png");
 		new Lwjgl3Application(new Init(), config);
 	}
 
