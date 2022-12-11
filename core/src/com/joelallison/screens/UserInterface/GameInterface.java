@@ -1,9 +1,6 @@
 package com.joelallison.screens.UserInterface;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -27,12 +24,28 @@ public class GameInterface extends UserInterface {
     DecimalFormat floatFormat = new DecimalFormat("##0.00");
     DecimalFormat intFormat = new DecimalFormat("00000");
 
-    public void genUI() {
-        //panel for editing specific generation parameters
-        leftPanel = new Window("Generation parameters:", chosenSkin);
+    public void genUI(){
+        stage.addActor(constructMenuBar(new MenuMethod[]{new MenuMethod("File", true, new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("test");
+            }
+        }),
+                new MenuMethod("Edit", true, new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("other test");
+                    }
+                })
+
+        }, new Vector2(600, 600)));
+
+        //box to edit leftPanel of generation
+        final Window leftPanel = new Window("Generation parameters:", chosenSkin);
         leftPanel.setSize(250f, 500f);
         leftPanel.setPosition(5f ,200f);
         leftPanel.setMovable(false);
+        leftPanel.setClip(true);
 
         scaleLabel.setPosition(leftPanel.getX(), leftPanel.getY() + leftPanel.getHeight() / 2);
         leftPanel.addActor(scaleLabel);
