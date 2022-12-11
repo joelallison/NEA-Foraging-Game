@@ -1,6 +1,8 @@
 package com.joelallison.screens.UserInterface;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -54,10 +56,9 @@ public class UserInterface {
     }
 
     protected TextButton processMenuBarItem(final MenuMethod method) {
-        GlyphLayout glyphLayout = new GlyphLayout(chosenSkin.getFont("default-font"), method.displayName);
+        //GlyphLayout glyphLayout = new GlyphLayout(chosenSkin.getFont("default-font"), method.displayName);
 
         final TextButton methodButton = new TextButton(method.displayName, chosenSkin, "default");
-        methodButton.setSize(glyphLayout.width * 1.2f, glyphLayout.height * 1.8f);
         methodButton.setPosition(0, 0 - methodButton.getHeight());
         methodButton.addListener(new ClickListener() {
             @Override

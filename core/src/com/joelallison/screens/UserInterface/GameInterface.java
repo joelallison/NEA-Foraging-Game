@@ -1,15 +1,12 @@
 package com.joelallison.screens.UserInterface;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 
-import javax.swing.*;
 import java.text.DecimalFormat;
 
 public class GameInterface extends UserInterface {
@@ -38,10 +35,9 @@ public class GameInterface extends UserInterface {
                     }
                 })
 
-        }, new Vector2(600, 600)));
+        }, new Vector2(32, Gdx.graphics.getHeight() - 10)));
 
         //box to edit leftPanel of generation
-        final Window leftPanel = new Window("Generation parameters:", chosenSkin);
         leftPanel.setSize(250f, 500f);
         leftPanel.setPosition(5f ,200f);
         leftPanel.setMovable(false);
@@ -128,45 +124,10 @@ public class GameInterface extends UserInterface {
 
         stage.addActor(leftPanel);
 
-
-
-
-
-
-
-
-        //toolbar
-        final TextButton file = new TextButton("File", chosenSkin, "default");
-        file.setSize(55f, 25f);
-        file.setPosition(0, Gdx.graphics.getHeight() - file.getHeight());
-
-        file.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                file.setText("Bingus!");
-            }
-        });
-
-        stage.addActor(file);
-
-        final TextButton edit = new TextButton("Edit", chosenSkin, "default");
-        edit.setSize(55f, 25f);
-        edit.setPosition(0 + file.getWidth(), Gdx.graphics.getHeight() - edit.getHeight());
-
-        edit.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                edit.setText("Bingus?");
-            }
-        });
-
-        stage.addActor(edit);
-
         final Label controlsTips = new Label("Press TAB to toggle UI", chosenSkin);
         controlsTips.setPosition(8, 8);
 
         stage.addActor(controlsTips);
-
     }
 
     public void update() {
