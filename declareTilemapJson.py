@@ -16,7 +16,7 @@ def makeMap(values):
         for x in range(0, len(values[y])):
             jsonString = str(jsonString + formatMapLine(values[y][x]) + r',')
 
-    return jsonString.strip(',')
+    return jsonString.strip(',') + r'}'
 
 width = input("What's the width of the tilemap?")
 height = input("What's the height of the tilemap?")

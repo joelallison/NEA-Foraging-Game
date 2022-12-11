@@ -1,17 +1,23 @@
 package com.joelallison.screens.UserInterface;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
+import javax.swing.*;
 import java.text.DecimalFormat;
 
 public class GameInterface extends UserInterface {
 
+    Window leftPanel = new Window("Generation parameters:", chosenSkin);
     Label scaleLabel = new Label("Scale:", chosenSkin);
     Label octavesLabel = new Label("Octaves:", chosenSkin);
     Label lacunarityLabel = new Label("Lacunarity:", chosenSkin);
@@ -21,36 +27,9 @@ public class GameInterface extends UserInterface {
     DecimalFormat floatFormat = new DecimalFormat("##0.00");
     DecimalFormat intFormat = new DecimalFormat("00000");
 
-    public void genUI(){
-        //toolbar
-        final TextButton file = new TextButton("File", chosenSkin, "default");
-        file.setSize(55f, 25f);
-        file.setPosition(0, Gdx.graphics.getHeight() - file.getHeight());
-
-        file.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                file.setText("Bingus!");
-            }
-        });
-
-        stage.addActor(file);
-
-        final TextButton edit = new TextButton("Edit", chosenSkin, "default");
-        edit.setSize(55f, 25f);
-        edit.setPosition(0 + file.getWidth(), Gdx.graphics.getHeight() - edit.getHeight());
-
-        edit.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                edit.setText("Bingus?");
-            }
-        });
-
-        stage.addActor(edit);
-
-        //box to edit leftPanel of generation
-        final Window leftPanel = new Window("Generation parameters:", chosenSkin);
+    public void genUI() {
+        //panel for editing specific generation parameters
+        leftPanel = new Window("Generation parameters:", chosenSkin);
         leftPanel.setSize(250f, 500f);
         leftPanel.setPosition(5f ,200f);
         leftPanel.setMovable(false);
@@ -122,7 +101,6 @@ public class GameInterface extends UserInterface {
 
         leftPanel.addActor(wrapFactorSlider);
 
-
         invertLabel.setPosition(leftPanel.getX(), (leftPanel.getY() + leftPanel.getHeight() / 2) - 96);
         leftPanel.addActor(invertLabel);
         invertCheck.setPosition(leftPanel.getX() + 48, (leftPanel.getY()-2 + leftPanel.getHeight() / 2) - 96);
@@ -136,6 +114,46 @@ public class GameInterface extends UserInterface {
         leftPanel.addActor(invertCheck);
 
         stage.addActor(leftPanel);
+
+
+
+
+
+
+
+
+        //toolbar
+        final TextButton file = new TextButton("File", chosenSkin, "default");
+        file.setSize(55f, 25f);
+        file.setPosition(0, Gdx.graphics.getHeight() - file.getHeight());
+
+        file.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                file.setText("Bingus!");
+            }
+        });
+
+        stage.addActor(file);
+
+        final TextButton edit = new TextButton("Edit", chosenSkin, "default");
+        edit.setSize(55f, 25f);
+        edit.setPosition(0 + file.getWidth(), Gdx.graphics.getHeight() - edit.getHeight());
+
+        edit.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                edit.setText("Bingus?");
+            }
+        });
+
+        stage.addActor(edit);
+
+        final Label controlsTips = new Label("Press TAB to toggle UI", chosenSkin);
+        controlsTips.setPosition(8, 8);
+
+        stage.addActor(controlsTips);
+
     }
 
     public void update() {
@@ -150,10 +168,16 @@ public class GameInterface extends UserInterface {
         lacunarityLabel.setText("Lacunarity:                             " + floatFormat.format(Float.parseFloat(values[2])));
         wrapFactorLabel.setText("Wrap Factor:                            " + floatFormat.format(Integer.parseInt(values[3])));
 
-
-        //if showLeft then show left panel etc.
+        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
+            if (leftPanel.isVisible()) {
+                leftPanel.setVisible(false);
+            }else {
+                leftPanel.setVisible(true);
+            }
+        }
 
     }
+
 
     @Override
     public void valuesDeclaration(){

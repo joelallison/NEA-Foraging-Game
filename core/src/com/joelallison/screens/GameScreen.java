@@ -74,7 +74,7 @@ public class GameScreen implements Screen {
 		terrainGen.layers[0].tileset = tilesets[0];
 		terrainGen.layers[0].tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
 		terrainGen.layers[0].tileBounds = new Tileset.TileBound[] {
-				new Tileset.TileBound("plant", 0.38f),
+				new Tileset.TileBound("plant", 0.35f),
 				new Tileset.TileBound("bush", 0.4f),
 				new Tileset.TileBound("tree_1", 0.6f),
 				new Tileset.TileBound("tree_2", 0.7f)

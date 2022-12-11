@@ -23,9 +23,7 @@ public class UserInterface {
     }
 
     private void setupSkins(){
-        Skin defaultSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
-
-        Skin commodoreSkin = new Skin(Gdx.files.internal("data/commodore64UI/uiskin.json"));
+        Skin defaultSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json")); //so that I could later implement a skin switching system
 
         chosenSkin = defaultSkin;
     }

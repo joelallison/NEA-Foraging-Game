@@ -19,6 +19,14 @@
       "tree_2": {
         "cornerX": 3,
         "cornerY": 0
+      },
+      "rock_1": {
+        "cornerX": 4,
+        "cornerY": 0
+      },
+      "rock_2": {
+        "cornerX": 5,
+        "cornerY": 0
       }
     }
   }
