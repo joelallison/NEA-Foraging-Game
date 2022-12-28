@@ -3,10 +3,9 @@ package com.joelallison;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.joelallison.generation.FileHandling;
-import com.joelallison.generation.Maze;
 import com.joelallison.screens.Init;
 
-import static com.joelallison.screens.GameScreen.LEVEL_ASPECT_RATIO;
+import static com.joelallison.screens.MainScreen.LEVEL_ASPECT_RATIO;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {

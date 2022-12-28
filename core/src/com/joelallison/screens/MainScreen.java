@@ -15,11 +15,11 @@ import com.joelallison.user.Player;
 import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainGenSetting;
 import com.joelallison.generation.TerrainGenSetting.TerrainLayer;
-import com.joelallison.screens.UserInterface.GameInterface;
+import com.joelallison.screens.UserInterface.MainInterface;
 
 import static com.joelallison.generation.TerrainGen.*;
 
-public class GameScreen implements Screen {
+public class MainScreen implements Screen {
 	final Init system;
 
 	ExtendViewport levelViewport;
@@ -43,8 +43,8 @@ public class GameScreen implements Screen {
 
 	Gson gson = new Gson();
 	Tileset[] tilesets;
-	GameInterface gi = new GameInterface();
-	public GameScreen(final Init system) {
+	MainInterface userInterface = new MainInterface();
+	public MainScreen(final Init system) {
 		this.system = system;
 		system.camera.zoom = 0.5f;
 		system.viewport.apply(true);
@@ -65,12 +65,12 @@ public class GameScreen implements Screen {
 
 		stateTime = 0f;
 
-		system.UIStage = gi.genStage();
-		gi.genUI();
+		system.UIStage = userInterface.genStage();
+		userInterface.genUI();
 	}
 
 	public void generateTiles() {
-		terrainGen.layers[0] = new TerrainLayer("tree", Float.parseFloat(gi.getValues()[0]), Integer.parseInt(gi.getValues()[1]), Float.parseFloat(gi.getValues()[2]), Integer.parseInt(gi.getValues()[3]), Boolean.parseBoolean(gi.getValues()[4]));
+		terrainGen.layers[0] = new TerrainLayer("tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
 		terrainGen.layers[0].tileset = tilesets[0];
 		terrainGen.layers[0].tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
 		terrainGen.layers[0].tileBounds = new Tileset.TileBound[] {
@@ -117,10 +117,10 @@ public class GameScreen implements Screen {
 
 		system.batch.end();
 
-		gi.update();
-
-		system.UIStage.act();
+		userInterface.update();
 		system.UIStage.draw();
+		system.UIStage.act();
+
 	}
 
 	@Override
@@ -145,7 +145,6 @@ public class GameScreen implements Screen {
 		system.viewport.update(width, height);
 		system.camera.position.set(MAP_DIMENSIONS.x * TILE_SIZE / 2, MAP_DIMENSIONS.y * TILE_SIZE / 2, 0);
 		system.viewport.getCamera().update();
-
 	}
 	
 	@Override

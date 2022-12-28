@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import java.text.DecimalFormat;
 
-public class GameInterface extends UserInterface {
+public class MainInterface extends UserInterface {
 
     Window leftPanel = new Window("Generation parameters:", chosenSkin);
     Label scaleLabel = new Label("Scale:", chosenSkin);
@@ -22,7 +22,7 @@ public class GameInterface extends UserInterface {
     DecimalFormat intFormat = new DecimalFormat("00000");
 
     public void genUI(){
-        stage.addActor(constructMenuBar(new MenuMethod[]{new MenuMethod("File", true, new Runnable() {
+        stage.addActor(constructMenuBar(new MenuMethod[]{new MenuMethod("File", true, new Runnable() { //creating the menu bar, using custom method in UserInterface
             @Override
             public void run() {
                 System.out.println("test");
@@ -149,16 +149,15 @@ public class GameInterface extends UserInterface {
                 leftPanel.setVisible(true);
             }
         }
-
     }
 
 
     @Override
     public void valuesDeclaration(){
-        values[0] = "20f"; //scale
-        values[1] = "2"; //octaves
-        values[2] = "2f"; //lacunarity
-        values[3] = "1"; //wrap factor
-        values[4] = "false"; //invert?
+        values[0] = "20f"; //'scale'
+        values[1] = "2"; //'octaves'
+        values[2] = "2f"; //'lacunarity'
+        values[3] = "1"; //'wrap factor'
+        values[4] = "false"; //'invert?'
     }
 }

@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 public class UserInterface {
     protected static Stage stage;
-    protected static Skin chosenSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
+    public static Skin chosenSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
     protected static String[] values = new String[20];
 
     public Stage genStage() {
