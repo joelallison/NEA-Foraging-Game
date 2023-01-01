@@ -1,6 +1,7 @@
 package com.joelallison.screens.UserInterface;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -13,11 +14,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import java.util.HashMap;
 
 public class UserInterface {
-    protected static Stage stage;
+
+    public static Color defaultBackgroundColor = new Color(0.1215686f, 0.09411765f, 0.07843137f, 1);
     public static Skin chosenSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
     protected static String[] values = new String[20];
 
-    public Stage genStage() {
+    public Stage genStage(Stage stage) {
         setupSkins();
         valuesDeclaration();
         stage = new Stage();
@@ -80,5 +82,9 @@ public class UserInterface {
             this.canBeRun = canBeRun;
             this.method = method;
         }
+    }
+
+    protected class Test extends WidgetGroup {
+
     }
 }

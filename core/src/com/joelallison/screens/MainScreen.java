@@ -5,8 +5,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
@@ -20,7 +22,11 @@ import com.joelallison.screens.UserInterface.MainInterface;
 import static com.joelallison.generation.TerrainGen.*;
 
 public class MainScreen implements Screen {
-	final Init system;
+	Stage mainUIStage;
+	public ExtendViewport viewport;
+	public static OrthographicCamera camera;
+	SpriteBatch batch;
+	ShapeRenderer sr;
 
 	ExtendViewport levelViewport;
 	OrthographicCamera levelCamera;
@@ -44,10 +50,14 @@ public class MainScreen implements Screen {
 	Gson gson = new Gson();
 	Tileset[] tilesets;
 	MainInterface userInterface = new MainInterface();
-	public MainScreen(final Init system) {
-		this.system = system;
-		system.camera.zoom = 0.5f;
-		system.viewport.apply(true);
+	public MainScreen() {
+		camera = new OrthographicCamera(1920, 1080);
+		viewport = new ExtendViewport(1920, 1080, camera);
+
+		batch = new SpriteBatch();
+
+		camera.zoom = 1.2f;
+		viewport.apply(true);
 
 		levelCamera = new OrthographicCamera(MAP_DIMENSIONS.x, MAP_DIMENSIONS.y);
 		levelViewport = new ExtendViewport(MAP_DIMENSIONS.x*TILE_SIZE, MAP_DIMENSIONS.y*TILE_SIZE, levelCamera);
@@ -56,20 +66,21 @@ public class MainScreen implements Screen {
 		yPos = 0;
 
 		//declare player stuff
-		player = new Player(0, 0, system);
+		player = new Player(0, 0);
 
 		tilesets = gson.fromJson(FileHandling.readJSONTileData("core/src/com/joelallison/display/tilesets.json"), Tileset[].class);
 		for (Tileset t : tilesets) { t.initTexture(); }
 
-		system.batch = new SpriteBatch();
+		batch = new SpriteBatch();
+		sr = new ShapeRenderer();
 
 		stateTime = 0f;
 
-		system.UIStage = userInterface.genStage();
-		userInterface.genUI();
+		mainUIStage = userInterface.genStage(mainUIStage);
+		userInterface.genUI(mainUIStage);
 	}
 
-	public void generateTiles() {
+	public void getTiles() {
 		terrainGen.layers[0] = new TerrainLayer("tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
 		terrainGen.layers[0].tileset = tilesets[0];
 		terrainGen.layers[0].tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
@@ -85,41 +96,44 @@ public class MainScreen implements Screen {
 	public void render(float delta) {
 		stateTime += Gdx.graphics.getDeltaTime();
 
-		system.viewport.apply();
-		system.camera.zoom = MathUtils.clamp(system.camera.zoom, 0.2f, 4f);
-		system.batch.setProjectionMatrix(system.viewport.getCamera().combined);
-		system.camera.update();
+		viewport.apply();
+		camera.zoom = MathUtils.clamp(camera.zoom, 0.2f, 4f); //set limits for the size of the viewport
+		batch.setProjectionMatrix(viewport.getCamera().combined);
+		sr.setProjectionMatrix(viewport.getCamera().combined);
+		camera.update();
 
 		player.handleInput();
 		xPos = player.getxPosition();
 		yPos = player.getyPosition();
 
-		generateTiles();
+		getTiles();
 		ScreenUtils.clear(terrainGen.layers[0].tileset.getColor());
 
-		float[][] noiseMap0 = genTerrain(terrainGen.getSeed(), MAP_DIMENSIONS, xPos, yPos, terrainGen.layers[0].getScaleVal(), terrainGen.layers[0].getOctavesVal(), terrainGen.layers[0].getLacunarityVal(), terrainGen.layers[0].getWrapVal(), terrainGen.layers[0].doInvert());
+		float[][] valueMap = genTerrain(terrainGen.getSeed(), MAP_DIMENSIONS, xPos, yPos, terrainGen.layers[0].getScaleVal(), terrainGen.layers[0].getOctavesVal(), terrainGen.layers[0].getLacunarityVal(), terrainGen.layers[0].getWrapVal(), terrainGen.layers[0].doInvert());
 
-		//clipping mask for rendering
-		//Rectangle scissors = new Rectangle();
-		//Rectangle clipBounds = new Rectangle(0, 0, 320, 320);
-
-		system.batch.begin();
-
+		batch.begin();
 		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
 			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
 				for (int i = 0; i < terrainGen.layers[0].tileBounds.length; i++) {
-					if (noiseMap0[x][y] >= terrainGen.layers[0].tileBounds[i].lowerBound) {
-						system.batch.draw(terrainGen.layers[0].getTextureFromIndex(i), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+					if (valueMap[x][y] >= terrainGen.layers[0].tileBounds[i].lowerBound) {
+						batch.draw(terrainGen.layers[0].getTextureFromIndex(i), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 					}
 				}
 			}
 		}
 
-		system.batch.end();
+		batch.end();
 
+		//draw border around the generated outcome
+		sr.begin(ShapeRenderer.ShapeType.Line);
+		sr.setColor(Color.WHITE);
+		sr.rect(0f, 0f, MAP_DIMENSIONS.x*TILE_SIZE, MAP_DIMENSIONS.y*TILE_SIZE);
+		sr.end();
+
+		//update the ui and draw it on top of everything else
 		userInterface.update();
-		system.UIStage.draw();
-		system.UIStage.act();
+		mainUIStage.draw();
+		mainUIStage.act();
 
 	}
 
@@ -142,9 +156,9 @@ public class MainScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		system.viewport.update(width, height);
-		system.camera.position.set(MAP_DIMENSIONS.x * TILE_SIZE / 2, MAP_DIMENSIONS.y * TILE_SIZE / 2, 0);
-		system.viewport.getCamera().update();
+		viewport.update(width, height);
+		camera.position.set(MAP_DIMENSIONS.x * TILE_SIZE / 2, MAP_DIMENSIONS.y * TILE_SIZE / 2, 0);
+		viewport.getCamera().update();
 	}
 	
 	@Override

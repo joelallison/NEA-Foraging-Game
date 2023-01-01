@@ -2,21 +2,17 @@ package com.joelallison.user;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.joelallison.screens.Init;
+
+import static com.joelallison.screens.MainScreen.camera;
 
 public class Player {
 
-    Init system;
     int xPosition;
     int yPosition;
 
-    public Player(int xPosition, int yPosition, Init system) {
+    public Player(int xPosition, int yPosition) {
         this.xPosition = xPosition;
         this.yPosition = yPosition;
-        this.system = system;
     }
 
     
@@ -37,10 +33,10 @@ public class Player {
 
         //zoom
         if (Gdx.input.isKeyPressed(Input.Keys.P)) {
-            system.camera.zoom += 0.02;
+            camera.zoom += 0.02;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.O)) {
-            system.camera.zoom -= 0.02;
+            camera.zoom -= 0.02;
         }
     }
 

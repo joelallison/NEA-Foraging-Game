@@ -4,25 +4,32 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.joelallison.display.Tileset;
+import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node;
 
 import java.text.DecimalFormat;
 
 public class MainInterface extends UserInterface {
 
-    Window leftPanel = new Window("Generation parameters:", chosenSkin);
-    Label scaleLabel = new Label("Scale:", chosenSkin);
-    Label octavesLabel = new Label("Octaves:", chosenSkin);
-    Label lacunarityLabel = new Label("Lacunarity:", chosenSkin);
-    Label wrapFactorLabel = new Label("Wrap factor:", chosenSkin);
-    Label invertLabel = new Label("Invert:", chosenSkin);
-    CheckBox invertCheck = new CheckBox("", chosenSkin);
-    DecimalFormat floatFormat = new DecimalFormat("##0.00");
-    DecimalFormat intFormat = new DecimalFormat("00000");
+    //many elements of the ui are used in multiple methods, so it's best that they're all declared globally [to the class]
+    protected Label scaleLabel = new Label("Scale:", chosenSkin);
+    protected Label octavesLabel = new Label("Octaves:", chosenSkin);
+    protected Label lacunarityLabel = new Label("Lacunarity:", chosenSkin);
+    protected Label wrapFactorLabel = new Label("Wrap factor:", chosenSkin);
+    protected Label invertLabel = new Label("Invert:", chosenSkin);
+    protected CheckBox invertCheck = new CheckBox("", chosenSkin);
+    protected DecimalFormat floatFormat = new DecimalFormat("##0.00");
+    protected DecimalFormat intFormat = new DecimalFormat("00000");
+    protected Window generationSettingsPanel = new Window("Generation parameters:", chosenSkin);
+    protected Window layerPanel = new Window("Layers:", chosenSkin);
+    protected Label controlsTips = new Label("Press TAB to toggle UI. All window-box things are draggable and movable!", chosenSkin);
 
-    public void genUI(){
-        stage.addActor(constructMenuBar(new MenuMethod[]{new MenuMethod("File", true, new Runnable() { //creating the menu bar, using custom method in UserInterface
+    public void genUI(Stage stage) {
+        //menu bar, using custom method in UserInterface
+        stage.addActor(constructMenuBar(new MenuMethod[]{new MenuMethod("File", true, new Runnable() {
             @Override
             public void run() {
                 System.out.println("test");
@@ -37,94 +44,24 @@ public class MainInterface extends UserInterface {
 
         }, new Vector2(32, Gdx.graphics.getHeight() - 10)));
 
-        //box to edit leftPanel of generation
-        leftPanel.setSize(250f, 500f);
-        leftPanel.setPosition(5f ,200f);
-        leftPanel.setMovable(false);
-        leftPanel.setClip(true);
+        //box to edit generation settings for selected layer
+        doGenerationSettingsPanel();
+        stage.addActor(generationSettingsPanel);
 
-        scaleLabel.setPosition(leftPanel.getX(), leftPanel.getY() + leftPanel.getHeight() / 2);
-        leftPanel.addActor(scaleLabel);
+        //box for managing the different layers of generation
+        //doLayerPanel();
+        //stage.addActor(layerPanel);
 
-        final Slider scaleSlider = new Slider(0.005f, 256f, 0.001f, false, chosenSkin);
-        scaleSlider.setPosition(scaleLabel.getX() + 44f, scaleLabel.getY()-2);
-        scaleSlider.setValue(Float.parseFloat(values[0]));
+        Tree<LayerWidget, Integer> tree = new Tree<>(chosenSkin);
 
-        scaleSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                values[0] = Float.toString(scaleSlider.getValue());
-            }
-        });
+        LayerWidget layerWidget1 = new LayerWidget(new Label("TEST", chosenSkin));
+        LayerWidget layerWidget2 = new LayerWidget(new Label("TEST2", chosenSkin));
+        tree.add(layerWidget1);
+        tree.add(layerWidget2);
 
-        leftPanel.addActor(scaleSlider);
+        stage.addActor(tree);
 
-        octavesLabel.setPosition(leftPanel.getX(), (leftPanel.getY() + leftPanel.getHeight() / 2) - 24);
-        leftPanel.addActor(octavesLabel);
-
-        final Slider octavesSlider = new Slider(1, 3, 1, false, chosenSkin);
-        octavesSlider.setPosition(octavesLabel.getX() + 64f, octavesLabel.getY()-2);
-        octavesSlider.setWidth(120f);
-        octavesSlider.setValue(Float.parseFloat(values[1]));
-
-        octavesSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                values[1] = Integer.toString((int) octavesSlider.getValue());
-            }
-        });
-
-        leftPanel.addActor(octavesSlider);
-
-        lacunarityLabel.setPosition(leftPanel.getX(), (leftPanel.getY() + leftPanel.getHeight() / 2) - 48);
-        leftPanel.addActor(lacunarityLabel);
-
-        final Slider lacunaritySlider = new Slider(0.01f, 10f, 0.01f, false, chosenSkin);
-        lacunaritySlider.setPosition(lacunarityLabel.getX() + 80f, lacunarityLabel.getY()-2);
-        lacunaritySlider.setWidth(108f);
-        lacunaritySlider.setValue(Float.parseFloat(values[2]));
-
-        lacunaritySlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                values[2] = Float.toString(lacunaritySlider.getValue());
-            }
-        });
-
-        leftPanel.addActor(lacunaritySlider);
-
-        wrapFactorLabel.setPosition(leftPanel.getX(), (leftPanel.getY() + leftPanel.getHeight() / 2) - 72);
-        leftPanel.addActor(wrapFactorLabel);
-
-        final Slider wrapFactorSlider = new Slider(1, 20, 1, false, chosenSkin);
-        wrapFactorSlider.setPosition(wrapFactorLabel.getX() + 92f, wrapFactorLabel.getY()-2);
-        wrapFactorSlider.setWidth(96f);
-        wrapFactorSlider.setValue(Float.parseFloat(values[3]));
-
-        wrapFactorSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                values[3] = Integer.toString((int) wrapFactorSlider.getValue());
-            }
-        });
-
-        leftPanel.addActor(wrapFactorSlider);
-
-        invertLabel.setPosition(leftPanel.getX(), (leftPanel.getY() + leftPanel.getHeight() / 2) - 96);
-        leftPanel.addActor(invertLabel);
-        invertCheck.setPosition(leftPanel.getX() + 48, (leftPanel.getY()-2 + leftPanel.getHeight() / 2) - 96);
-        invertCheck.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                values[4] = Boolean.toString(invertCheck.isChecked());
-            }
-        });
-
-        leftPanel.addActor(invertCheck);
-
-        stage.addActor(leftPanel);
-
-        final Label controlsTips = new Label("Press TAB to toggle UI", chosenSkin);
+        //text to tell users of otherwise hidden keybinds
         controlsTips.setPosition(8, 8);
 
         stage.addActor(controlsTips);
@@ -137,27 +74,133 @@ public class MainInterface extends UserInterface {
             lacunarityLabel.setColor(1, 1, 1, 1);
         }
 
-        scaleLabel.setText("Scale:                                      " + floatFormat.format(Float.parseFloat(values[0])));
-        octavesLabel.setText("Octaves:                                 " + intFormat.format(Integer.parseInt(values[1])));
-        lacunarityLabel.setText("Lacunarity:                             " + floatFormat.format(Float.parseFloat(values[2])));
-        wrapFactorLabel.setText("Wrap Factor:                            " + floatFormat.format(Integer.parseInt(values[3])));
+        scaleLabel.setText("Scale: " + floatFormat.format(Float.parseFloat(values[0])));
+        octavesLabel.setText("Octaves: " + intFormat.format(Integer.parseInt(values[1])));
+        lacunarityLabel.setText("Lacunarity: " + floatFormat.format(Float.parseFloat(values[2])));
+        wrapFactorLabel.setText("Wrap Factor: " + floatFormat.format(Integer.parseInt(values[3])));
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
-            if (leftPanel.isVisible()) {
-                leftPanel.setVisible(false);
-            }else {
-                leftPanel.setVisible(true);
+            if (generationSettingsPanel.isVisible()) {
+                generationSettingsPanel.setVisible(false);
+                controlsTips.setText("Press TAB to toggle UI.");
+            } else {
+                generationSettingsPanel.setVisible(true);
+                controlsTips.setText("Press TAB to toggle UI. All window-box things are draggable and movable!"); //should be added to the hashmap
             }
         }
     }
 
+    protected void doGenerationSettingsPanel() {
+        generationSettingsPanel.add(scaleLabel);
+
+        final Slider scaleSlider = new Slider(0.005f, 256f, 0.001f, false, chosenSkin);
+        scaleSlider.setValue(Float.parseFloat(values[0]));
+
+        scaleSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                values[0] = Float.toString(scaleSlider.getValue());
+            }
+        });
+
+        generationSettingsPanel.add(scaleSlider);
+        generationSettingsPanel.row();
+
+        generationSettingsPanel.add(octavesLabel);
+
+        final Slider octavesSlider = new Slider(1, 3, 1, false, chosenSkin);
+        octavesSlider.setValue(Float.parseFloat(values[1]));
+
+        octavesSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                values[1] = Integer.toString((int) octavesSlider.getValue());
+            }
+        });
+
+        generationSettingsPanel.add(octavesSlider);
+
+        generationSettingsPanel.row();
+        generationSettingsPanel.add(lacunarityLabel);
+
+        final Slider lacunaritySlider = new Slider(0.01f, 10f, 0.01f, false, chosenSkin);
+        lacunaritySlider.setValue(Float.parseFloat(values[2]));
+
+        lacunaritySlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                values[2] = Float.toString(lacunaritySlider.getValue());
+            }
+        });
+
+        generationSettingsPanel.add(lacunaritySlider);
+
+        generationSettingsPanel.row();
+        generationSettingsPanel.add(wrapFactorLabel);
+
+        final Slider wrapFactorSlider = new Slider(1, 20, 1, false, chosenSkin);
+        wrapFactorSlider.setValue(Float.parseFloat(values[3]));
+
+        wrapFactorSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                values[3] = Integer.toString((int) wrapFactorSlider.getValue());
+            }
+        });
+
+        generationSettingsPanel.add(wrapFactorSlider);
+
+        generationSettingsPanel.row();
+        generationSettingsPanel.add(invertLabel);
+        invertCheck.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                values[4] = Boolean.toString(invertCheck.isChecked());
+            }
+        });
+
+        generationSettingsPanel.add(invertCheck);
+
+        generationSettingsPanel.setPosition(5f, 500f);
+        generationSettingsPanel.padLeft(4f);
+        generationSettingsPanel.padRight(4f);
+        generationSettingsPanel.setSize(generationSettingsPanel.getPrefWidth() * 1.2f, generationSettingsPanel.getPrefHeight());
+    }
+
+    protected void doLayerPanel() {
+        Tree layerTree = new Tree(chosenSkin);
+
+        Node layerWidget = new LayerWidget(new Label("TEST", chosenSkin));
+        layerTree.add(layerWidget);
+
+        layerPanel.add(layerTree);
+    }
+
 
     @Override
-    public void valuesDeclaration(){
+    public void valuesDeclaration() {
         values[0] = "20f"; //'scale'
         values[1] = "2"; //'octaves'
         values[2] = "2f"; //'lacunarity'
         values[3] = "1"; //'wrap factor'
         values[4] = "false"; //'invert?'
+    }
+
+    protected class LayerWidget extends Node<LayerWidget, Integer, Label>{
+        /*String selectedTileset;
+        String selectedAlgorithm;
+        Vector2 centrePoint;
+
+        Tileset.TileBound[] tiles;
+
+        HorizontalGroup group;*/
+
+        Label label;
+
+        public LayerWidget(Label label) {
+            this.label = label;
+        }
+
+
     }
 }
