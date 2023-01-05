@@ -21,8 +21,6 @@ public class DesktopLauncher {
 		//maze.genMaze();
 		//FileHandling.writeToFile("Maze.txt", FileHandling.mazeToStringArray(maze.maze, "pgm", true, true));
 
-		FileHandling.readJSONTileData("core/src/com/joelallison/display/tilesets.json");
-
 		config.setTitle("World Gen Tool");
 		//config.setWindowIcon("assets/tree.png");
 		new Lwjgl3Application(new TitleScreen(), config);

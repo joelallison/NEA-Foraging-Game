@@ -2,7 +2,7 @@ package com.joelallison.generation;
 
 import com.joelallison.display.Tileset.*;
 
-public class GenSetting {
+abstract class GenSetting {
     protected String name;
     protected Long seed;
 
