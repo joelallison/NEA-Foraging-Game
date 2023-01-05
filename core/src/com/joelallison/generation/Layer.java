@@ -1,5 +1,7 @@
 package com.joelallison.generation;
 
+import com.joelallison.display.Tileset;
+
 public class Layer<Setting extends GenSetting> {
 
     //an array of layers - lower index means lower down, just makes sense as it expands into higher numbers
@@ -17,7 +19,8 @@ public class Layer<Setting extends GenSetting> {
 
     private String layerName;
     public Setting settings;
-
+    public Tileset tileSet;
+    private boolean showLayer;
 
 
 

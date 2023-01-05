@@ -38,8 +38,11 @@ public class Tileset {
         }
     }
 
-    public static class TileBound {
+    public static class TileChild {
         public String name;
+    }
+
+    public static class TileBound extends TileChild {
         public Float lowerBound;
         public Float upperBound;
 

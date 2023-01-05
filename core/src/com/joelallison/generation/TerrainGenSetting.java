@@ -3,6 +3,7 @@ package com.joelallison.generation;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.joelallison.display.Tileset;
+import com.joelallison.display.Tileset.*;
 
 import java.util.HashMap;
 
@@ -22,7 +23,7 @@ public class TerrainGenSetting extends GenSetting {
         private float lacunarityVal;
         private int wrapVal;
         private boolean invert;
-        public Tileset.TileBound[] tileBounds;
+        public Tileset.TileBound[] tileBounds; //these are the tile children for this gen type
 
         public TerrainLayer(String TileID, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
             this.TileID = TileID;
@@ -36,6 +37,8 @@ public class TerrainGenSetting extends GenSetting {
         public TextureRegion getTextureFromIndex(int i) {
             return this.tileset.getTileTexture(this.tileset.map.get(this.tileBounds[i].name));
         }
+
+
         public String getTileID() {
             return TileID;
         }
@@ -83,6 +86,11 @@ public class TerrainGenSetting extends GenSetting {
         public void setInvert(boolean invert) {
             this.invert = invert;
         }
+    }
+
+    @Override
+    public TileChild[] getTileChildren(){
+        return tileBounds;
     }
 
 }
