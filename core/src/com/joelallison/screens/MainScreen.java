@@ -16,7 +16,6 @@ import com.joelallison.display.Tileset;
 import com.joelallison.user.Player;
 import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainGenSetting;
-import com.joelallison.generation.TerrainGenSetting.TerrainLayer;
 import com.joelallison.screens.UserInterface.MainInterface;
 
 import static com.joelallison.generation.TerrainGen.*;
@@ -26,12 +25,12 @@ public class MainScreen implements Screen {
 	public ExtendViewport viewport;
 	public static OrthographicCamera camera;
 	SpriteBatch batch;
-	ShapeRenderer sr;
+	ShapeRenderer sr; //for misc UI additions
 
 	ExtendViewport levelViewport;
 	OrthographicCamera levelCamera;
 
-	public TerrainGenSetting terrainGen = new TerrainGenSetting("terrain", 3L, 2);
+	public TerrainGenSetting terrainGen;
 
 	public static final int TILE_SIZE = 32;
 	public static final int CHUNK_SIZE = 7;
@@ -81,10 +80,10 @@ public class MainScreen implements Screen {
 	}
 
 	public void getTiles() {
-		terrainGen.layers[0] = new TerrainLayer("tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
-		terrainGen.layers[0].tileset = tilesets[0];
-		terrainGen.layers[0].tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
-		terrainGen.layers[0].tileBounds = new Tileset.TileBound[] {
+		terrainGen = new TerrainGenSetting("terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
+		terrainGen.tileset = tilesets[0];
+		terrainGen.tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
+		terrainGen.tileBounds = new Tileset.TileBound[] {
 				new Tileset.TileBound("plant", 0.35f),
 				new Tileset.TileBound("bush", 0.4f),
 				new Tileset.TileBound("tree_1", 0.6f),
@@ -107,16 +106,16 @@ public class MainScreen implements Screen {
 		yPos = player.getyPosition();
 
 		getTiles();
-		ScreenUtils.clear(terrainGen.layers[0].tileset.getColor());
+		ScreenUtils.clear(terrainGen.tileset.getColor());
 
-		float[][] valueMap = genTerrain(terrainGen.getSeed(), MAP_DIMENSIONS, xPos, yPos, terrainGen.layers[0].getScaleVal(), terrainGen.layers[0].getOctavesVal(), terrainGen.layers[0].getLacunarityVal(), terrainGen.layers[0].getWrapVal(), terrainGen.layers[0].doInvert());
+		float[][] valueMap = genTerrain(terrainGen.getSeed(), MAP_DIMENSIONS, xPos, yPos, terrainGen.getScaleVal(), terrainGen.getOctavesVal(), terrainGen.getLacunarityVal(), terrainGen.getWrapVal(), terrainGen.doInvert());
 
 		batch.begin();
 		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
 			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
-				for (int i = 0; i < terrainGen.layers[0].tileBounds.length; i++) {
-					if (valueMap[x][y] >= terrainGen.layers[0].tileBounds[i].lowerBound) {
-						batch.draw(terrainGen.layers[0].getTextureFromIndex(i), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+				for (int i = 0; i < terrainGen.tileBounds.length; i++) {
+					if (valueMap[x][y] >= terrainGen.tileBounds[i].lowerBound) {
+						batch.draw(terrainGen.getTextureFromIndex(i), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 					}
 				}
 			}
@@ -163,8 +162,6 @@ public class MainScreen implements Screen {
 	
 	@Override
 	public void dispose () {
-		for (TerrainLayer x: terrainGen.layers) {
-			x.tileset.getSpriteSheet().dispose();
-		}
+		terrainGen.tileset.getSpriteSheet().dispose();
 	}
 }

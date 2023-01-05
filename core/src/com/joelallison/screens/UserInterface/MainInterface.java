@@ -49,17 +49,8 @@ public class MainInterface extends UserInterface {
         stage.addActor(generationSettingsPanel);
 
         //box for managing the different layers of generation
-        //doLayerPanel();
-        //stage.addActor(layerPanel);
-
-        Tree<LayerWidget, Integer> tree = new Tree<>(chosenSkin);
-
-        LayerWidget layerWidget1 = new LayerWidget(new Label("TEST", chosenSkin));
-        LayerWidget layerWidget2 = new LayerWidget(new Label("TEST2", chosenSkin));
-        tree.add(layerWidget1);
-        tree.add(layerWidget2);
-
-        stage.addActor(tree);
+        doLayerPanel();
+        stage.addActor(layerPanel);
 
         //text to tell users of otherwise hidden keybinds
         controlsTips.setPosition(8, 8);
@@ -168,12 +159,7 @@ public class MainInterface extends UserInterface {
     }
 
     protected void doLayerPanel() {
-        Tree layerTree = new Tree(chosenSkin);
 
-        Node layerWidget = new LayerWidget(new Label("TEST", chosenSkin));
-        layerTree.add(layerWidget);
-
-        layerPanel.add(layerTree);
     }
 
 
@@ -184,23 +170,5 @@ public class MainInterface extends UserInterface {
         values[2] = "2f"; //'lacunarity'
         values[3] = "1"; //'wrap factor'
         values[4] = "false"; //'invert?'
-    }
-
-    protected class LayerWidget extends Node<LayerWidget, Integer, Label>{
-        /*String selectedTileset;
-        String selectedAlgorithm;
-        Vector2 centrePoint;
-
-        Tileset.TileBound[] tiles;
-
-        HorizontalGroup group;*/
-
-        Label label;
-
-        public LayerWidget(Label label) {
-            this.label = label;
-        }
-
-
     }
 }
