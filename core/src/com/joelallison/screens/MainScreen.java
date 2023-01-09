@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
 import com.joelallison.display.Tileset;
+import com.joelallison.generation.Layer;
 import com.joelallison.user.Player;
 import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainLayer;
@@ -76,12 +77,17 @@ public class MainScreen implements Screen {
 
 		stateTime = 0f;
 
+
 		mainUIStage = userInterface.genStage(mainUIStage);
 		userInterface.genUI(mainUIStage);
+
+		layers[0] = new TerrainLayer("terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
+
+
 	}
 
 	public void getTiles() {
-		terrainGen = new TerrainGenLayer"terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
+		terrainGen = new TerrainLayer("terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
 		terrainGen.tileset = tilesets[0];
 		terrainGen.tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
 		terrainGen.tileBounds = new Tileset.TileBound[] {

@@ -86,8 +86,8 @@ public class UserInterface {
     }
 
     protected HorizontalGroup createLayer(Layer layer) {
+        System.out.println(layer.getClass().getName().replace("com.joelallison.generation.",""));
 
-
-        return null;
+        return new HorizontalGroup();
     }
 }

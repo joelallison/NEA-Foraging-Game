@@ -7,8 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.joelallison.generation.Layer;
-import com.joelallison.generation.TerrainGenSetting;
 
 import java.text.DecimalFormat;
 
@@ -51,7 +49,6 @@ public class MainInterface extends UserInterface {
         stage.addActor(generationSettingsPanel);
 
         //box for managing the different layers of generation
-        doLayerPanel();
         stage.addActor(layerPanel);
 
         //text to tell users of otherwise hidden keybinds
@@ -61,6 +58,8 @@ public class MainInterface extends UserInterface {
     }
 
     public void update() {
+        doLayerPanel();
+
         if (Integer.parseInt(values[1]) < 2) { //lacunarity has no effect if octaves is less than 2, this visual update attempts to indicate that to the user
             lacunarityLabel.setColor(0.45f, 0.45f, 0.45f, 1);
         } else {
@@ -163,7 +162,7 @@ public class MainInterface extends UserInterface {
     protected void doLayerPanel() {
         VerticalGroup layerGroup = new VerticalGroup();
 
-        layerGroup.addActor(createTerrainGenLayer((layers[0])));
+        layerGroup.addActor(createLayer((layers[0])));
 
         /*for (int i = 0; i < layers.length; i++) {
             //if(layers[i].settings.getClass() == TerrainGenSetting.class) { // unfortunately a switch case can't be used
