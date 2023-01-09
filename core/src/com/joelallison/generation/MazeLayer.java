@@ -2,7 +2,7 @@ package com.joelallison.generation;
 
 import java.util.*;
 
-public class Maze extends Layer {
+public class MazeLayer extends Layer {
     //depth-first search (recursive) maze generation
     //(the stack typical of a DFS is via the call stack)
     //I've found that this has a limit of 857x857, due to a StackOverflowError.
@@ -15,7 +15,7 @@ public class Maze extends Layer {
     private int count = 0;
 
     public int[][] maze;
-    public Maze(String name, long seed, int width, int height) {
+    public MazeLayer(String name, long seed, int width, int height) {
         super(name, seed);
 
         //each 'wall' and 'path' tiles are full cells, so the maze needs to be an odd width and height

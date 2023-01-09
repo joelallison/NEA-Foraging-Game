@@ -1,5 +1,6 @@
 package com.joelallison.generation;
 
+import com.badlogic.gdx.math.Vector2;
 import com.joelallison.display.Tileset;
 import com.joelallison.display.Tileset.*;
 
@@ -9,6 +10,7 @@ public abstract class Layer {
     protected Tileset tileSet;
     protected boolean showLayer;
     protected boolean opened;
+    protected Vector2 center;
 
 
     // when you move the layer, a layer gets stored separately, another gets copied over to where it will move,
@@ -22,9 +24,19 @@ public abstract class Layer {
     // clipping mode?
     // the spacing and wave collapse feature?
 
-    public Layer(String name, Long seed) {
+    public Layer(String name, Long seed) { //for the creation of a layer with specific values
         this.name = name;
         this.seed = seed;
+    }
+    public Layer() { //for the creation of a layer with default values
+    }
+
+    public Vector2 getCenter() {
+        return center;
+    }
+
+    public void setCenter(Vector2 center) {
+        this.center = center;
     }
 
     public Long getSeed() {

@@ -19,19 +19,14 @@ import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.UserInterface.MainInterface;
 
-import static com.joelallison.generation.TerrainGen.*;
-
 public class MainScreen implements Screen {
 	Stage mainUIStage;
 	public ExtendViewport viewport;
 	public static OrthographicCamera camera;
 	SpriteBatch batch;
 	ShapeRenderer sr; //for misc UI additions
-
 	ExtendViewport levelViewport;
 	OrthographicCamera levelCamera;
-
-	public TerrainLayer terrainGen;
 	public static Layer[] layers = new Layer[1];
 
 	public static final int TILE_SIZE = 32;
@@ -41,13 +36,9 @@ public class MainScreen implements Screen {
 	public static final Vector2 MAP_DIMENSIONS = new Vector2(CHUNK_SIZE * LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.x, CHUNK_SIZE* LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.y);
 
 	public static final Vector2 WINDOW_ASPECT_RATIO = new Vector2(16, 9);
-
 	int xPos, yPos;
-
 	Player player;
-
 	float stateTime;
-
 	Gson gson = new Gson();
 	Tileset[] tilesets;
 	MainInterface userInterface = new MainInterface();
@@ -77,20 +68,16 @@ public class MainScreen implements Screen {
 
 		stateTime = 0f;
 
-
+		layers[0] = new TerrainLayer("Terrain!!", 3L, 20f, 2, 2f, 1, false);
 		mainUIStage = userInterface.genStage(mainUIStage);
 		userInterface.genUI(mainUIStage);
-
-		layers[0] = new TerrainLayer("terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
-
 
 	}
 
 	public void getTiles() {
-		terrainGen = new TerrainLayer("terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
-		terrainGen.tileset = tilesets[0];
-		terrainGen.tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
-		terrainGen.tileBounds = new Tileset.TileBound[] {
+		((TerrainLayer) layers[0]).tileset = tilesets[0];
+		((TerrainLayer) layers[0]).tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
+		((TerrainLayer) layers[0]).tileBounds = new Tileset.TileBound[] {
 				new Tileset.TileBound("plant", 0.35f),
 				new Tileset.TileBound("bush", 0.4f),
 				new Tileset.TileBound("tree_1", 0.6f),
@@ -113,16 +100,16 @@ public class MainScreen implements Screen {
 		yPos = player.getyPosition();
 
 		getTiles();
-		ScreenUtils.clear(terrainGen.tileset.getColor());
+		ScreenUtils.clear(((TerrainLayer) layers[0]).tileset.getColor());
 
-		float[][] valueMap = genTerrain(terrainGen.getSeed(), MAP_DIMENSIONS, xPos, yPos, terrainGen.getScaleVal(), terrainGen.getOctavesVal(), terrainGen.getLacunarityVal(), terrainGen.getWrapVal(), terrainGen.doInvert());
+		float[][] valueMap = TerrainLayer.genTerrain(((TerrainLayer) layers[0]).getSeed(), MAP_DIMENSIONS, xPos, yPos, ((TerrainLayer) layers[0]).getScaleVal(), ((TerrainLayer) layers[0]).getOctavesVal(), ((TerrainLayer) layers[0]).getLacunarityVal(), ((TerrainLayer) layers[0]).getWrapVal(), ((TerrainLayer) layers[0]).doInvert());
 
 		batch.begin();
 		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
 			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
-				for (int i = 0; i < terrainGen.tileBounds.length; i++) {
-					if (valueMap[x][y] >= terrainGen.tileBounds[i].lowerBound) {
-						batch.draw(terrainGen.getTextureFromIndex(i), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+				for (int i = 0; i < ((TerrainLayer) layers[0]).tileBounds.length; i++) {
+					if (valueMap[x][y] >= ((TerrainLayer) layers[0]).tileBounds[i].lowerBound) {
+						batch.draw(((TerrainLayer) layers[0]).getTextureFromIndex(i), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 					}
 				}
 			}
@@ -137,7 +124,7 @@ public class MainScreen implements Screen {
 		sr.end();
 
 		//update the ui and draw it on top of everything else
-		userInterface.update();
+		userInterface.update(delta);
 		mainUIStage.draw();
 		mainUIStage.act();
 
@@ -169,6 +156,6 @@ public class MainScreen implements Screen {
 	
 	@Override
 	public void dispose () {
-		terrainGen.tileset.getSpriteSheet().dispose();
+		((TerrainLayer) layers[0]).tileset.getSpriteSheet().dispose();
 	}
 }

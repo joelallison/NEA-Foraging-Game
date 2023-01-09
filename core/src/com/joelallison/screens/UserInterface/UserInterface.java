@@ -3,6 +3,8 @@ package com.joelallison.screens.UserInterface;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -18,11 +20,9 @@ public class UserInterface {
 
     public static Color defaultBackgroundColor = new Color(0.1215686f, 0.09411765f, 0.07843137f, 1);
     public static Skin chosenSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
-    protected static String[] values = new String[20];
 
     public Stage genStage(Stage stage) {
         setupSkins();
-        valuesDeclaration();
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
@@ -32,14 +32,6 @@ public class UserInterface {
     private void setupSkins(){
         Skin defaultSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
         chosenSkin = defaultSkin;
-    }
-
-    public String[] getValues() {
-        return values;
-    }
-
-    protected void valuesDeclaration() {
-
     }
 
     protected Table constructMenuBar(MenuMethod[] menuButtons, Vector2 position) {
@@ -86,8 +78,31 @@ public class UserInterface {
     }
 
     protected HorizontalGroup createLayer(Layer layer) {
-        System.out.println(layer.getClass().getName().replace("com.joelallison.generation.",""));
+        HorizontalGroup layerGroup = new HorizontalGroup();
+        layerGroup.space(2);
+        layerGroup.pad(4);
 
-        return new HorizontalGroup();
+        TextButton moveUp = new TextButton("^", chosenSkin);
+        TextButton moveDown = new TextButton("v", chosenSkin);
+        TextButton showOrHide = new TextButton("[show/hide]", chosenSkin);
+
+        String layerType = layer.getClass().getName().replace("com.joelallison.generation.","").replace("Layer", "");
+
+        layerGroup.addActor(moveUp);
+        layerGroup.addActor(moveDown);
+
+        switch(layerType) {
+            case "Terrain":
+                layerGroup.addActor(new TextField(layerType + " [name]", chosenSkin));
+
+                break;
+            default:
+                layerGroup.addActor(new TextField("(error?) Unknown layer type: " + layerType + " [name]", chosenSkin));
+
+        }
+
+        layerGroup.addActor(showOrHide);
+
+        return layerGroup;
     }
 }

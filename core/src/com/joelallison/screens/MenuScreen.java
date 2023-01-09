@@ -10,12 +10,10 @@ import com.joelallison.screens.UserInterface.MenuInterface;
 import com.joelallison.screens.UserInterface.UserInterface;
 
 public class MenuScreen implements Screen {
-
     SpriteBatch batch;
     Stage menuUIStage;
     ExtendViewport viewport;
     OrthographicCamera camera;
-
     float stateTime;
     MenuInterface userInterface = new MenuInterface();
     public MenuScreen() {
@@ -40,16 +38,14 @@ public class MenuScreen implements Screen {
     }
 
     public void render(float delta) {
-        //stateTime += Gdx.graphics.getDeltaTime();
+        stateTime += Gdx.graphics.getDeltaTime();
 
         viewport.apply();
         batch.setProjectionMatrix(viewport.getCamera().combined);
         camera.update();
         ScreenUtils.clear(UserInterface.defaultBackgroundColor);
 
-        //userInterface.update();
-
-
+        //userInterface.update(); --> there's no update method yet
 
         batch.begin();
 
