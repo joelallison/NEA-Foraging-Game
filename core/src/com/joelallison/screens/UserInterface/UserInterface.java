@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import sun.plugin.javascript.navig4.Layer;
 
 import java.util.HashMap;
 
@@ -84,7 +85,9 @@ public class UserInterface {
         }
     }
 
-    protected class Test extends WidgetGroup {
+    protected HorizontalGroup createLayer(Layer layer) {
 
+
+        return null;
     }
 }
