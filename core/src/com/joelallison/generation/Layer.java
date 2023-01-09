@@ -3,7 +3,7 @@ package com.joelallison.generation;
 import com.joelallison.display.Tileset;
 import com.joelallison.display.Tileset.*;
 
-abstract class Layer {
+public abstract class Layer {
     protected String name;
     protected Long seed;
     protected Tileset tileSet;
