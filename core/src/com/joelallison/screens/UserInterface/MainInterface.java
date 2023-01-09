@@ -7,10 +7,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.joelallison.display.Tileset;
-import com.badlogic.gdx.scenes.scene2d.ui.Tree.Node;
+import com.joelallison.generation.Layer;
+import com.joelallison.generation.TerrainGenSetting;
 
 import java.text.DecimalFormat;
+
+import static com.joelallison.screens.MainScreen.layers;
 
 public class MainInterface extends UserInterface {
 
@@ -159,7 +161,17 @@ public class MainInterface extends UserInterface {
     }
 
     protected void doLayerPanel() {
+        VerticalGroup layerGroup = new VerticalGroup();
 
+        layerGroup.addActor(createTerrainGenLayer((layers[0])));
+
+        /*for (int i = 0; i < layers.length; i++) {
+            //if(layers[i].settings.getClass() == TerrainGenSetting.class) { // unfortunately a switch case can't be used
+            //    layerGroup.addActor(createTerrainGenLayer((layers[i])));
+            //}
+
+
+        }*/
     }
 
 

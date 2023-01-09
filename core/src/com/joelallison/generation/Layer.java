@@ -2,7 +2,7 @@ package com.joelallison.generation;
 
 import com.joelallison.display.Tileset;
 
-public class Layer<Setting extends GenSetting> {
+public class Layer { // I was going to make Layer a parameterized class, but found that didn't work later on
 
     // an array of layers - lower index means lower down, just makes sense as it expands into higher numbers
 
@@ -14,14 +14,18 @@ public class Layer<Setting extends GenSetting> {
     // layer settings edited on the left, upon selecting the layer
     // children boundaries etc. are edited on the right as part of the layer box.
     // export layer button
-    // show/hide layer button?
+    // show/hide layer button
     // clipping mode?
     // the spacing and wave collapse feature?
 
     private String layerName;
-    public Setting settings;
     public Tileset tileSet;
     private boolean showLayer;
 
+    public Layer(String layerName) {
+        this.layerName = layerName;
+    }
+
+    
 
 }

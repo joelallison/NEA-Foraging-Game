@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.joelallison.generation.Layer;
+import com.joelallison.generation.TerrainGenSetting;
 
 import java.util.HashMap;
 
@@ -84,7 +86,21 @@ public class UserInterface {
         }
     }
 
-    protected class Test extends WidgetGroup {
+    public HorizontalGroup createTerrainGenLayer(Layer layer) {
+        HorizontalGroup layerHorizontalGroup = new HorizontalGroup();
 
+        TextField layerName = new TextField("", chosenSkin);
+
+        layerHorizontalGroup.addActor(layerName);
+
+        // layer has name, settings, chosen tileset and tile children that function in a way specific to the gen type
+        // the layer itself can be moved up or down
+        // layer settings edited on the left, upon selecting the layer
+        // children boundaries etc. are edited on the right as part of the layer box.
+        // export layer button
+        // show/hide layer button
+        // clipping mode?
+        // the spacing and wave collapse feature?
+        return layerHorizontalGroup;
     }
 }

@@ -13,10 +13,16 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
 import com.joelallison.display.Tileset;
+import com.joelallison.generation.GenSetting;
+import com.joelallison.generation.Layer;
 import com.joelallison.user.Player;
 import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainGenSetting;
 import com.joelallison.screens.UserInterface.MainInterface;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import static com.joelallison.generation.TerrainGen.*;
 
@@ -31,6 +37,7 @@ public class MainScreen implements Screen {
 	OrthographicCamera levelCamera;
 
 	public TerrainGenSetting terrainGen;
+	public static Layer[] layers = new Layer[1];
 
 	public static final int TILE_SIZE = 32;
 	public static final int CHUNK_SIZE = 7;
@@ -77,10 +84,23 @@ public class MainScreen implements Screen {
 
 		mainUIStage = userInterface.genStage(mainUIStage);
 		userInterface.genUI(mainUIStage);
+
+
+		layers[0] = new Layer("Terrain");
+		layers[0].settings = new TerrainGenSetting("terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
+		terrainGen = new TerrainGenSetting("terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
+
+
 	}
 
 	public void getTiles() {
-		terrainGen = new TerrainGenSetting("terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
+		terrainGen.setScaleVal(Float.parseFloat(userInterface.getValues()[0]));
+		terrainGen.setOctavesVal(Integer.parseInt(userInterface.getValues()[1]));
+		terrainGen.setLacunarityVal(Float.parseFloat(userInterface.getValues()[2]));
+		terrainGen.setWrapVal(Integer.parseInt(userInterface.getValues()[3]));
+		terrainGen.setInvert(Boolean.parseBoolean(userInterface.getValues()[4]));
+
+
 		terrainGen.tileset = tilesets[0];
 		terrainGen.tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
 		terrainGen.tileBounds = new Tileset.TileBound[] {
