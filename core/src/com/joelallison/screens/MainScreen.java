@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.joelallison.display.Tileset;
 import com.joelallison.user.Player;
 import com.joelallison.generation.FileHandling;
-import com.joelallison.generation.TerrainGenSetting;
+import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.UserInterface.MainInterface;
 
 import static com.joelallison.generation.TerrainGen.*;
@@ -30,7 +30,7 @@ public class MainScreen implements Screen {
 	ExtendViewport levelViewport;
 	OrthographicCamera levelCamera;
 
-	public TerrainGenSetting terrainGen;
+	public TerrainLayer terrainGen;
 
 	public static final int TILE_SIZE = 32;
 	public static final int CHUNK_SIZE = 7;
@@ -80,7 +80,7 @@ public class MainScreen implements Screen {
 	}
 
 	public void getTiles() {
-		terrainGen = new TerrainGenSetting("terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
+		terrainGen = new TerrainLayer("terrain", 3L, "tree", Float.parseFloat(userInterface.getValues()[0]), Integer.parseInt(userInterface.getValues()[1]), Float.parseFloat(userInterface.getValues()[2]), Integer.parseInt(userInterface.getValues()[3]), Boolean.parseBoolean(userInterface.getValues()[4]));
 		terrainGen.tileset = tilesets[0];
 		terrainGen.tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
 		terrainGen.tileBounds = new Tileset.TileBound[] {

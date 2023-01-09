@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.joelallison.display.Tileset;
 import com.joelallison.display.Tileset.*;
 
-public class TerrainGenSetting extends GenSetting {
+public class TerrainLayer extends Layer {
 
     private String TileID;
     public Tileset tileset;
@@ -16,7 +16,7 @@ public class TerrainGenSetting extends GenSetting {
     public Tileset.TileBound[] tileBounds; //these are the tile children for this gen type
 
 
-    public TerrainGenSetting(String name, Long seed, String TileID, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
+    public TerrainLayer(String name, Long seed, String TileID, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
         super(name, seed);
         this.TileID = TileID;
         this.scaleVal = scaleVal;
