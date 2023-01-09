@@ -2,7 +2,7 @@ package com.joelallison.generation;
 
 import java.util.*;
 
-public class Maze extends GenSetting{
+public class Maze extends Layer {
     //depth-first search (recursive) maze generation
     //(the stack typical of a DFS is via the call stack)
     //I've found that this has a limit of 857x857, due to a StackOverflowError.

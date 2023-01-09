@@ -14,7 +14,6 @@ public class DesktopLauncher {
 		config.useVsync(true);
 		config.setForegroundFPS(60);
 
-
 		//FileHandling.createFile("aaaaa.txt");
 		//int size = 33;
 		//Maze maze = new Maze("a maze ing",1, size,  size);
