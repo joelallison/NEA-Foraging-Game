@@ -14,9 +14,8 @@ import com.joelallison.generation.TerrainLayer;
 
 import java.text.DecimalFormat;
 
-import static com.badlogic.gdx.utils.Align.center;
 import static com.joelallison.screens.MainScreen.layers;
-
+import static com.joelallison.screens.MainScreen.userControls;
 
 public class MainInterface extends UserInterface {
 
@@ -34,7 +33,8 @@ public class MainInterface extends UserInterface {
     protected DecimalFormat intFormat = new DecimalFormat("00000");
     protected Window generationSettingsPanel = new Window("Generation parameters:", chosenSkin);
     protected Window layerPanel = new Window("Layers:", chosenSkin);
-    protected Label controlsTips = new Label("Press TAB to toggle UI. All window-box things are draggable and movable!", chosenSkin);
+    protected Label controlsTips = new Label("Press TAB to toggle UI. Use '<' and '>' to zoom in and out. All window-box things are draggable and movable!", chosenSkin);
+    protected Label displayedCoordinates = new Label("x: , y: ", chosenSkin);
     protected VerticalGroup layerGroup = new VerticalGroup();
     Layer[] oldLayers;
     Stage stage;
@@ -68,6 +68,8 @@ public class MainInterface extends UserInterface {
         doLayerPanel();
         stage.addActor(layerPanel);
 
+        displayedCoordinates.setPosition(Gdx.graphics.getWidth() - (4 * displayedCoordinates.getPrefWidth()), Gdx.graphics.getHeight() - (2 * displayedCoordinates.getPrefHeight()));
+        stage.addActor(displayedCoordinates);
 
         // TextFields don't lose focus by default when you click out, so...
         stage.getRoot().addCaptureListener(new InputListener() {
@@ -88,13 +90,17 @@ public class MainInterface extends UserInterface {
         updateGenerationSettingsPanel();
         updateLayerPanel();
 
+        displayedCoordinates.setText("x: " + userControls.getxPosition() + " y: " + userControls.getyPosition());
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
             if (generationSettingsPanel.isVisible()) {
                 generationSettingsPanel.setVisible(false);
+                displayedCoordinates.setVisible(false);
                 controlsTips.setText("Press TAB to toggle UI.");
             } else {
                 generationSettingsPanel.setVisible(true);
-                controlsTips.setText("Press TAB to toggle UI. All window-box things are draggable and movable!"); //should be added to the hashmap
+                displayedCoordinates.setVisible(true);
+                controlsTips.setText("Press TAB to toggle UI. Use '<' and '>' to zoom in and out. All window-box things are draggable and movable!");
             }
         }
     }

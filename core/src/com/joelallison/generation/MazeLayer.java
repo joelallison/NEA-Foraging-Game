@@ -104,7 +104,7 @@ public class MazeLayer extends Layer {
                         recursion(r, c - 2);
                     }
                     break;
-            }//recursively backtracks just due to trying directions again and again
+            } // recursively backtracks just due to trying directions again and again
         }
     }
 

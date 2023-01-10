@@ -5,12 +5,12 @@ import com.badlogic.gdx.Input;
 
 import static com.joelallison.screens.MainScreen.camera;
 
-public class Player {
+public class UserControls {
 
     int xPosition;
     int yPosition;
 
-    public Player(int xPosition, int yPosition) {
+    public UserControls(int xPosition, int yPosition) {
         this.xPosition = xPosition;
         this.yPosition = yPosition;
     }
@@ -32,10 +32,10 @@ public class Player {
         }
 
         //zoom
-        if (Gdx.input.isKeyPressed(Input.Keys.P)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.PERIOD)) {
             camera.zoom += 0.02;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.O)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.COMMA)) {
             camera.zoom -= 0.02;
         }
     }

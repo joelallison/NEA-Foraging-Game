@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
 import com.joelallison.display.Tileset;
 import com.joelallison.generation.Layer;
-import com.joelallison.user.Player;
+import com.joelallison.user.UserControls;
 import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.UserInterface.MainInterface;
@@ -37,7 +37,7 @@ public class MainScreen implements Screen {
 
 	public static final Vector2 WINDOW_ASPECT_RATIO = new Vector2(16, 9);
 	int xPos, yPos;
-	Player player;
+	public static UserControls userControls;
 	float stateTime;
 	Gson gson = new Gson();
 	Tileset[] tilesets;
@@ -58,7 +58,7 @@ public class MainScreen implements Screen {
 		yPos = 0;
 
 		//declare player stuff
-		player = new Player(0, 0);
+		userControls = new UserControls(0, 0);
 
 		tilesets = gson.fromJson(FileHandling.readJSONTileData("core/src/com/joelallison/display/tilesets.json"), Tileset[].class);
 		for (Tileset t : tilesets) { t.initTexture(); }
@@ -95,25 +95,16 @@ public class MainScreen implements Screen {
 		sr.setProjectionMatrix(viewport.getCamera().combined);
 		camera.update();
 
-		player.handleInput();
-		xPos = player.getxPosition();
-		yPos = player.getyPosition();
+		userControls.handleInput();
+		xPos = userControls.getxPosition();
+		yPos = userControls.getyPosition();
 
 		getTiles();
 		ScreenUtils.clear(((TerrainLayer) layers[0]).tileset.getColor());
 
-		float[][] valueMap = TerrainLayer.genTerrain(((TerrainLayer) layers[0]).getSeed(), MAP_DIMENSIONS, xPos, yPos, ((TerrainLayer) layers[0]).getScaleVal(), ((TerrainLayer) layers[0]).getOctavesVal(), ((TerrainLayer) layers[0]).getLacunarityVal(), ((TerrainLayer) layers[0]).getWrapVal(), ((TerrainLayer) layers[0]).doInvert());
-
 		batch.begin();
-		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
-			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
-				for (int i = 0; i < ((TerrainLayer) layers[0]).tileBounds.length; i++) {
-					if (valueMap[x][y] >= ((TerrainLayer) layers[0]).tileBounds[i].lowerBound) {
-						batch.draw(((TerrainLayer) layers[0]).getTextureFromIndex(i), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-					}
-				}
-			}
-		}
+
+		drawLayers();
 
 		batch.end();
 
@@ -128,6 +119,25 @@ public class MainScreen implements Screen {
 		mainUIStage.draw();
 		mainUIStage.act();
 
+	}
+
+	public void drawLayers() {
+		//go from top layer to bottom layer
+		for (int i = layers.length; i > 0; i--) {
+
+		}
+
+		float[][] valueMap = TerrainLayer.genTerrain(((TerrainLayer) layers[0]).getSeed(), MAP_DIMENSIONS, xPos, yPos, ((TerrainLayer) layers[0]).getScaleVal(), ((TerrainLayer) layers[0]).getOctavesVal(), ((TerrainLayer) layers[0]).getLacunarityVal(), ((TerrainLayer) layers[0]).getWrapVal(), ((TerrainLayer) layers[0]).doInvert());
+
+		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
+			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
+				for (int i = 0; i < ((TerrainLayer) layers[0]).tileBounds.length; i++) {
+					if (valueMap[x][y] >= ((TerrainLayer) layers[0]).tileBounds[i].lowerBound) {
+						batch.draw(((TerrainLayer) layers[0]).getTextureFromIndex(i), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+					}
+				}
+			}
+		}
 	}
 
 	@Override

@@ -16,25 +16,29 @@ public class MenuScreen implements Screen {
     OrthographicCamera camera;
     float stateTime;
     MenuInterface userInterface = new MenuInterface();
+
     public MenuScreen() {
         camera = new OrthographicCamera(1920, 1080);
         viewport = new ExtendViewport(1920, 1080, camera);
 
         batch = new SpriteBatch();
 
-        menuUIStage = userInterface.genStage(menuUIStage);
-        userInterface.genUI(menuUIStage);
-
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keyCode) {
                 if (keyCode == Input.Keys.ENTER) {
-                    ((Game)Gdx.app.getApplicationListener()).setScreen(new MainScreen());
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new MainScreen());
                     dispose();
                 }
                 return true;
             }
         });
+    }
+
+    @Override
+    public void show() {
+        menuUIStage = userInterface.genStage(menuUIStage);
+        userInterface.genUI(menuUIStage);
     }
 
     public void render(float delta) {
@@ -69,11 +73,6 @@ public class MenuScreen implements Screen {
 
     @Override
     public void resume() {
-
-    }
-
-    @Override
-    public void show() {
 
     }
 

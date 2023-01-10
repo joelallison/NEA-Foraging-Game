@@ -140,10 +140,6 @@ public class TerrainLayer extends Layer {
             }
         }
 
-
-
-
-
         return noiseMap;
     }
 
