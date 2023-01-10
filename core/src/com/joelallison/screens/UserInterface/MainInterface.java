@@ -73,7 +73,7 @@ public class MainInterface extends UserInterface {
 
         // TextFields don't lose focus by default when you click out, so...
         stage.getRoot().addCaptureListener(new InputListener() {
-            // this code was gratefully found as a response to this post: https://github.com/libgdx/libgdx/issues/2173
+            // this code was gratefully found on a GitHub forum --> https://github.com/libgdx/libgdx/issues/2173
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (!(event.getTarget() instanceof TextField)) stage.setKeyboardFocus(null);
                 return false;
