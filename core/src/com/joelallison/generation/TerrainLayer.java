@@ -1,9 +1,11 @@
 package com.joelallison.generation;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.joelallison.display.Tileset;
 import com.joelallison.display.Tileset.*;
+import com.joelallison.screens.MainScreen;
 import tools.OpenSimplex2S;
 
 public class TerrainLayer extends Layer {
@@ -16,16 +18,19 @@ public class TerrainLayer extends Layer {
 
     public float[][] valueMap;
 
-    public TerrainLayer(String name, Long seed, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
-        super(name, seed);
+    public TerrainLayer(int layerID, String name, Long seed, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
+        super(name, seed, layerID);
         this.scaleVal = scaleVal;
         this.octavesVal = octavesVal;
         this.lacunarityVal = lacunarityVal;
         this.wrapVal = wrapVal;
         this.invert = invert;
+
+        defaultTileValues();
     }
 
-    public TerrainLayer(Long seed) { //these are some [fairly bland] default values
+    public TerrainLayer(Long seed, int layerID) { //these are some [fairly bland] default values
+        this.layerID = layerID;
         this.name = "Terrain Layer";
         this.seed = seed; //seed is the only value that gets specifically set, this is so that the layer can be given the overall seed value.
         this.scaleVal = 20f;
@@ -33,6 +38,19 @@ public class TerrainLayer extends Layer {
         this.lacunarityVal = 2f;
         this.wrapVal = 1;
         this.invert = false;
+
+        defaultTileValues();
+    }
+
+    public void defaultTileValues() {
+        this.tileset = MainScreen.tilesets[0];
+        this.tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
+        this.tileChildren = new Tileset.TileChild[] {
+                new Tileset.TileChild("plant", 0.35f),
+                new Tileset.TileChild("bush", 0.4f),
+                new Tileset.TileChild("tree_1", 0.6f),
+                new Tileset.TileChild("tree_2", 0.7f)
+        };
     }
 
     public TextureRegion getTextureFromIndex(int i) {

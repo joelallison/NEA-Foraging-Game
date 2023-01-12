@@ -2,20 +2,17 @@ package com.joelallison.screens.UserInterface;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.joelallison.generation.Layer;
 import com.joelallison.screens.MainScreen;
 
-import java.util.HashMap;
+import java.util.Objects;
+
+import static com.joelallison.screens.MainScreen.layers;
 
 public class UserInterface {
 
@@ -78,27 +75,38 @@ public class UserInterface {
         }
     }
 
-    protected HorizontalGroup createLayer(Layer layer) {
+    protected HorizontalGroup createLayerWidget(final Layer layer) {
         HorizontalGroup layerGroup = new HorizontalGroup();
-        layerGroup.space(2);
-        layerGroup.pad(4);
+        layerGroup.space(4);
+        layerGroup.pad(8);
+
+        layerGroup.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                for (int i = 0; i < layers.size(); i++) {
+                    if(Objects.equals(layers.get(i).getName(), layer.getLayerID())) {
+                        MainInterface.selectedLayerID = i;
+                    }
+                }
+
+            }
+        });
 
         TextButton moveUp = new TextButton("^", chosenSkin);
         TextButton moveDown = new TextButton("v", chosenSkin);
         TextButton showOrHide = new TextButton("[show/hide]", chosenSkin);
 
-        String layerType = MainScreen.getLayerType(layer);
-
         layerGroup.addActor(moveUp);
         layerGroup.addActor(moveDown);
 
+        String layerType = MainScreen.getLayerType(layer);
         switch(layerType) {
             case "Terrain":
-                layerGroup.addActor(new TextField(layerType + " [name]", chosenSkin));
+                layerGroup.addActor(new TextField(layer.getName(), chosenSkin));
 
                 break;
             default:
-                layerGroup.addActor(new TextField("(error?) Unknown layer type: " + layerType + " [name]", chosenSkin));
+                layerGroup.addActor(new TextField("(error?) Unknown layer type: " + layer.getName(), chosenSkin));
 
         }
 

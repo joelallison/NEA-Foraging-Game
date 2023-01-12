@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
@@ -21,6 +20,9 @@ import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.UserInterface.MainInterface;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class MainScreen implements Screen {
 	Stage mainUIStage;
 	public ExtendViewport viewport;
@@ -29,7 +31,9 @@ public class MainScreen implements Screen {
 	ShapeRenderer sr; //for misc UI additions
 	ExtendViewport levelViewport;
 	OrthographicCamera levelCamera;
-	public static Layer[] layers = new Layer[1];
+	public static ArrayList<Layer> layers = new ArrayList<>(3);
+
+	HashMap<String, Integer> layerIDs = new HashMap<String, Integer>(1);
 
 	public static final int TILE_SIZE = 32;
 	public static final int CHUNK_SIZE = 7;
@@ -42,7 +46,7 @@ public class MainScreen implements Screen {
 	public static UserControls userControls;
 	float stateTime;
 	Gson gson = new Gson();
-	Tileset[] tilesets;
+	public static Tileset[] tilesets;
 	MainInterface userInterface = new MainInterface();
 	public MainScreen() {
 		camera = new OrthographicCamera(1920, 1080);
@@ -70,16 +74,17 @@ public class MainScreen implements Screen {
 
 		stateTime = 0f;
 
-		layers[0] = new TerrainLayer("Terrain!!", 3L, 20f, 2, 2f, 1, false);
+		layers.add(new TerrainLayer(0, "Terrain!!", 3L, 20f, 2, 2f, 1, false));
+		layerIDs.put(layers.get(0).getName(), layers.get(0).getLayerID());
 		mainUIStage = userInterface.genStage(mainUIStage);
 		userInterface.genUI(mainUIStage);
 
 	}
 
-	public void getTiles() {
-		((TerrainLayer) layers[0]).tileset = tilesets[0];
-		((TerrainLayer) layers[0]).tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
-		((TerrainLayer) layers[0]).tileChildren = new Tileset.TileChild[] {
+	public void setTiles() {
+		((TerrainLayer) layers.get(0)).tileset = tilesets[0];
+		((TerrainLayer) layers.get(0)).tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
+		((TerrainLayer) layers.get(0)).tileChildren = new Tileset.TileChild[] {
 				new Tileset.TileChild("plant", 0.35f),
 				new Tileset.TileChild("bush", 0.4f),
 				new Tileset.TileChild("tree_1", 0.6f),
@@ -101,8 +106,8 @@ public class MainScreen implements Screen {
 		xPos = userControls.getxPosition();
 		yPos = userControls.getyPosition();
 
-		getTiles();
-		ScreenUtils.clear(((TerrainLayer) layers[0]).tileset.getColor());
+		setTiles();
+		ScreenUtils.clear(((TerrainLayer) layers.get(0)).tileset.getColor());
 
 		batch.begin();
 
@@ -127,15 +132,18 @@ public class MainScreen implements Screen {
 		//go from top layer to bottom layer
 		boolean[][] tileAbove = new boolean[(int) MAP_DIMENSIONS.x][(int) MAP_DIMENSIONS.y];
 
-		((TerrainLayer) layers[0]).generateValueMap(MAP_DIMENSIONS, xPos, yPos);
+
+		for (int i = 0; i < layers.size(); i++) {
+			((TerrainLayer) layers.get(i)).generateValueMap(MAP_DIMENSIONS, xPos, yPos);
+		}
 
 		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
 			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
-				for (int i = layers.length-1; i >= 0; i--) {
+				for (int i = layers.size() -1; i >= 0; i--) {
 					if (tileAbove[x][y] == false) {
-						switch (getLayerType(layers[i])) {
+						switch (getLayerType(layers.get(i))) {
 							case "Terrain":
-								TextureRegion tile = getTextureForTerrainValue(layers[i], x, y);
+								TextureRegion tile = getTextureForTerrainValue(layers.get(i), x, y);
 								if (tile != null) {
 									batch.draw(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 									tileAbove[x][y] = true;
@@ -162,7 +170,7 @@ public class MainScreen implements Screen {
 		return null; // if there should be no tile drawn at this position for this layer
 	}
 
-	public static String getLayerType(Layer layer){
+	public static String getLayerType(Layer layer) {
 		return layer.getClass().getName().replace("com.joelallison.generation.","").replace("Layer", "");
 	}
 
@@ -192,6 +200,6 @@ public class MainScreen implements Screen {
 	
 	@Override
 	public void dispose () {
-		((TerrainLayer) layers[0]).tileset.getSpriteSheet().dispose();
+		((TerrainLayer) layers.get(0)).tileset.getSpriteSheet().dispose();
 	}
 }

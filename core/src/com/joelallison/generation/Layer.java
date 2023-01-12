@@ -5,6 +5,7 @@ import com.joelallison.display.Tileset;
 import com.joelallison.display.Tileset.*;
 
 public abstract class Layer {
+    protected int layerID;
     protected String name;
     protected Long seed;
     protected Tileset tileSet;
@@ -25,11 +26,21 @@ public abstract class Layer {
     // clipping mode?
     // the spacing and wave collapse feature?
 
-    public Layer(String name, Long seed) { //for the creation of a layer with specific values
+    public Layer(String name, Long seed, int layerID) { //for the creation of a layer with specific values
         this.name = name;
         this.seed = seed;
+        this.layerID = layerID;
     }
     public Layer() { //for the creation of a layer with default values
+
+    }
+
+    public int getLayerID() {
+        return layerID;
+    }
+
+    public void setLayerID(int layerID) {
+        this.layerID = layerID;
     }
 
     public Vector2 getCenter() {

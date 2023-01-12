@@ -9,10 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.joelallison.generation.Layer;
 import com.joelallison.generation.TerrainLayer;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 import static com.joelallison.screens.MainScreen.layers;
 import static com.joelallison.screens.MainScreen.userControls;
@@ -36,9 +39,13 @@ public class MainInterface extends UserInterface {
     protected Label controlsTips = new Label("Press TAB to toggle UI. Use '<' and '>' to zoom in and out. All window-box things are draggable and movable!", chosenSkin);
     protected Label displayedCoordinates = new Label("x: , y: ", chosenSkin);
     protected VerticalGroup layerGroup = new VerticalGroup();
-    Layer[] oldLayers;
+    boolean layersChanged = false;
     Stage stage;
-    int selectedLayerIndex = 0;
+
+    public static int selectedLayerID;
+    public static int selectedLayerIndex;
+
+    Label selectedLayer = new Label("The currently selected layer is '[].", chosenSkin);
 
     public void genUI(final Stage stage) { //stage is made final here so that it can be accessed within inner classes
         //menu bar, using custom method in UserInterface
@@ -106,7 +113,7 @@ public class MainInterface extends UserInterface {
     }
 
     protected void doGenerationSettingsPanel() {
-        String selectedLayerType = layers[selectedLayerIndex].getClass().getName().replace("com.joelallison.generation.","").replace("Layer", "");
+        String selectedLayerType = layers.get(selectedLayerIndex).getClass().getName().replace("com.joelallison.generation.","").replace("Layer", "");
 
         switch (selectedLayerType) {
             case "Terrain":
@@ -129,12 +136,12 @@ public class MainInterface extends UserInterface {
         generationSettingsPanel.add(scaleLabel);
 
         final Slider scaleSlider = new Slider(0.005f, 256f, 0.001f, false, chosenSkin);
-        scaleSlider.setValue(((TerrainLayer) layers[selectedLayerIndex]).getScaleVal());
+        scaleSlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getScaleVal());
 
         scaleSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) layers[selectedLayerIndex]).setScaleVal(scaleSlider.getValue());
+                ((TerrainLayer) layers.get(selectedLayerIndex)).setScaleVal(scaleSlider.getValue());
             }
         });
 
@@ -144,12 +151,12 @@ public class MainInterface extends UserInterface {
         generationSettingsPanel.add(octavesLabel);
 
         final Slider octavesSlider = new Slider(1, 3, 1, false, chosenSkin);
-        octavesSlider.setValue(((TerrainLayer) layers[selectedLayerIndex]).getOctavesVal());
+        octavesSlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getOctavesVal());
 
         octavesSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) layers[selectedLayerIndex]).setOctavesVal((int) octavesSlider.getValue());
+                ((TerrainLayer) layers.get(selectedLayerIndex)).setOctavesVal((int) octavesSlider.getValue());
             }
         });
 
@@ -159,12 +166,12 @@ public class MainInterface extends UserInterface {
         generationSettingsPanel.add(lacunarityLabel);
 
         final Slider lacunaritySlider = new Slider(0.01f, 10f, 0.01f, false, chosenSkin);
-        lacunaritySlider.setValue(((TerrainLayer) layers[selectedLayerIndex]).getLacunarityVal());
+        lacunaritySlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getLacunarityVal());
 
         lacunaritySlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) layers[selectedLayerIndex]).setLacunarityVal(lacunaritySlider.getValue());
+                ((TerrainLayer) layers.get(selectedLayerIndex)).setLacunarityVal(lacunaritySlider.getValue());
             }
         });
 
@@ -174,12 +181,12 @@ public class MainInterface extends UserInterface {
         generationSettingsPanel.add(wrapFactorLabel);
 
         final Slider wrapFactorSlider = new Slider(1, 20, 1, false, chosenSkin);
-        wrapFactorSlider.setValue(((TerrainLayer) layers[selectedLayerIndex]).getWrapVal());
+        wrapFactorSlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getWrapVal());
 
         wrapFactorSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) layers[selectedLayerIndex]).setWrapVal((int) wrapFactorSlider.getValue());
+                ((TerrainLayer) layers.get(selectedLayerIndex)).setWrapVal((int) wrapFactorSlider.getValue());
             }
         });
 
@@ -190,7 +197,7 @@ public class MainInterface extends UserInterface {
         invertCheck.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) layers[selectedLayerIndex]).setInvert(invertCheck.isChecked());
+                ((TerrainLayer) layers.get(selectedLayerIndex)).setInvert(invertCheck.isChecked());
             }
         });
 
@@ -205,41 +212,71 @@ public class MainInterface extends UserInterface {
 
     }
 
+    public static int getSelectedLayerIndexFromID(int selectedLayerID) {
+        return 0;
+    }
+
     protected void updateGenerationSettingsPanel(){
         updateGenerationSettingsTerrain();
     }
 
     protected void updateGenerationSettingsTerrain() {
-        if (((TerrainLayer) layers[selectedLayerIndex]).getOctavesVal() < 2) { // lacunarity has no effect if octaves is less than 2, this visual update attempts to indicate that to the user
+        if (((TerrainLayer) layers.get(selectedLayerIndex)).getOctavesVal() < 2) { // lacunarity has no effect if octaves is less than 2, this visual update attempts to indicate that to the user
             lacunarityLabel.setColor(0.45f, 0.45f, 0.45f, 1);
         } else {
             lacunarityLabel.setColor(1, 1, 1, 1);
         }
 
-        scaleLabel.setText("Scale: " + floatFormat.format(((TerrainLayer) layers[selectedLayerIndex]).getScaleVal()));
-        octavesLabel.setText("Octaves: " + intFormat.format(((TerrainLayer) layers[selectedLayerIndex]).getOctavesVal()));
-        lacunarityLabel.setText("Lacunarity: " + floatFormat.format(((TerrainLayer) layers[selectedLayerIndex]).getLacunarityVal()));
-        wrapFactorLabel.setText("Wrap Factor: " + floatFormat.format(((TerrainLayer) layers[selectedLayerIndex]).getWrapVal()));
+        scaleLabel.setText("Scale: " + floatFormat.format(((TerrainLayer) layers.get(selectedLayerIndex)).getScaleVal()));
+        octavesLabel.setText("Octaves: " + intFormat.format(((TerrainLayer) layers.get(selectedLayerIndex)).getOctavesVal()));
+        lacunarityLabel.setText("Lacunarity: " + floatFormat.format(((TerrainLayer) layers.get(selectedLayerIndex)).getLacunarityVal()));
+        wrapFactorLabel.setText("Wrap Factor: " + floatFormat.format(((TerrainLayer) layers.get(selectedLayerIndex)).getWrapVal()));
     }
 
     protected void doLayerPanel() {
-        oldLayers = layers;
-        for (int i = 0; i < layers.length; i++) {
-            layerGroup.addActor(createLayer((layers[i])));
+        for (int i = 0; i < layers.size(); i++) {
+            System.out.println("hello?");
+            layerGroup.addActor(createLayerWidget((layers.get(i))));
         }
+
+        HorizontalGroup layerFunctions = new HorizontalGroup();
+        layerFunctions.space(2);
+        layerFunctions.pad(4);
+        layerFunctions.align(Align.center);
+
+        TextButton addLayer = new TextButton("+", chosenSkin);
+        addLayer.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                layers.add(layers.size(), new TerrainLayer(3L, layers.size()));
+                selectedLayerID = layers.size() - 1;
+                selectedLayerIndex = getSelectedLayerIndexFromID(selectedLayerID);
+                layersChanged = true;
+            }
+        }
+        );
+
+        TextButton removeLayer = new TextButton("-", chosenSkin);
+
+        layerFunctions.addActor(addLayer);
+        layerFunctions.addActor(removeLayer);
+
+        layerGroup.addActor(layerFunctions);
+
+        layerGroup.addActor(selectedLayer);
 
         layerPanel.setSize(layerPanel.getPrefWidth(), layerPanel.getPrefHeight());
 
     }
 
     protected void updateLayerPanel() {
-        if (oldLayers != layers) {
+        if (layersChanged) {
             layerGroup.clear();
-            for (int i = 0; i < layers.length; i++) {
-                layerGroup.addActor(createLayer((layers[i])));
-            }
+            doLayerPanel();
         }
 
-        oldLayers = layers;
+        selectedLayer.setText("The currently selected layer is '" + layers.get(selectedLayerIndex).getName() + "[" + selectedLayerID + "]'.");
+
+        layersChanged = false;
     }
 }
