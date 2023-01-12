@@ -35,7 +35,7 @@ public class MainScreen implements Screen {
 	public static final int CHUNK_SIZE = 7;
 	public static final Vector2 LEVEL_ASPECT_RATIO = new Vector2(4, 3);
 	public static final int LEVEL_ASPECT_SCALAR = 2;
-	public static final Vector2 MAP_DIMENSIONS = new Vector2(CHUNK_SIZE * LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.x, CHUNK_SIZE* LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.y);
+	public static final Vector2 MAP_DIMENSIONS = new Vector2((int) CHUNK_SIZE * LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.x, (int) CHUNK_SIZE* LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.y);
 
 	public static final Vector2 WINDOW_ASPECT_RATIO = new Vector2(16, 9);
 	int xPos, yPos;
@@ -125,35 +125,34 @@ public class MainScreen implements Screen {
 
 	public void drawLayers() {
 		//go from top layer to bottom layer
-		for (int i = layers.length; i > 0; i--) {
-
-		}
+		boolean[][] tileAbove = new boolean[(int) MAP_DIMENSIONS.x][(int) MAP_DIMENSIONS.y];
 
 		((TerrainLayer) layers[0]).generateValueMap(MAP_DIMENSIONS, xPos, yPos);
 
 		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
 			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
 				for (int i = layers.length-1; i >= 0; i--) {
-					switch (getLayerType(layers[i])) {
-						case "Terrain":
-							TextureRegion tile = getTextureForTerrainValue(layers[i], x, y);
-							if (tile != null) {
-								batch.draw(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-							}
+					if (tileAbove[x][y] == false) {
+						switch (getLayerType(layers[i])) {
+							case "Terrain":
+								TextureRegion tile = getTextureForTerrainValue(layers[i], x, y);
+								if (tile != null) {
+									batch.draw(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+									tileAbove[x][y] = true;
+								}
+								break;
+							default:
 
-							break;
-						default:
-
-
+						}
 					}
+
+
 				}
 			}
 		}
 	}
 
 	public TextureRegion getTextureForTerrainValue(Layer layer, int x, int y) {
-		// if (layer.upperBound == null) {
-
 		for (int i = layer.tileChildren.length-1; i >= 0; i--) { // highest layer first
 			if (((TerrainLayer)layer).valueMap[x][y] > layer.tileChildren[i].lowerBound){
 				return ((TerrainLayer) layer).getTextureFromIndex(i);

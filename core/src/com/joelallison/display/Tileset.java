@@ -41,21 +41,15 @@ public class Tileset {
     public static class TileChild {
         public String name; //universal
         public Float lowerBound; //for TerrainLayer TileChildren
-        public Float upperBound; //for TerrainLayer TileChildren
 
         public String orientationID; //for MazeLayer TileChildren
 
         public TileChild(String name, float lowerBound) { //for TerrainLayer
             this.name = name;
             this.lowerBound = lowerBound;
-            this.upperBound = -1f;
         }
 
-        public TileChild(String name, float lowerBound, float upperBound) { //for TerrainLayer
-            this.name = name;
-            this.lowerBound = lowerBound;
-            this.upperBound = upperBound;
-        }
+
     }
 
     public void initTexture() {
