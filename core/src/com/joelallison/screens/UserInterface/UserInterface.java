@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.joelallison.generation.Layer;
+import com.joelallison.screens.MainScreen;
 
 import java.util.HashMap;
 
@@ -86,7 +87,7 @@ public class UserInterface {
         TextButton moveDown = new TextButton("v", chosenSkin);
         TextButton showOrHide = new TextButton("[show/hide]", chosenSkin);
 
-        String layerType = layer.getClass().getName().replace("com.joelallison.generation.","").replace("Layer", "");
+        String layerType = MainScreen.getLayerType(layer);
 
         layerGroup.addActor(moveUp);
         layerGroup.addActor(moveDown);

@@ -5,10 +5,12 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
@@ -77,11 +79,11 @@ public class MainScreen implements Screen {
 	public void getTiles() {
 		((TerrainLayer) layers[0]).tileset = tilesets[0];
 		((TerrainLayer) layers[0]).tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
-		((TerrainLayer) layers[0]).tileBounds = new Tileset.TileBound[] {
-				new Tileset.TileBound("plant", 0.35f),
-				new Tileset.TileBound("bush", 0.4f),
-				new Tileset.TileBound("tree_1", 0.6f),
-				new Tileset.TileBound("tree_2", 0.7f)
+		((TerrainLayer) layers[0]).tileChildren = new Tileset.TileChild[] {
+				new Tileset.TileChild("plant", 0.35f),
+				new Tileset.TileChild("bush", 0.4f),
+				new Tileset.TileChild("tree_1", 0.6f),
+				new Tileset.TileChild("tree_2", 0.7f)
 		};
 	}
 
@@ -127,17 +129,42 @@ public class MainScreen implements Screen {
 
 		}
 
-		float[][] valueMap = TerrainLayer.genTerrain(((TerrainLayer) layers[0]).getSeed(), MAP_DIMENSIONS, xPos, yPos, ((TerrainLayer) layers[0]).getScaleVal(), ((TerrainLayer) layers[0]).getOctavesVal(), ((TerrainLayer) layers[0]).getLacunarityVal(), ((TerrainLayer) layers[0]).getWrapVal(), ((TerrainLayer) layers[0]).doInvert());
+		((TerrainLayer) layers[0]).generateValueMap(MAP_DIMENSIONS, xPos, yPos);
 
 		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
 			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
-				for (int i = 0; i < ((TerrainLayer) layers[0]).tileBounds.length; i++) {
-					if (valueMap[x][y] >= ((TerrainLayer) layers[0]).tileBounds[i].lowerBound) {
-						batch.draw(((TerrainLayer) layers[0]).getTextureFromIndex(i), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+				for (int i = layers.length-1; i >= 0; i--) {
+					switch (getLayerType(layers[i])) {
+						case "Terrain":
+							TextureRegion tile = getTextureForTerrainValue(layers[i], x, y);
+							if (tile != null) {
+								batch.draw(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+							}
+
+							break;
+						default:
+
+
 					}
 				}
 			}
 		}
+	}
+
+	public TextureRegion getTextureForTerrainValue(Layer layer, int x, int y) {
+		// if (layer.upperBound == null) {
+
+		for (int i = layer.tileChildren.length-1; i >= 0; i--) { // highest layer first
+			if (((TerrainLayer)layer).valueMap[x][y] > layer.tileChildren[i].lowerBound){
+				return ((TerrainLayer) layer).getTextureFromIndex(i);
+			}
+		}
+
+		return null; // if there should be no tile drawn at this position for this layer
+	}
+
+	public static String getLayerType(Layer layer){
+		return layer.getClass().getName().replace("com.joelallison.generation.","").replace("Layer", "");
 	}
 
 	@Override

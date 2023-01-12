@@ -13,7 +13,8 @@ public class TerrainLayer extends Layer {
     private float lacunarityVal;
     private int wrapVal;
     private boolean invert;
-    public Tileset.TileBound[] tileBounds; //these are the tile children for this gen type
+
+    public float[][] valueMap;
 
     public TerrainLayer(String name, Long seed, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
         super(name, seed);
@@ -35,7 +36,11 @@ public class TerrainLayer extends Layer {
     }
 
     public TextureRegion getTextureFromIndex(int i) {
-        return this.tileset.getTileTexture(this.tileset.map.get(this.tileBounds[i].name));
+        return this.tileset.getTileTexture(this.tileset.map.get(this.tileChildren[i].name));
+    }
+
+    public void generateValueMap(Vector2 dimensions, int xOffset, int yOffset) {
+        valueMap = genTerrain(this.getSeed(), dimensions, xOffset, yOffset, this.getScaleVal(), this.getOctavesVal(), this.getLacunarityVal(), this.getWrapVal(), this.doInvert());
     }
 
     public float getScaleVal() {
@@ -76,11 +81,6 @@ public class TerrainLayer extends Layer {
 
     public void setInvert(boolean invert) {
         this.invert = invert;
-    }
-
-    @Override
-    public TileChild[] getTileChildren() {
-        return tileBounds;
     }
 
     //generation stuff here onwards

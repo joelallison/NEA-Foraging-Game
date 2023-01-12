@@ -39,20 +39,19 @@ public class Tileset {
     }
 
     public static class TileChild {
-        public String name;
-    }
+        public String name; //universal
+        public Float lowerBound; //for TerrainLayer TileChildren
+        public Float upperBound; //for TerrainLayer TileChildren
 
-    public static class TileBound extends TileChild {
-        public Float lowerBound;
-        public Float upperBound;
+        public String orientationID; //for MazeLayer TileChildren
 
-        public TileBound(String name, float lowerBound) {
+        public TileChild(String name, float lowerBound) { //for TerrainLayer
             this.name = name;
             this.lowerBound = lowerBound;
             this.upperBound = -1f;
         }
 
-        public TileBound(String name, float lowerBound, float upperBound) {
+        public TileChild(String name, float lowerBound, float upperBound) { //for TerrainLayer
             this.name = name;
             this.lowerBound = lowerBound;
             this.upperBound = upperBound;

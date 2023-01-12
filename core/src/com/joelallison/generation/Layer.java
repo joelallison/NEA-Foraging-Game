@@ -11,6 +11,7 @@ public abstract class Layer {
     protected boolean showLayer;
     protected boolean opened;
     protected Vector2 center;
+    public TileChild[] tileChildren;
 
 
     // when you move the layer, a layer gets stored separately, another gets copied over to where it will move,
@@ -53,9 +54,5 @@ public abstract class Layer {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public TileChild[] getTileChildren(){
-        return null; //
     }
 }
