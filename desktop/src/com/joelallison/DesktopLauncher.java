@@ -24,6 +24,4 @@ public class DesktopLauncher {
 		//config.setWindowIcon("assets/tree.png");
 		new Lwjgl3Application(new TitleScreen(), config);
 	}
-
-
 }

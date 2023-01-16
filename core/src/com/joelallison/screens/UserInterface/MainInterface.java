@@ -11,11 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.joelallison.generation.Layer;
 import com.joelallison.generation.TerrainLayer;
 
 import java.text.DecimalFormat;
-import java.util.List;
 
 import static com.joelallison.screens.MainScreen.layers;
 import static com.joelallison.screens.MainScreen.userControls;
@@ -41,11 +39,8 @@ public class MainInterface extends UserInterface {
     protected VerticalGroup layerGroup = new VerticalGroup();
     boolean layersChanged = false;
     Stage stage;
-
-    public static int selectedLayerID;
     public static int selectedLayerIndex;
-
-    Label selectedLayer = new Label("The currently selected layer is '[].", chosenSkin);
+    protected Label selectedLayerLabel = new Label("The currently selected layer is '[].", chosenSkin);
 
     public void genUI(final Stage stage) { //stage is made final here so that it can be accessed within inner classes
         //menu bar, using custom method in UserInterface
@@ -212,10 +207,6 @@ public class MainInterface extends UserInterface {
 
     }
 
-    public static int getSelectedLayerIndexFromID(int selectedLayerID) {
-        return 0;
-    }
-
     protected void updateGenerationSettingsPanel(){
         updateGenerationSettingsTerrain();
     }
@@ -234,7 +225,7 @@ public class MainInterface extends UserInterface {
     }
 
     protected void doLayerPanel() {
-        for (int i = 0; i < layers.size(); i++) {
+        for (int i = layers.size()-1; i >= 0; i--) {
             System.out.println("hello?");
             layerGroup.addActor(createLayerWidget((layers.get(i))));
         }
@@ -248,9 +239,7 @@ public class MainInterface extends UserInterface {
         addLayer.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                layers.add(layers.size(), new TerrainLayer(3L, layers.size()));
-                selectedLayerID = layers.size() - 1;
-                selectedLayerIndex = getSelectedLayerIndexFromID(selectedLayerID);
+                layers.add(new TerrainLayer(3L));
                 layersChanged = true;
             }
         }
@@ -263,7 +252,7 @@ public class MainInterface extends UserInterface {
 
         layerGroup.addActor(layerFunctions);
 
-        layerGroup.addActor(selectedLayer);
+        layerGroup.addActor(selectedLayerLabel);
 
         layerPanel.setSize(layerPanel.getPrefWidth(), layerPanel.getPrefHeight());
 
@@ -273,10 +262,12 @@ public class MainInterface extends UserInterface {
         if (layersChanged) {
             layerGroup.clear();
             doLayerPanel();
+
+            layersChanged = false;
         }
 
-        selectedLayer.setText("The currently selected layer is '" + layers.get(selectedLayerIndex).getName() + "[" + selectedLayerID + "]'.");
+        selectedLayerLabel.setText("The currently selected layer is '" + layers.get(selectedLayerIndex).getName() + "'.");
 
-        layersChanged = false;
+
     }
 }

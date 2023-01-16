@@ -29,18 +29,9 @@ public abstract class Layer {
     public Layer(String name, Long seed, int layerID) { //for the creation of a layer with specific values
         this.name = name;
         this.seed = seed;
-        this.layerID = layerID;
     }
     public Layer() { //for the creation of a layer with default values
 
-    }
-
-    public int getLayerID() {
-        return layerID;
-    }
-
-    public void setLayerID(int layerID) {
-        this.layerID = layerID;
     }
 
     public Vector2 getCenter() {

@@ -29,8 +29,7 @@ public class TerrainLayer extends Layer {
         defaultTileValues();
     }
 
-    public TerrainLayer(Long seed, int layerID) { //these are some [fairly bland] default values
-        this.layerID = layerID;
+    public TerrainLayer(Long seed) { //these are some [fairly bland] default values
         this.name = "Terrain Layer";
         this.seed = seed; //seed is the only value that gets specifically set, this is so that the layer can be given the overall seed value.
         this.scaleVal = 20f;

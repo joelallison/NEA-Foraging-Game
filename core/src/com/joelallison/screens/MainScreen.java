@@ -21,7 +21,6 @@ import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.UserInterface.MainInterface;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class MainScreen implements Screen {
 	Stage mainUIStage;
@@ -31,9 +30,7 @@ public class MainScreen implements Screen {
 	ShapeRenderer sr; //for misc UI additions
 	ExtendViewport levelViewport;
 	OrthographicCamera levelCamera;
-	public static ArrayList<Layer> layers = new ArrayList<>(3);
-
-	HashMap<String, Integer> layerIDs = new HashMap<String, Integer>(1);
+	public static ArrayList<Layer> layers = new ArrayList<>(0);
 
 	public static final int TILE_SIZE = 32;
 	public static final int CHUNK_SIZE = 7;
@@ -75,7 +72,6 @@ public class MainScreen implements Screen {
 		stateTime = 0f;
 
 		layers.add(new TerrainLayer(0, "Terrain!!", 3L, 20f, 2, 2f, 1, false));
-		layerIDs.put(layers.get(0).getName(), layers.get(0).getLayerID());
 		mainUIStage = userInterface.genStage(mainUIStage);
 		userInterface.genUI(mainUIStage);
 

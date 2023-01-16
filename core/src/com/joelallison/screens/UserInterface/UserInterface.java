@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -80,26 +81,32 @@ public class UserInterface {
         layerGroup.space(4);
         layerGroup.pad(8);
 
-        layerGroup.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                for (int i = 0; i < layers.size(); i++) {
-                    if(Objects.equals(layers.get(i).getName(), layer.getLayerID())) {
-                        MainInterface.selectedLayerID = i;
-                    }
-                }
 
-            }
-        });
 
+        TextButton select = new TextButton("*", chosenSkin);
         TextButton moveUp = new TextButton("^", chosenSkin);
         TextButton moveDown = new TextButton("v", chosenSkin);
         TextButton showOrHide = new TextButton("[show/hide]", chosenSkin);
 
+        select.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                for (int i = 0; i < layers.size(); i++) {
+                    if(Objects.equals(layers.get(i), layer)) {
+                        MainInterface.selectedLayerIndex = i;
+                    }
+                }
+                return true;
+
+            }
+        });
+
         layerGroup.addActor(moveUp);
         layerGroup.addActor(moveDown);
 
+
         String layerType = MainScreen.getLayerType(layer);
+
         switch(layerType) {
             case "Terrain":
                 layerGroup.addActor(new TextField(layer.getName(), chosenSkin));
@@ -111,6 +118,9 @@ public class UserInterface {
         }
 
         layerGroup.addActor(showOrHide);
+        layerGroup.addActor(select);
+
+
 
         return layerGroup;
     }
