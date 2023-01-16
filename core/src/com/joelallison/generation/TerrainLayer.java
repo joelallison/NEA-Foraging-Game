@@ -4,26 +4,25 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.joelallison.display.Tileset;
-import com.joelallison.display.Tileset.*;
 import com.joelallison.screens.MainScreen;
 import tools.OpenSimplex2S;
 
 public class TerrainLayer extends Layer {
     public Tileset tileset;
-    private float scaleVal;
-    private int octavesVal;
-    private float lacunarityVal;
-    private int wrapVal;
+    private float scale;
+    private int octaves;
+    private float lacunarity;
+    private int wrap;
     private boolean invert;
 
     public float[][] valueMap;
 
-    public TerrainLayer(int layerID, String name, Long seed, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
-        super(name, seed, layerID);
-        this.scaleVal = scaleVal;
-        this.octavesVal = octavesVal;
-        this.lacunarityVal = lacunarityVal;
-        this.wrapVal = wrapVal;
+    public TerrainLayer(String name, Long seed, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
+        super(name, seed);
+        this.scale = scaleVal;
+        this.octaves = octavesVal;
+        this.lacunarity = lacunarityVal;
+        this.wrap = wrapVal;
         this.invert = invert;
 
         defaultTileValues();
@@ -32,10 +31,10 @@ public class TerrainLayer extends Layer {
     public TerrainLayer(Long seed) { //these are some [fairly bland] default values
         this.name = "Terrain Layer";
         this.seed = seed; //seed is the only value that gets specifically set, this is so that the layer can be given the overall seed value.
-        this.scaleVal = 20f;
-        this.octavesVal = 2;
-        this.lacunarityVal = 2f;
-        this.wrapVal = 1;
+        this.scale = 20f;
+        this.octaves = 2;
+        this.lacunarity = 2f;
+        this.wrap = 1;
         this.invert = false;
 
         defaultTileValues();
@@ -57,42 +56,42 @@ public class TerrainLayer extends Layer {
     }
 
     public void generateValueMap(Vector2 dimensions, int xOffset, int yOffset) {
-        valueMap = genTerrain(this.getSeed(), dimensions, xOffset, yOffset, this.getScaleVal(), this.getOctavesVal(), this.getLacunarityVal(), this.getWrapVal(), this.doInvert());
+        valueMap = genTerrain(this.getSeed(), dimensions, xOffset, yOffset, this.getScale(), this.getOctaves(), this.getLacunarity(), this.getWrap(), this.isInverted());
     }
 
-    public float getScaleVal() {
-        return scaleVal;
+    public float getScale() {
+        return scale;
     }
 
-    public void setScaleVal(float scaleVal) {
-        this.scaleVal = scaleVal;
+    public void setScale(float scale) {
+        this.scale = scale;
     }
 
-    public int getOctavesVal() {
-        return octavesVal;
+    public int getOctaves() {
+        return octaves;
     }
 
-    public void setOctavesVal(int octavesVal) {
-        this.octavesVal = octavesVal;
+    public void setOctaves(int octaves) {
+        this.octaves = octaves;
     }
 
-    public float getLacunarityVal() {
-        return lacunarityVal;
+    public float getLacunarity() {
+        return lacunarity;
     }
 
-    public void setLacunarityVal(float lacunarityVal) {
-        this.lacunarityVal = lacunarityVal;
+    public void setLacunarity(float lacunarity) {
+        this.lacunarity = lacunarity;
     }
 
-    public int getWrapVal() {
-        return wrapVal;
+    public int getWrap() {
+        return wrap;
     }
 
-    public void setWrapVal(int wrapVal) {
-        this.wrapVal = wrapVal;
+    public void setWrap(int wrap) {
+        this.wrap = wrap;
     }
 
-    public boolean doInvert() {
+    public boolean isInverted() {
         return invert;
     }
 

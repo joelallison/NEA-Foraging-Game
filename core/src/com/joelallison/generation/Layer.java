@@ -9,7 +9,7 @@ public abstract class Layer {
     protected String name;
     protected Long seed;
     protected Tileset tileSet;
-    protected boolean showLayer;
+    protected boolean showLayer = true; // shown by default
     protected boolean opened;
     protected Vector2 center;
     public TileChild[] tileChildren;
@@ -26,12 +26,19 @@ public abstract class Layer {
     // clipping mode?
     // the spacing and wave collapse feature?
 
-    public Layer(String name, Long seed, int layerID) { //for the creation of a layer with specific values
+    public Layer(String name, Long seed) { //for the creation of a layer with specific values
         this.name = name;
         this.seed = seed;
     }
     public Layer() { //for the creation of a layer with default values
 
+    }
+    public boolean layerShown() {
+        return showLayer;
+    }
+
+    public void setShowLayer(boolean showLayer) {
+        this.showLayer = showLayer;
     }
 
     public Vector2 getCenter() {

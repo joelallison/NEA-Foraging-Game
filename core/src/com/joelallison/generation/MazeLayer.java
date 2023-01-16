@@ -15,8 +15,8 @@ public class MazeLayer extends Layer {
     private int count = 0;
 
     public int[][] maze;
-    public MazeLayer(int layerID, String name, long seed, int width, int height) {
-        super(name, seed, layerID);
+    public MazeLayer(String name, long seed, int width, int height) {
+        super(name, seed);
 
         //each 'wall' and 'path' tiles are full cells, so the maze needs to be an odd width and height
         //this means that, in a way, the maze is half the dimensions that were specified.

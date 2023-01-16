@@ -75,7 +75,7 @@ public class MainScreen implements Screen {
 
 		//hueShiftShader = new ShaderProgram(Gdx.files.internal("display/shaders/hueshift.vsh"), Gdx.files.internal("display/shaders/hueshift.fsh"));
 
-		layers.add(new TerrainLayer(0, "Terrain!!", 3L, 20f, 2, 2f, 1, false));
+		layers.add(new TerrainLayer(3L));
 		mainUIStage = userInterface.genStage(mainUIStage);
 		userInterface.genUI(mainUIStage);
 
@@ -133,21 +133,21 @@ public class MainScreen implements Screen {
 			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
 				// top layer to bottom layer
 				for (int i = layers.size() - 1; i >= 0; i--) {
-					if (tileAbove[x][y] == false) {
-						switch (getLayerType(layers.get(i))) {
-							case "Terrain":
-								TextureRegion tile = getTextureForTerrainValue(layers.get(i), x, y);
-								if (tile != null) {
-									batch.draw(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-									tileAbove[x][y] = true;
-								}
-								break;
-							default:
+					if(layers.get(i).layerShown()){
+						if (tileAbove[x][y] == false) {
+							switch (getLayerType(layers.get(i))) {
+								case "Terrain":
+									TextureRegion tile = getTextureForTerrainValue(layers.get(i), x, y);
+									if (tile != null) {
+										batch.draw(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+										tileAbove[x][y] = true;
+									}
+									break;
+								default:
 
+							}
 						}
 					}
-
-
 				}
 			}
 		}
