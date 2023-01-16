@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.joelallison.generation.Layer;
 import com.joelallison.screens.MainScreen;
 
+import java.awt.event.KeyEvent;
 import java.util.Objects;
 
 import static com.joelallison.screens.MainScreen.layers;
@@ -74,54 +75,5 @@ public class UserInterface {
             this.canBeRun = canBeRun;
             this.method = method;
         }
-    }
-
-    protected HorizontalGroup createLayerWidget(final Layer layer) {
-        HorizontalGroup layerGroup = new HorizontalGroup();
-        layerGroup.space(4);
-        layerGroup.pad(8);
-
-
-
-        TextButton select = new TextButton("*", chosenSkin);
-        TextButton moveUp = new TextButton("^", chosenSkin);
-        TextButton moveDown = new TextButton("v", chosenSkin);
-        TextButton showOrHide = new TextButton("[show/hide]", chosenSkin);
-
-        select.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                for (int i = 0; i < layers.size(); i++) {
-                    if(Objects.equals(layers.get(i), layer)) {
-                        MainInterface.selectedLayerIndex = i;
-                    }
-                }
-                return true;
-
-            }
-        });
-
-        layerGroup.addActor(moveUp);
-        layerGroup.addActor(moveDown);
-
-
-        String layerType = MainScreen.getLayerType(layer);
-
-        switch(layerType) {
-            case "Terrain":
-                layerGroup.addActor(new TextField(layer.getName(), chosenSkin));
-
-                break;
-            default:
-                layerGroup.addActor(new TextField("(error?) Unknown layer type: " + layer.getName(), chosenSkin));
-
-        }
-
-        layerGroup.addActor(showOrHide);
-        layerGroup.addActor(select);
-
-
-
-        return layerGroup;
     }
 }

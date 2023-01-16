@@ -11,9 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.joelallison.generation.Layer;
 import com.joelallison.generation.TerrainLayer;
+import com.joelallison.screens.MainScreen;
 
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 import static com.joelallison.screens.MainScreen.layers;
 import static com.joelallison.screens.MainScreen.userControls;
@@ -34,7 +37,8 @@ public class MainInterface extends UserInterface {
     protected DecimalFormat intFormat = new DecimalFormat("00000");
     protected Window generationSettingsPanel = new Window("Generation parameters:", chosenSkin);
     protected Window layerPanel = new Window("Layers:", chosenSkin);
-    protected Label controlsTips = new Label("Press TAB to toggle UI. Use '<' and '>' to zoom in and out. All window-box things are draggable and movable!", chosenSkin);
+    String helpMsg = "Press TAB to toggle UI. Use '<' and '>' to zoom in and out. All window-box things are draggable and movable! The * layer button is used to select that layer.";
+    protected Label controlsTips = new Label(helpMsg, chosenSkin);
     protected Label displayedCoordinates = new Label("x: , y: ", chosenSkin);
     protected VerticalGroup layerGroup = new VerticalGroup();
     boolean layersChanged = false;
@@ -98,11 +102,13 @@ public class MainInterface extends UserInterface {
             if (generationSettingsPanel.isVisible()) {
                 generationSettingsPanel.setVisible(false);
                 displayedCoordinates.setVisible(false);
+                layerPanel.setVisible(false);
                 controlsTips.setText("Press TAB to toggle UI.");
             } else {
                 generationSettingsPanel.setVisible(true);
                 displayedCoordinates.setVisible(true);
-                controlsTips.setText("Press TAB to toggle UI. Use '<' and '>' to zoom in and out. All window-box things are draggable and movable!");
+                layerPanel.setVisible(true);
+                controlsTips.setText(helpMsg);
             }
         }
     }
@@ -204,10 +210,11 @@ public class MainInterface extends UserInterface {
 
         //add sliders to input coords
 
-
     }
 
     protected void updateGenerationSettingsPanel(){
+        generationSettingsPanel.getTitleLabel().setText("Generation Settings: " + layers.get(selectedLayerIndex).getName());
+
         updateGenerationSettingsTerrain();
     }
 
@@ -226,7 +233,6 @@ public class MainInterface extends UserInterface {
 
     protected void doLayerPanel() {
         for (int i = layers.size()-1; i >= 0; i--) {
-            System.out.println("hello?");
             layerGroup.addActor(createLayerWidget((layers.get(i))));
         }
 
@@ -269,5 +275,62 @@ public class MainInterface extends UserInterface {
         selectedLayerLabel.setText("The currently selected layer is '" + layers.get(selectedLayerIndex).getName() + "'.");
 
 
+    }
+
+    protected HorizontalGroup createLayerWidget(final Layer layer) {
+        HorizontalGroup layerGroup = new HorizontalGroup();
+        layerGroup.space(4);
+        layerGroup.pad(8);
+
+        TextButton select = new TextButton("*", chosenSkin);
+        TextButton moveUp = new TextButton("^", chosenSkin);
+        TextButton moveDown = new TextButton("v", chosenSkin);
+        TextButton showOrHide = new TextButton("[show/hide]", chosenSkin);
+
+        select.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                for (int i = 0; i < layers.size(); i++) {
+                    if(Objects.equals(layers.get(i), layer)) {
+                        MainInterface.selectedLayerIndex = i;
+                    }
+                }
+                return true;
+
+            }
+        });
+
+        layerGroup.addActor(moveUp);
+        layerGroup.addActor(moveDown);
+
+
+        String layerType = MainScreen.getLayerType(layer);
+
+        switch(layerType) {
+            case "Terrain":
+                final TextField nameField = new TextField(layer.getName(), chosenSkin);
+                nameField.setTextFieldListener(new TextField.TextFieldListener(){
+                    @Override
+                    public void keyTyped(TextField field, char c) {
+                        layer.setName(nameField.getText());
+                    }
+                });
+
+                layerGroup.addActor(nameField);
+
+
+
+                break;
+            default:
+                layerGroup.addActor(new TextField("(error?) Unknown layer type: " + layer.getName(), chosenSkin));
+
+        }
+
+        layerGroup.addActor(showOrHide);
+        layerGroup.addActor(select);
+
+
+
+        return layerGroup;
     }
 }

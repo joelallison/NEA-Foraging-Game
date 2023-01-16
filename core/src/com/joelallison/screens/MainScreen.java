@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -45,6 +46,7 @@ public class MainScreen implements Screen {
 	Gson gson = new Gson();
 	public static Tileset[] tilesets;
 	MainInterface userInterface = new MainInterface();
+	//ShaderProgram hueShiftShader;
 	public MainScreen() {
 		camera = new OrthographicCamera(1920, 1080);
 		viewport = new ExtendViewport(1920, 1080, camera);
@@ -71,21 +73,12 @@ public class MainScreen implements Screen {
 
 		stateTime = 0f;
 
+		//hueShiftShader = new ShaderProgram(Gdx.files.internal("display/shaders/hueshift.vsh"), Gdx.files.internal("display/shaders/hueshift.fsh"));
+
 		layers.add(new TerrainLayer(0, "Terrain!!", 3L, 20f, 2, 2f, 1, false));
 		mainUIStage = userInterface.genStage(mainUIStage);
 		userInterface.genUI(mainUIStage);
 
-	}
-
-	public void setTiles() {
-		((TerrainLayer) layers.get(0)).tileset = tilesets[0];
-		((TerrainLayer) layers.get(0)).tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
-		((TerrainLayer) layers.get(0)).tileChildren = new Tileset.TileChild[] {
-				new Tileset.TileChild("plant", 0.35f),
-				new Tileset.TileChild("bush", 0.4f),
-				new Tileset.TileChild("tree_1", 0.6f),
-				new Tileset.TileChild("tree_2", 0.7f)
-		};
 	}
 
 	@Override
@@ -102,7 +95,7 @@ public class MainScreen implements Screen {
 		xPos = userControls.getxPosition();
 		yPos = userControls.getyPosition();
 
-		setTiles();
+
 		ScreenUtils.clear(((TerrainLayer) layers.get(0)).tileset.getColor());
 
 		batch.begin();
@@ -133,9 +126,13 @@ public class MainScreen implements Screen {
 			((TerrainLayer) layers.get(i)).generateValueMap(MAP_DIMENSIONS, xPos, yPos);
 		}
 
+		// if there's a change,
+		tileAbove = new boolean[(int) MAP_DIMENSIONS.x][(int) MAP_DIMENSIONS.y];
+
 		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
 			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
-				for (int i = layers.size() -1; i >= 0; i--) {
+				// top layer to bottom layer
+				for (int i = layers.size() - 1; i >= 0; i--) {
 					if (tileAbove[x][y] == false) {
 						switch (getLayerType(layers.get(i))) {
 							case "Terrain":
@@ -196,6 +193,8 @@ public class MainScreen implements Screen {
 	
 	@Override
 	public void dispose () {
-		((TerrainLayer) layers.get(0)).tileset.getSpriteSheet().dispose();
+		for (Layer layer: layers) {
+			((TerrainLayer) layer).tileset.getSpriteSheet().dispose();
+		}
 	}
 }
