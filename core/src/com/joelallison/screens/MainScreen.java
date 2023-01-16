@@ -22,6 +22,7 @@ import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.UserInterface.MainInterface;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainScreen implements Screen {
 	Stage mainUIStage;
@@ -95,6 +96,7 @@ public class MainScreen implements Screen {
 		xPos = userControls.getxPosition();
 		yPos = userControls.getyPosition();
 
+		makeLayersUnique();
 
 		ScreenUtils.clear(((TerrainLayer) layers.get(0)).tileset.getColor());
 
@@ -165,6 +167,19 @@ public class MainScreen implements Screen {
 
 	public static String getLayerType(Layer layer) {
 		return layer.getClass().getName().replace("com.joelallison.generation.","").replace("Layer", "");
+	}
+
+	public void makeLayersUnique() {
+		HashMap<String, Integer> nameTallies = new HashMap<String, Integer>();
+
+		for(Layer layer : layers) {
+			if (nameTallies.containsKey(layer.getName())) {
+				nameTallies.put(layer.getName(), nameTallies.get(layer.getName()) + 1);
+				layer.setName(layer.getName() + ((nameTallies.get(layer.getName()))));
+			}else {
+				nameTallies.put(layer.getName(), 1);
+			}
+		}
 	}
 
 	@Override
