@@ -32,7 +32,7 @@ public class MainInterface extends UserInterface {
     protected Label centerPointLabel = new Label("Centre point:", chosenSkin); // for variable names, I'm reluctantly using the American spelling of 'centre' as it feels like convention :-(
     protected TextField xCoordField = new TextField("", chosenSkin);
     protected TextField yCoordField = new TextField("", chosenSkin);
-
+    String integerFilter = "-?[0-9]+";
     final Slider scaleSlider = new Slider(0.005f, 256f, 0.001f, false, chosenSkin);
     final Slider octavesSlider = new Slider(1, 3, 1, false, chosenSkin);
     final Slider lacunaritySlider = new Slider(0.01f, 10f, 0.01f, false, chosenSkin);
@@ -206,8 +206,10 @@ public class MainInterface extends UserInterface {
         generationSettingsPanel.row();
         generationSettingsPanel.row();
         generationSettingsPanel.add(centerPointLabel);
+        generationSettingsPanel.row();
 
-        //add sliders to input coords
+        generationSettingsPanel.add(xCoordField);
+        generationSettingsPanel.add(yCoordField);
 
     }
 
