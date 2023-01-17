@@ -4,17 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.joelallison.generation.Layer;
-import com.joelallison.screens.MainScreen;
-
-import java.awt.event.KeyEvent;
-import java.util.Objects;
-
-import static com.joelallison.screens.MainScreen.layers;
 
 public class UserInterface {
 

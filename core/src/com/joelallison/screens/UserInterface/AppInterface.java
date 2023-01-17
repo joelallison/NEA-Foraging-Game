@@ -12,15 +12,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.joelallison.generation.Layer;
 import com.joelallison.generation.TerrainLayer;
-import com.joelallison.screens.MainScreen;
+import com.joelallison.screens.AppScreen;
 
 import java.text.DecimalFormat;
 import java.util.Objects;
 
-import static com.joelallison.screens.MainScreen.layers;
-import static com.joelallison.screens.MainScreen.userControls;
+import static com.joelallison.screens.AppScreen.layers;
+import static com.joelallison.screens.AppScreen.userControls;
 
-public class MainInterface extends UserInterface {
+public class AppInterface extends UserInterface {
 
     //many elements of the ui are used in multiple methods, so it's best that they're all declared globally [to the class]
     protected Label scaleLabel = new Label("Scale:", chosenSkin);
@@ -307,7 +307,7 @@ public class MainInterface extends UserInterface {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 for (int i = 0; i < layers.size(); i++) {
                     if (Objects.equals(layers.get(i), layer)) {
-                        MainInterface.selectedLayerIndex = i;
+                        AppInterface.selectedLayerIndex = i;
                     }
                 }
                 return true;
@@ -334,7 +334,7 @@ public class MainInterface extends UserInterface {
         layerGroup.addActor(moveUp);
         layerGroup.addActor(moveDown);
 
-        String layerType = MainScreen.getLayerType(layer);
+        String layerType = AppScreen.getLayerType(layer);
 
         switch (layerType) {
             case "Terrain":

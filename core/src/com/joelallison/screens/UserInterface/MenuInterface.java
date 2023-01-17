@@ -7,8 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.joelallison.screens.MainScreen;
+import com.joelallison.screens.AppScreen;
 
 
 public class MenuInterface extends UserInterface {
@@ -35,7 +34,7 @@ public class MenuInterface extends UserInterface {
         skipButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new MainScreen());
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new AppScreen());
                 return true;
             }
         });
@@ -50,6 +49,13 @@ public class MenuInterface extends UserInterface {
         loginTable.row();
         loginTable.add(skipButton);
 
+        // login screen
+        // register screen
+        // buttons to go between the two
+
+        // user account
+        // username - unique, password - hashed, meets certain requirements
+        // can store save files to server
 
         loginTable.pad(16);
         loginTable.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);

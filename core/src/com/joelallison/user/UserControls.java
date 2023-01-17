@@ -3,7 +3,7 @@ package com.joelallison.user;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
-import static com.joelallison.screens.MainScreen.camera;
+import static com.joelallison.screens.AppScreen.camera;
 
 public class UserControls {
 

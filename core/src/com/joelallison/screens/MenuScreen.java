@@ -27,7 +27,7 @@ public class MenuScreen implements Screen {
             @Override
             public boolean keyDown(int keyCode) {
                 if (keyCode == Input.Keys.ENTER) {
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(new MainScreen());
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new AppScreen());
                     dispose();
                 }
                 return true;

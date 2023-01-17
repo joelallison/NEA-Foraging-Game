@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -19,13 +18,11 @@ import com.joelallison.generation.Layer;
 import com.joelallison.user.UserControls;
 import com.joelallison.generation.FileHandling;
 import com.joelallison.generation.TerrainLayer;
-import com.joelallison.screens.UserInterface.MainInterface;
+import com.joelallison.screens.UserInterface.AppInterface;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 
-public class MainScreen implements Screen {
+public class AppScreen implements Screen {
 	Stage mainUIStage;
 	public ExtendViewport viewport;
 	public static OrthographicCamera camera;
@@ -47,9 +44,9 @@ public class MainScreen implements Screen {
 	float stateTime;
 	Gson gson = new Gson();
 	public static Tileset[] tilesets;
-	MainInterface userInterface = new MainInterface();
+	AppInterface userInterface = new AppInterface();
 	//ShaderProgram hueShiftShader;
-	public MainScreen() {
+	public AppScreen() {
 		camera = new OrthographicCamera(1920, 1080);
 		viewport = new ExtendViewport(1920, 1080, camera);
 

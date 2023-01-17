@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.joelallison.display.Tileset;
-import com.joelallison.screens.MainScreen;
+import com.joelallison.screens.AppScreen;
 import tools.OpenSimplex2S;
 
 public class TerrainLayer extends Layer {
@@ -41,7 +41,7 @@ public class TerrainLayer extends Layer {
     }
 
     public void defaultTileValues() {
-        this.tileset = MainScreen.tilesets[0];
+        this.tileset = AppScreen.tilesets[0];
         this.tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
         this.tileChildren = new Tileset.TileChild[] {
                 new Tileset.TileChild("plant", 0.35f),

@@ -1,25 +1,17 @@
 package com.joelallison.screens;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-import java.util.Timer;
-
-import static com.joelallison.screens.UserInterface.UserInterface.chosenSkin;
-
-public class TitleScreen extends Game {
+public class StartScreen extends Game {
 
     SpriteBatch batch;
     Stage stage;
     public ExtendViewport viewport;
     public OrthographicCamera camera;
-
-
 
     public void create() {
         camera = new OrthographicCamera(1920, 1080);
