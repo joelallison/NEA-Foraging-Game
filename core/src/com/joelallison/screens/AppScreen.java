@@ -16,7 +16,7 @@ import com.google.gson.Gson;
 import com.joelallison.display.Tileset;
 import com.joelallison.generation.Layer;
 import com.joelallison.user.UserControls;
-import com.joelallison.generation.FileHandling;
+import com.joelallison.user.FileHandling;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.UserInterface.AppInterface;
 
@@ -58,6 +58,7 @@ public class AppScreen implements Screen {
 		levelCamera = new OrthographicCamera(MAP_DIMENSIONS.x, MAP_DIMENSIONS.y);
 		levelViewport = new ExtendViewport(MAP_DIMENSIONS.x*TILE_SIZE, MAP_DIMENSIONS.y*TILE_SIZE, levelCamera);
 
+		// delcare default coords
 		xPos = 0;
 		yPos = 0;
 
@@ -65,7 +66,7 @@ public class AppScreen implements Screen {
 		userControls = new UserControls(0, 0);
 
 		tilesets = gson.fromJson(FileHandling.readJSONTileData("core/src/com/joelallison/display/tilesets.json"), Tileset[].class);
-		for (Tileset t : tilesets) { t.initTexture(); }
+		for (Tileset t : tilesets) { t.initTileset(); }
 
 		batch = new SpriteBatch();
 		sr = new ShapeRenderer();

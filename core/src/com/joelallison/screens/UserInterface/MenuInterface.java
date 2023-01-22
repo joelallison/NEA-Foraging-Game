@@ -3,10 +3,12 @@ package com.joelallison.screens.UserInterface;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.utils.Align;
 import com.joelallison.screens.AppScreen;
 
 
@@ -17,6 +19,7 @@ public class MenuInterface extends UserInterface {
     Label passwordLabel = new Label("Password", chosenSkin);
     TextField passwordField = new TextField("", chosenSkin);
     TextButton loginButton = new TextButton("Login", chosenSkin);
+    TextButton registerButton = new TextButton("Register", chosenSkin);
 
     TextButton skipButton = new TextButton("Just do the thing", chosenSkin);
     Table loginTable = new Table();
@@ -39,15 +42,24 @@ public class MenuInterface extends UserInterface {
             }
         });
 
-        //loginTable.setDebug(true);
-        loginTable.add(usernameLabel);
-        loginTable.add(usernameField);
+
+
+        loginTable.setDebug(true);
+        loginTable.setFillParent(true);
+
+        loginTable.add(usernameLabel).space(4).align(Align.left);
         loginTable.row();
-        loginTable.add(passwordLabel);
-        loginTable.add(passwordField);
-        loginTable.add(loginButton);
+        loginTable.add(usernameField).space(4).colspan(3);
+        loginTable.row();
+        loginTable.add(passwordLabel).space(4).align(Align.left);;
+        loginTable.row();
+        loginTable.add(passwordField).space(4).colspan(3);
+        loginTable.row();
+        loginTable.add(registerButton).space(4);
+        loginTable.add(loginButton).space(4);
         loginTable.row();
         loginTable.add(skipButton);
+
 
         // login screen
         // register screen
@@ -57,8 +69,7 @@ public class MenuInterface extends UserInterface {
         // username - unique, password - hashed, meets certain requirements
         // can store save files to server
 
-        loginTable.pad(16);
-        loginTable.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
+        //loginTable.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
 
         stage.addActor(loginTable);
     }

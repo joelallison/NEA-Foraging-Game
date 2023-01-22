@@ -42,7 +42,6 @@ public class TerrainLayer extends Layer {
 
     public void defaultTileValues() {
         this.tileset = AppScreen.tilesets[0];
-        this.tileset.setColor(new Color(0.1215686f, 0.09411765f, 0.07843137f, 1));
         this.tileChildren = new Tileset.TileChild[] {
                 new Tileset.TileChild("plant", 0.35f),
                 new Tileset.TileChild("bush", 0.4f),

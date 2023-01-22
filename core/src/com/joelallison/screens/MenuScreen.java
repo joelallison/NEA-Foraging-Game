@@ -1,6 +1,7 @@
 package com.joelallison.screens;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -47,7 +48,7 @@ public class MenuScreen implements Screen {
         viewport.apply();
         batch.setProjectionMatrix(viewport.getCamera().combined);
         camera.update();
-        ScreenUtils.clear(UserInterface.defaultBackgroundColor);
+        ScreenUtils.clear(new Color(0.365f, 0.525f, 0.310f, 1f));
 
         //userInterface.update(); --> there's no update method yet
 

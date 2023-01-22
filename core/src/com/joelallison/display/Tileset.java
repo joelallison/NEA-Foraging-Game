@@ -12,8 +12,8 @@ public class Tileset {
     private String spriteSheet;
     private Texture spriteSheetTexture;
     public int tileSize;
-
     private Color baseColor;
+    private String baseColorHex;
     public HashMap<String, Tile> map = new HashMap<String, Tile>(); //Tile name : Tile data
 
     public Tileset(String name, String spriteSheet, int tileSize) {
@@ -52,8 +52,9 @@ public class Tileset {
 
     }
 
-    public void initTexture() {
+    public void initTileset() {
         spriteSheetTexture = new Texture(Gdx.files.internal(this.spriteSheet));
+        baseColor = Color.valueOf(this.baseColorHex);
     }
 
     public Color getColor() {

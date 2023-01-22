@@ -1,4 +1,4 @@
-package com.joelallison.generation;
+package com.joelallison.user;
 
 import java.io.File;
 import java.io.FileNotFoundException;

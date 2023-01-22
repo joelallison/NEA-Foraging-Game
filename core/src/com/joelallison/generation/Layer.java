@@ -10,7 +10,6 @@ public abstract class Layer {
     protected Long seed;
     protected Tileset tileSet;
     protected boolean showLayer = true; // shown by default
-    protected boolean opened;
     protected Vector2 center;
     public TileChild[] tileChildren;
 
