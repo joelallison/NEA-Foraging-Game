@@ -1,8 +1,10 @@
 package com.joelallison.generation;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.joelallison.display.Tileset;
-import com.joelallison.display.Tileset.*;
+import com.joelallison.graphics.Tileset;
+import com.joelallison.graphics.Tileset.*;
+import tools.HSLColor;
 
 public abstract class Layer {
     protected int layerID;
@@ -11,6 +13,8 @@ public abstract class Layer {
     protected Tileset tileSet;
     protected boolean showLayer = true; // shown by default
     protected Vector2 center;
+
+    protected HSLColor HSLadjustment = new HSLColor(0, 0, 0);
     public TileChild[] tileChildren;
 
 

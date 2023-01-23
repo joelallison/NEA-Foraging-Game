@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
-import com.joelallison.display.Tileset;
+import com.joelallison.graphics.Tileset;
 import com.joelallison.generation.Layer;
 import com.joelallison.user.UserControls;
 import com.joelallison.user.FileHandling;
@@ -45,7 +45,7 @@ public class AppScreen implements Screen {
 	Gson gson = new Gson();
 	public static Tileset[] tilesets;
 	AppInterface userInterface = new AppInterface();
-	//ShaderProgram hueShiftShader;
+
 	public AppScreen() {
 		camera = new OrthographicCamera(1920, 1080);
 		viewport = new ExtendViewport(1920, 1080, camera);
@@ -58,14 +58,14 @@ public class AppScreen implements Screen {
 		levelCamera = new OrthographicCamera(MAP_DIMENSIONS.x, MAP_DIMENSIONS.y);
 		levelViewport = new ExtendViewport(MAP_DIMENSIONS.x*TILE_SIZE, MAP_DIMENSIONS.y*TILE_SIZE, levelCamera);
 
-		// delcare default coords
+		// declare default coords
 		xPos = 0;
 		yPos = 0;
 
 		//declare player stuff
 		userControls = new UserControls(0, 0);
 
-		tilesets = gson.fromJson(FileHandling.readJSONTileData("core/src/com/joelallison/display/tilesets.json"), Tileset[].class);
+		tilesets = gson.fromJson(FileHandling.readJSONTileData("core/src/com/joelallison/graphics/tilesets.json"), Tileset[].class);
 		for (Tileset t : tilesets) { t.initTileset(); }
 
 		batch = new SpriteBatch();
@@ -73,7 +73,7 @@ public class AppScreen implements Screen {
 
 		stateTime = 0f;
 
-		//hueShiftShader = new ShaderProgram(Gdx.files.internal("display/shaders/hueshift.vsh"), Gdx.files.internal("display/shaders/hueshift.fsh"));
+
 
 		layers.add(new TerrainLayer(3L));
 		mainUIStage = userInterface.genStage(mainUIStage);

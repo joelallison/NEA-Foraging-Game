@@ -1,4 +1,4 @@
-package com.joelallison.display;
+package com.joelallison.graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -22,11 +22,12 @@ public class Tileset {
         this.tileSize = tileSize;
     }
 
-    public Tileset(String name, String spriteSheet, int tileSize, HashMap<String, Tile> map) {
+    public Tileset(String name, String spriteSheet, int tileSize, String baseColorHex, HashMap<String, Tile> map) {
         this.name = name;
         this.spriteSheet = spriteSheet;
         this.tileSize = tileSize;
         this.map = map;
+        this.baseColorHex = baseColorHex;
     }
 
     public static class Tile {

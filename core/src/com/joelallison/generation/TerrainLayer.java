@@ -1,9 +1,8 @@
 package com.joelallison.generation;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.joelallison.display.Tileset;
+import com.joelallison.graphics.Tileset;
 import com.joelallison.screens.AppScreen;
 import tools.OpenSimplex2S;
 
