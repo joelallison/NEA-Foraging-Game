@@ -35,6 +35,7 @@ public class TerrainLayer extends Layer {
         this.lacunarity = 2f;
         this.wrap = 1;
         this.invert = false;
+        this.hueShift = 0;
 
         defaultTileValues();
     }

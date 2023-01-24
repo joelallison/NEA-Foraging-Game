@@ -13,8 +13,7 @@ public abstract class Layer {
     protected Tileset tileSet;
     protected boolean showLayer = true; // shown by default
     protected Vector2 center;
-
-    protected HSLColor HSLadjustment = new HSLColor(0, 0, 0);
+    public float hueShift;
     public TileChild[] tileChildren;
 
 

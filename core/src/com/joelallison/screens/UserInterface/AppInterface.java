@@ -37,12 +37,12 @@ public class AppInterface extends UserInterface {
     final Slider octavesSlider = new Slider(1, 3, 1, false, chosenSkin);
     final Slider lacunaritySlider = new Slider(0.01f, 10f, 0.01f, false, chosenSkin);
     final Slider wrapFactorSlider = new Slider(1, 20, 1, false, chosenSkin);
-
-
     protected DecimalFormat floatFormat = new DecimalFormat("##0.00");
     protected DecimalFormat intFormat = new DecimalFormat("00000");
     protected Window generationSettingsPanel = new Window("Generation parameters:", chosenSkin);
     protected Window layerPanel = new Window("Layers:", chosenSkin);
+    protected Window tilePanel = new Window("Tiles and aesthetics:", chosenSkin);
+    final Slider hueSlider = new Slider(-1, 1, 0.001f, false, chosenSkin);
     String helpMsg = "Press TAB to toggle UI.\nUse '<' and '>' to zoom in and out. All window-box things are draggable and movable!\nThe * layer button is used to select that layer. The ! layer button is a shortcut to exporting the layer individually.";
     protected Label controlsTips = new Label(helpMsg, chosenSkin);
     protected Label displayedCoordinates = new Label("x: , y: ", chosenSkin);
@@ -75,9 +75,12 @@ public class AppInterface extends UserInterface {
         stage.addActor(generationSettingsPanel);
 
         //box for managing the different layers of generation
-        layerPanel.add(layerGroup);
         doLayerPanel();
         stage.addActor(layerPanel);
+
+        //box to edit tiles and visuals
+        doTilePanel();
+        stage.addActor(tilePanel);
 
         displayedCoordinates.setPosition(Gdx.graphics.getWidth() - (4 * displayedCoordinates.getPrefWidth()), Gdx.graphics.getHeight() - (2 * displayedCoordinates.getPrefHeight()));
         stage.addActor(displayedCoordinates);
@@ -100,6 +103,7 @@ public class AppInterface extends UserInterface {
     public void update(float delta) {
         updateGenerationSettingsPanel();
         updateLayerPanel();
+        updateTilePanel();
 
         displayedCoordinates.setText("x: " + userControls.getxPosition() + " y: " + userControls.getyPosition());
 
@@ -108,14 +112,32 @@ public class AppInterface extends UserInterface {
                 generationSettingsPanel.setVisible(false);
                 displayedCoordinates.setVisible(false);
                 layerPanel.setVisible(false);
+                tilePanel.setVisible(false);
                 controlsTips.setText("Press TAB to toggle UI.");
             } else {
                 generationSettingsPanel.setVisible(true);
                 displayedCoordinates.setVisible(true);
                 layerPanel.setVisible(true);
+                tilePanel.setVisible(true);
                 controlsTips.setText(helpMsg);
             }
         }
+    }
+
+    protected void doTilePanel() {
+        hueSlider.setValue((layers.get(selectedLayerIndex)).hueShift);
+        hueSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                (layers.get(selectedLayerIndex)).hueShift = (hueSlider.getValue());
+            }
+        });
+
+        tilePanel.add(hueSlider);
+    }
+
+    protected void updateTilePanel() {
+        hueSlider.setValue((layers.get(selectedLayerIndex)).hueShift);
     }
 
     protected void doGenerationSettingsPanel() {
@@ -129,7 +151,6 @@ public class AppInterface extends UserInterface {
             default:
                 // 0_o
         }
-
 
         generationSettingsPanel.setPosition(5f, Gdx.graphics.getHeight() - 400f);
         generationSettingsPanel.padLeft(4f);
@@ -210,7 +231,6 @@ public class AppInterface extends UserInterface {
 
         generationSettingsPanel.add(xCoordField);
         generationSettingsPanel.add(yCoordField);
-
     }
 
     protected void updateGenerationSettingsPanel() {
@@ -240,6 +260,8 @@ public class AppInterface extends UserInterface {
     }
 
     protected void doLayerPanel() {
+        layerPanel.add(layerGroup);
+
         for (int i = layers.size() - 1; i >= 0; i--) {
             layerGroup.addActor(createLayerWidget((layers.get(i))));
         }

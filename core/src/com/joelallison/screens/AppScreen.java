@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -43,14 +44,15 @@ public class AppScreen implements Screen {
 	public static UserControls userControls;
 	float stateTime;
 	Gson gson = new Gson();
+	private ShaderProgram shaderProgram;
 	public static Tileset[] tilesets;
 	AppInterface userInterface = new AppInterface();
-
 	public AppScreen() {
 		camera = new OrthographicCamera(1920, 1080);
 		viewport = new ExtendViewport(1920, 1080, camera);
 
 		batch = new SpriteBatch();
+		sr = new ShapeRenderer();
 
 		camera.zoom = 1.2f;
 		viewport.apply(true);
@@ -68,12 +70,14 @@ public class AppScreen implements Screen {
 		tilesets = gson.fromJson(FileHandling.readJSONTileData("core/src/com/joelallison/graphics/tilesets.json"), Tileset[].class);
 		for (Tileset t : tilesets) { t.initTileset(); }
 
-		batch = new SpriteBatch();
-		sr = new ShapeRenderer();
+		String vertexShader = Gdx.files.internal("core/src/com/joelallison/graphics/shaders/vertex.glsl").readString();
+		String hueshiftShader = Gdx.files.internal("core/src/com/joelallison/graphics/shaders/hueshift.glsl").readString();
+		shaderProgram = new ShaderProgram(vertexShader, hueshiftShader);
+		shaderProgram.pedantic = false;
+
+		//batch.setShader(shaderProgram);
 
 		stateTime = 0f;
-
-
 
 		layers.add(new TerrainLayer(3L));
 		mainUIStage = userInterface.genStage(mainUIStage);
@@ -115,7 +119,6 @@ public class AppScreen implements Screen {
 		userInterface.update(delta);
 		mainUIStage.draw();
 		mainUIStage.act();
-
 	}
 
 	public void drawLayers() {
@@ -140,6 +143,9 @@ public class AppScreen implements Screen {
 								case "Terrain":
 									TextureRegion tile = getTextureForTerrainValue(layers.get(i), x, y);
 									if (tile != null) {
+										//shaderProgram.setUniformf("hue", 0.4f);
+										//shaderProgram.setUniformf("u_time", stateTime);
+										//shaderProgram.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 										batch.draw(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 										tileAbove[x][y] = true;
 									}
