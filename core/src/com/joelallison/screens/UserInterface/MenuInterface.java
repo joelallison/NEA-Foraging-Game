@@ -21,7 +21,7 @@ public class MenuInterface extends UserInterface {
     TextButton loginButton = new TextButton("Login", chosenSkin);
     TextButton registerButton = new TextButton("Register", chosenSkin);
 
-    TextButton skipButton = new TextButton("Just do the thing", chosenSkin);
+    TextButton skipButton = new TextButton("Go to app", chosenSkin);
     Table loginTable = new Table();
 
     public void genUI(final Stage stage) { //stage is made final here so that it can be accessed within inner classes

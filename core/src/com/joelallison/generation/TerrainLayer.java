@@ -13,7 +13,6 @@ public class TerrainLayer extends Layer {
     private float lacunarity;
     private int wrap;
     private boolean invert;
-
     public float[][] valueMap;
 
     public TerrainLayer(String name, Long seed, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
@@ -24,7 +23,7 @@ public class TerrainLayer extends Layer {
         this.wrap = wrapVal;
         this.invert = invert;
 
-        defaultTileValues();
+        this.defaultTileValues();
     }
 
     public TerrainLayer(Long seed) { //these are some [fairly bland] default values
@@ -40,7 +39,7 @@ public class TerrainLayer extends Layer {
         defaultTileValues();
     }
 
-    public void defaultTileValues() {
+    private void defaultTileValues() {
         this.tileset = AppScreen.tilesets[0];
         this.tileChildren = new Tileset.TileChild[] {
                 new Tileset.TileChild("plant", 0.35f),
@@ -48,10 +47,6 @@ public class TerrainLayer extends Layer {
                 new Tileset.TileChild("tree_1", 0.6f),
                 new Tileset.TileChild("tree_2", 0.7f)
         };
-    }
-
-    public TextureRegion getTextureFromIndex(int i) {
-        return this.tileset.getTileTexture(this.tileset.map.get(this.tileChildren[i].name));
     }
 
     public void generateValueMap(Vector2 dimensions, int xOffset, int yOffset) {
@@ -98,7 +93,9 @@ public class TerrainLayer extends Layer {
         this.invert = invert;
     }
 
-    //generation stuff here onwards
+
+
+    //generation stuff is from here onwards
 
     public static float[][] genTerrain(long seed, Vector2 Dimensions, int xOffset, int yOffset, float scale, int octaves, float lacunarity, int wrapFactor, boolean invertWrap) {
         //greater scale zooms in, halved scale from normal could be used for map data. I think scale of 4 is best for most stuff

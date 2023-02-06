@@ -26,9 +26,7 @@ public class Database {
             if (rows > 0) {
                 System.out.println("New user added.");
             }
-
             connection.close();
-
         } catch (SQLException e) {
             System.out.println("PostgreSQL Server Connection error");
             e.printStackTrace();

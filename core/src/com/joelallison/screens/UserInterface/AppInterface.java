@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 import java.util.Objects;
 
 import static com.joelallison.screens.AppScreen.layers;
-import static com.joelallison.screens.AppScreen.userControls;
+import static com.joelallison.screens.AppScreen.userInput;
 
 public class AppInterface extends UserInterface {
 
@@ -75,6 +75,7 @@ public class AppInterface extends UserInterface {
         stage.addActor(generationSettingsPanel);
 
         //box for managing the different layers of generation
+        layerPanel.add(layerGroup);
         doLayerPanel();
         stage.addActor(layerPanel);
 
@@ -105,7 +106,7 @@ public class AppInterface extends UserInterface {
         updateLayerPanel();
         updateTilePanel();
 
-        displayedCoordinates.setText("x: " + userControls.getxPosition() + " y: " + userControls.getyPosition());
+        displayedCoordinates.setText("x: " + userInput.getxPosition() + " y: " + userInput.getyPosition());
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
             if (generationSettingsPanel.isVisible()) {
@@ -260,8 +261,6 @@ public class AppInterface extends UserInterface {
     }
 
     protected void doLayerPanel() {
-        layerPanel.add(layerGroup);
-
         for (int i = layers.size() - 1; i >= 0; i--) {
             layerGroup.addActor(createLayerWidget((layers.get(i))));
         }

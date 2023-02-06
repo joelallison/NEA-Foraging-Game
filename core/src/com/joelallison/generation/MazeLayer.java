@@ -1,5 +1,8 @@
 package com.joelallison.generation;
 
+import com.joelallison.graphics.Tileset;
+import com.joelallison.screens.AppScreen;
+
 import java.util.*;
 
 public class MazeLayer extends Layer {
@@ -22,6 +25,10 @@ public class MazeLayer extends Layer {
         //this means that, in a way, the maze is half the dimensions that were specified.
         this.width = width + ((width+1)%2); //ensures width is odd
         this.height = height + ((height+1)%2); //ensures height is odd
+    }
+
+    private void defaultTileValues() {
+        //NEEDS WORK!!
     }
 
     public void genMaze() {

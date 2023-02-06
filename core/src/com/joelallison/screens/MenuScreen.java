@@ -17,6 +17,7 @@ public class MenuScreen implements Screen {
     OrthographicCamera camera;
     float stateTime;
     MenuInterface userInterface = new MenuInterface();
+    private String username;
 
     public MenuScreen() {
         camera = new OrthographicCamera(1920, 1080);

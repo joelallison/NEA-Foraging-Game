@@ -5,12 +5,12 @@ import com.badlogic.gdx.Input;
 
 import static com.joelallison.screens.AppScreen.camera;
 
-public class UserControls {
+public class UserInput {
 
     int xPosition;
     int yPosition;
 
-    public UserControls(int xPosition, int yPosition) {
+    public UserInput(int xPosition, int yPosition) {
         this.xPosition = xPosition;
         this.yPosition = yPosition;
     }

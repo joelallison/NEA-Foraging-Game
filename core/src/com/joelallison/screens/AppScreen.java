@@ -16,8 +16,8 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.generation.Layer;
-import com.joelallison.user.UserControls;
-import com.joelallison.user.FileHandling;
+import com.joelallison.user.UserInput;
+import com.joelallison.export.FileHandling;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.UserInterface.AppInterface;
 
@@ -32,7 +32,6 @@ public class AppScreen implements Screen {
 	ExtendViewport levelViewport;
 	OrthographicCamera levelCamera;
 	public static ArrayList<Layer> layers = new ArrayList<>(0);
-
 	public static final int TILE_SIZE = 32;
 	public static final int CHUNK_SIZE = 7;
 	public static final Vector2 LEVEL_ASPECT_RATIO = new Vector2(4, 3);
@@ -41,7 +40,7 @@ public class AppScreen implements Screen {
 
 	public static final Vector2 WINDOW_ASPECT_RATIO = new Vector2(16, 9);
 	int xPos, yPos;
-	public static UserControls userControls;
+	public static UserInput userInput;
 	float stateTime;
 	Gson gson = new Gson();
 	private ShaderProgram shaderProgram;
@@ -65,15 +64,15 @@ public class AppScreen implements Screen {
 		yPos = 0;
 
 		//declare player stuff
-		userControls = new UserControls(0, 0);
+		userInput = new UserInput(0, 0);
 
 		tilesets = gson.fromJson(FileHandling.readJSONTileData("core/src/com/joelallison/graphics/tilesets.json"), Tileset[].class);
 		for (Tileset t : tilesets) { t.initTileset(); }
 
 		String vertexShader = Gdx.files.internal("core/src/com/joelallison/graphics/shaders/vertex.glsl").readString();
 		String hueshiftShader = Gdx.files.internal("core/src/com/joelallison/graphics/shaders/hueshift.glsl").readString();
-		shaderProgram = new ShaderProgram(vertexShader, hueshiftShader);
-		shaderProgram.pedantic = false;
+		//shaderProgram = new ShaderProgram(vertexShader, hueshiftShader);
+		//shaderProgram.pedantic = false;
 
 		//batch.setShader(shaderProgram);
 
@@ -88,25 +87,20 @@ public class AppScreen implements Screen {
 	@Override
 	public void render(float delta) {
 		stateTime += Gdx.graphics.getDeltaTime();
-
 		viewport.apply();
 		camera.zoom = MathUtils.clamp(camera.zoom, 0.2f, 4f); //set limits for the size of the viewport
 		batch.setProjectionMatrix(viewport.getCamera().combined);
 		sr.setProjectionMatrix(viewport.getCamera().combined);
 		camera.update();
 
-		userControls.handleInput();
-		xPos = userControls.getxPosition();
-		yPos = userControls.getyPosition();
+		userInput.handleInput();
+		xPos = userInput.getxPosition();
+		yPos = userInput.getyPosition();
 
-		//makeLayersUnique();
-
-		ScreenUtils.clear(((TerrainLayer) layers.get(0)).tileset.getColor());
+		ScreenUtils.clear(layers.get(0).tileset.getColor());
 
 		batch.begin();
-
 		drawLayers();
-
 		batch.end();
 
 		//draw border around the generated outcome

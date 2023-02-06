@@ -1,21 +1,23 @@
 package com.joelallison.generation;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.graphics.Tileset.*;
+import com.joelallison.screens.AppScreen;
 import tools.HSLColor;
 
 public abstract class Layer {
     protected int layerID;
     protected String name;
     protected Long seed;
-    protected Tileset tileSet;
+    public Tileset tileset = AppScreen.tilesets[0]; //default value that's needed due to the way libgdx runs its render process
     protected boolean showLayer = true; // shown by default
     protected Vector2 center;
     public float hueShift;
     public TileChild[] tileChildren;
-
+    protected boolean inheritSeed = false;
 
     // when you move the layer, a layer gets stored separately, another gets copied over to where it will move,
     // and then the separate one gets stored in its final place, writing over the recently moved one's old duplicate
@@ -34,6 +36,9 @@ public abstract class Layer {
     }
     public Layer() { //for the creation of a layer with default values
 
+    }
+    public TextureRegion getTextureFromIndex(int i) {
+        return this.tileset.getTileTexture(this.tileset.map.get(this.tileChildren[i].name));
     }
     public boolean layerShown() {
         return showLayer;
