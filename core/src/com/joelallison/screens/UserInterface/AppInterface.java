@@ -17,7 +17,7 @@ import com.joelallison.screens.AppScreen;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
-import static com.joelallison.screens.AppScreen.layers;
+import static com.joelallison.screens.AppScreen.creation;
 import static com.joelallison.screens.AppScreen.userInput;
 
 public class AppInterface extends UserInterface {
@@ -29,9 +29,9 @@ public class AppInterface extends UserInterface {
     protected Label wrapFactorLabel = new Label("Wrap factor:", chosenSkin);
     protected Label invertLabel = new Label("Invert:", chosenSkin);
     protected CheckBox invertCheck = new CheckBox("", chosenSkin);
-    protected Label centerPointLabel = new Label("Centre point:", chosenSkin); // for variable names, I'm reluctantly using the American spelling of 'centre' as it feels like convention :-(
-    protected TextField xCoordField = new TextField("", chosenSkin);
-    protected TextField yCoordField = new TextField("", chosenSkin);
+    protected Label centerPointLabel = new Label("x: , y:", chosenSkin); // for variable names, I'm reluctantly using the American spelling of 'centre' as it feels like convention :-(
+    protected TextButton centerPointButton = new TextButton("Centre coords:", chosenSkin);
+
     String integerFilter = "-?[0-9]+";
     final Slider scaleSlider = new Slider(0.005f, 256f, 0.001f, false, chosenSkin);
     final Slider octavesSlider = new Slider(1, 3, 1, false, chosenSkin);
@@ -126,11 +126,11 @@ public class AppInterface extends UserInterface {
     }
 
     protected void doTilePanel() {
-        hueSlider.setValue((layers.get(selectedLayerIndex)).hueShift);
+        hueSlider.setValue((creation.layers.get(selectedLayerIndex)).hueShift);
         hueSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                (layers.get(selectedLayerIndex)).hueShift = (hueSlider.getValue());
+                (creation.layers.get(selectedLayerIndex)).hueShift = (hueSlider.getValue());
             }
         });
 
@@ -138,11 +138,11 @@ public class AppInterface extends UserInterface {
     }
 
     protected void updateTilePanel() {
-        hueSlider.setValue((layers.get(selectedLayerIndex)).hueShift);
+        hueSlider.setValue((creation.layers.get(selectedLayerIndex)).hueShift);
     }
 
     protected void doGenerationSettingsPanel() {
-        String selectedLayerType = layers.get(selectedLayerIndex).getClass().getName().replace("com.joelallison.generation.", "").replace("Layer", "");
+        String selectedLayerType = creation.layers.get(selectedLayerIndex).getClass().getName().replace("com.joelallison.generation.", "").replace("Layer", "");
 
         switch (selectedLayerType) {
             case "Terrain":
@@ -162,11 +162,11 @@ public class AppInterface extends UserInterface {
     protected void loadTerrainSettings() {
         generationSettingsPanel.add(scaleLabel);
 
-        scaleSlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getScale());
+        scaleSlider.setValue(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getScale());
         scaleSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) layers.get(selectedLayerIndex)).setScale(scaleSlider.getValue());
+                ((TerrainLayer) creation.layers.get(selectedLayerIndex)).setScale(scaleSlider.getValue());
             }
         });
 
@@ -175,12 +175,12 @@ public class AppInterface extends UserInterface {
 
         generationSettingsPanel.add(octavesLabel);
 
-        octavesSlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getOctaves());
+        octavesSlider.setValue(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getOctaves());
 
         octavesSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) layers.get(selectedLayerIndex)).setOctaves((int) octavesSlider.getValue());
+                ((TerrainLayer) creation.layers.get(selectedLayerIndex)).setOctaves((int) octavesSlider.getValue());
             }
         });
 
@@ -189,12 +189,12 @@ public class AppInterface extends UserInterface {
         generationSettingsPanel.row();
         generationSettingsPanel.add(lacunarityLabel);
 
-        lacunaritySlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getLacunarity());
+        lacunaritySlider.setValue(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getLacunarity());
 
         lacunaritySlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) layers.get(selectedLayerIndex)).setLacunarity(lacunaritySlider.getValue());
+                ((TerrainLayer) creation.layers.get(selectedLayerIndex)).setLacunarity(lacunaritySlider.getValue());
             }
         });
 
@@ -203,12 +203,12 @@ public class AppInterface extends UserInterface {
         generationSettingsPanel.row();
         generationSettingsPanel.add(wrapFactorLabel);
 
-        wrapFactorSlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getWrap());
+        wrapFactorSlider.setValue(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getWrap());
 
         wrapFactorSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) layers.get(selectedLayerIndex)).setWrap((int) wrapFactorSlider.getValue());
+                ((TerrainLayer) creation.layers.get(selectedLayerIndex)).setWrap((int) wrapFactorSlider.getValue());
             }
         });
 
@@ -219,50 +219,58 @@ public class AppInterface extends UserInterface {
         invertCheck.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) layers.get(selectedLayerIndex)).setInvert(invertCheck.isChecked());
+                ((TerrainLayer) creation.layers.get(selectedLayerIndex)).setInvert(invertCheck.isChecked());
             }
         });
 
         generationSettingsPanel.add(invertCheck);
 
         generationSettingsPanel.row();
-        generationSettingsPanel.row();
-        generationSettingsPanel.add(centerPointLabel);
-        generationSettingsPanel.row();
+        generationSettingsPanel.add(centerPointButton);
+        centerPointButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Dialog dialog = new Dialog("Editing centre coords", chosenSkin, "dialog") {
+                    //AAAAAAA
+                };
+                dialog.show(stage);
+                return true;
+            }
+        });
 
-        generationSettingsPanel.add(xCoordField);
-        generationSettingsPanel.add(yCoordField);
+
+        generationSettingsPanel.add(centerPointLabel);
     }
 
     protected void updateGenerationSettingsPanel() {
-        generationSettingsPanel.getTitleLabel().setText("Generation Settings: " + layers.get(selectedLayerIndex).getName());
+        generationSettingsPanel.getTitleLabel().setText("Generation Settings: " + creation.layers.get(selectedLayerIndex).getName());
 
         updateGenerationSettingsTerrain();
     }
 
     protected void updateGenerationSettingsTerrain() {
-        if (((TerrainLayer) layers.get(selectedLayerIndex)).getOctaves() < 2) { // lacunarity has no effect if octaves is less than 2, this visual update attempts to indicate that to the user
+        if (((TerrainLayer) creation.layers.get(selectedLayerIndex)).getOctaves() < 2) { // lacunarity has no effect if octaves is less than 2, this visual update attempts to indicate that to the user
             lacunarityLabel.setColor(0.45f, 0.45f, 0.45f, 1);
         } else {
             lacunarityLabel.setColor(1, 1, 1, 1);
         }
 
-        scaleLabel.setText("Scale: " + floatFormat.format(((TerrainLayer) layers.get(selectedLayerIndex)).getScale()));
-        octavesLabel.setText("Octaves: " + intFormat.format(((TerrainLayer) layers.get(selectedLayerIndex)).getOctaves()));
-        lacunarityLabel.setText("Lacunarity: " + floatFormat.format(((TerrainLayer) layers.get(selectedLayerIndex)).getLacunarity()));
-        wrapFactorLabel.setText("Wrap Factor: " + floatFormat.format(((TerrainLayer) layers.get(selectedLayerIndex)).getWrap()));
+        scaleLabel.setText("Scale: " + floatFormat.format(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getScale()));
+        octavesLabel.setText("Octaves: " + intFormat.format(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getOctaves()));
+        lacunarityLabel.setText("Lacunarity: " + floatFormat.format(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getLacunarity()));
+        wrapFactorLabel.setText("Wrap Factor: " + floatFormat.format(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getWrap()));
 
-        scaleSlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getScale());
-        octavesSlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getOctaves());
-        lacunaritySlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getLacunarity());
-        wrapFactorSlider.setValue(((TerrainLayer) layers.get(selectedLayerIndex)).getWrap());
-        invertCheck.setChecked(((TerrainLayer) layers.get(selectedLayerIndex)).isInverted());
+        scaleSlider.setValue(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getScale());
+        octavesSlider.setValue(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getOctaves());
+        lacunaritySlider.setValue(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getLacunarity());
+        wrapFactorSlider.setValue(((TerrainLayer) creation.layers.get(selectedLayerIndex)).getWrap());
+        invertCheck.setChecked(((TerrainLayer) creation.layers.get(selectedLayerIndex)).isInverted());
 
     }
 
     protected void doLayerPanel() {
-        for (int i = layers.size() - 1; i >= 0; i--) {
-            layerGroup.addActor(createLayerWidget((layers.get(i))));
+        for (int i = creation.layers.size() - 1; i >= 0; i--) {
+            layerGroup.addActor(createLayerWidget((creation.layers.get(i))));
         }
 
         HorizontalGroup layerFunctions = new HorizontalGroup();
@@ -274,13 +282,29 @@ public class AppInterface extends UserInterface {
         addLayer.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                layers.add(new TerrainLayer(3L));
+                creation.layers.add(new TerrainLayer(3L));
                 layersChanged = true;
                 return true;
             }
         });
 
         TextButton removeLayer = new TextButton("-", chosenSkin);
+        removeLayer.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(creation.layers.size() > 1){
+                    creation.layers.remove(selectedLayerIndex);
+                    layersChanged = true;
+                    if(selectedLayerIndex != 0) {
+                        selectedLayerIndex = selectedLayerIndex - 1;
+                    }else {
+                        selectedLayerIndex = 0;
+                    }
+                }
+
+                return true;
+            }
+        });
 
         layerFunctions.addActor(addLayer);
         layerFunctions.addActor(removeLayer);
@@ -301,7 +325,7 @@ public class AppInterface extends UserInterface {
             layersChanged = false;
         }
 
-        selectedLayerLabel.setText("The currently selected layer is '" + layers.get(selectedLayerIndex).getName() + "'.");
+        selectedLayerLabel.setText("The currently selected layer is '" + creation.layers.get(selectedLayerIndex).getName() + "'.");
     }
 
     protected HorizontalGroup createLayerWidget(final Layer layer) {
@@ -326,28 +350,35 @@ public class AppInterface extends UserInterface {
         select.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                for (int i = 0; i < layers.size(); i++) {
-                    if (Objects.equals(layers.get(i), layer)) {
+                for (int i = 0; i < creation.layers.size(); i++) {
+                    if (Objects.equals(creation.layers.get(i), layer)) {
                         AppInterface.selectedLayerIndex = i;
                     }
                 }
                 return true;
-
             }
         });
 
         moveUp.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                moveLayerUp(layers.indexOf(layer));
+                int layerIndex = creation.layers.indexOf(layer);
+                if (layerIndex < creation.layers.size()-1) {
+                    layersChanged = true;
+                    creation.swapLayers(layerIndex, layerIndex + 1);
+                }
                 return true;
             }
         });
 
-        moveUp.addListener(new InputListener() {
+        moveDown.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                moveLayerDown(layers.indexOf(layer));
+                int layerIndex = creation.layers.indexOf(layer);
+                if (layerIndex > 0) {
+                    layersChanged = true;
+                    creation.swapLayers(layerIndex - 1, layerIndex);
+                }
                 return true;
             }
         });
@@ -380,14 +411,4 @@ public class AppInterface extends UserInterface {
         return layerGroup;
     }
 
-    public void moveLayerUp(int index) {
-        if (index < layers.size()-1) {
-            Layer tempLayer = layers.get(index);
-            layers.set(index+1, layers.get(index));
-            layers.set(index, tempLayer);
-        }
-    }
-
-    public void moveLayerDown(int index) {
-    }
 }

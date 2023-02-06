@@ -40,7 +40,7 @@ public class TerrainLayer extends Layer {
     }
 
     private void defaultTileValues() {
-        this.tileset = AppScreen.tilesets[0];
+        this.tileset = AppScreen.tilesets.get("Trees & Rocks");
         this.tileChildren = new Tileset.TileChild[] {
                 new Tileset.TileChild("plant", 0.35f),
                 new Tileset.TileChild("bush", 0.4f),

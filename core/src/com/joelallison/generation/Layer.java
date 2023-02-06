@@ -9,10 +9,9 @@ import com.joelallison.screens.AppScreen;
 import tools.HSLColor;
 
 public abstract class Layer {
-    protected int layerID;
     protected String name;
     protected Long seed;
-    public Tileset tileset = AppScreen.tilesets[0]; //default value that's needed due to the way libgdx runs its render process
+    public Tileset tileset = AppScreen.tilesets.get("Trees & Rocks"); //default value that's needed due to the way libgdx runs its render process
     protected boolean showLayer = true; // shown by default
     protected Vector2 center;
     public float hueShift;

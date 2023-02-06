@@ -13,38 +13,39 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.google.gson.Gson;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.generation.Layer;
+import com.joelallison.user.Creation;
 import com.joelallison.user.UserInput;
-import com.joelallison.export.FileHandling;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.UserInterface.AppInterface;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.joelallison.io.JsonHandling.tilesetsJsonToMap;
 
 public class AppScreen implements Screen {
 	Stage mainUIStage;
+
+	//viewport displays the generated tiles
 	public ExtendViewport viewport;
 	public static OrthographicCamera camera;
 	SpriteBatch batch;
 	ShapeRenderer sr; //for misc UI additions
-	ExtendViewport levelViewport;
-	OrthographicCamera levelCamera;
-	public static ArrayList<Layer> layers = new ArrayList<>(0);
+	public static Creation creation;
 	public static final int TILE_SIZE = 32;
 	public static final int CHUNK_SIZE = 7;
 	public static final Vector2 LEVEL_ASPECT_RATIO = new Vector2(4, 3);
 	public static final int LEVEL_ASPECT_SCALAR = 2;
 	public static final Vector2 MAP_DIMENSIONS = new Vector2((int) CHUNK_SIZE * LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.x, (int) CHUNK_SIZE* LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.y);
-
-	public static final Vector2 WINDOW_ASPECT_RATIO = new Vector2(16, 9);
 	int xPos, yPos;
 	public static UserInput userInput;
 	float stateTime;
-	Gson gson = new Gson();
+
 	private ShaderProgram shaderProgram;
-	public static Tileset[] tilesets;
+	public static HashMap<String, Tileset> tilesets;
 	AppInterface userInterface = new AppInterface();
 	public AppScreen() {
 		camera = new OrthographicCamera(1920, 1080);
@@ -53,11 +54,8 @@ public class AppScreen implements Screen {
 		batch = new SpriteBatch();
 		sr = new ShapeRenderer();
 
-		camera.zoom = 1.2f;
+		camera.zoom = 1.2f; //default viewport size
 		viewport.apply(true);
-
-		levelCamera = new OrthographicCamera(MAP_DIMENSIONS.x, MAP_DIMENSIONS.y);
-		levelViewport = new ExtendViewport(MAP_DIMENSIONS.x*TILE_SIZE, MAP_DIMENSIONS.y*TILE_SIZE, levelCamera);
 
 		// declare default coords
 		xPos = 0;
@@ -66,8 +64,12 @@ public class AppScreen implements Screen {
 		//declare player stuff
 		userInput = new UserInput(0, 0);
 
-		tilesets = gson.fromJson(FileHandling.readJSONTileData("core/src/com/joelallison/graphics/tilesets.json"), Tileset[].class);
-		for (Tileset t : tilesets) { t.initTileset(); }
+		tilesets = tilesetsJsonToMap("core/src/com/joelallison/graphics/tilesets.json");
+		for (Map.Entry<String, Tileset> set : tilesets.entrySet()) {
+			set.getValue().initTileset();
+		}
+
+		creation = new Creation("Creation");
 
 		String vertexShader = Gdx.files.internal("core/src/com/joelallison/graphics/shaders/vertex.glsl").readString();
 		String hueshiftShader = Gdx.files.internal("core/src/com/joelallison/graphics/shaders/hueshift.glsl").readString();
@@ -78,10 +80,8 @@ public class AppScreen implements Screen {
 
 		stateTime = 0f;
 
-		layers.add(new TerrainLayer(3L));
 		mainUIStage = userInterface.genStage(mainUIStage);
 		userInterface.genUI(mainUIStage);
-
 	}
 
 	@Override
@@ -97,45 +97,47 @@ public class AppScreen implements Screen {
 		xPos = userInput.getxPosition();
 		yPos = userInput.getyPosition();
 
-		ScreenUtils.clear(layers.get(0).tileset.getColor());
+		ScreenUtils.clear(creation.layers.get(0).tileset.getColor());
 
 		batch.begin();
 		drawLayers();
 		batch.end();
 
-		//draw border around the generated outcome
-		sr.begin(ShapeRenderer.ShapeType.Line);
-		sr.setColor(Color.WHITE);
-		sr.rect(0f, 0f, MAP_DIMENSIONS.x*TILE_SIZE, MAP_DIMENSIONS.y*TILE_SIZE);
-		sr.end();
+		drawUIShapes();
 
 		//update the ui and draw it on top of everything else
+		creation.makeLayerNamesUnique();
 		userInterface.update(delta);
 		mainUIStage.draw();
 		mainUIStage.act();
 	}
 
+	public void drawUIShapes() {
+		sr.begin(ShapeRenderer.ShapeType.Line);
+
+		//draw border around the generated outcome
+		sr.setColor(Color.WHITE);
+		sr.rect(0f, 0f, MAP_DIMENSIONS.x*TILE_SIZE, MAP_DIMENSIONS.y*TILE_SIZE);
+
+		sr.end();
+	}
+
 	public void drawLayers() {
-		//go from top layer to bottom layer
-		boolean[][] tileAbove = new boolean[(int) MAP_DIMENSIONS.x][(int) MAP_DIMENSIONS.y];
-
-
-		for (int i = 0; i < layers.size(); i++) {
-			((TerrainLayer) layers.get(i)).generateValueMap(MAP_DIMENSIONS, xPos, yPos);
+		for (int i = 0; i < creation.layers.size(); i++) {
+			((TerrainLayer) creation.layers.get(i)).generateValueMap(MAP_DIMENSIONS, xPos, yPos);
 		}
 
-		// if there's a change,
-		tileAbove = new boolean[(int) MAP_DIMENSIONS.x][(int) MAP_DIMENSIONS.y];
+		boolean[][] tileAbove = new boolean[(int) MAP_DIMENSIONS.x][(int) MAP_DIMENSIONS.y];
 
 		for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
 			for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
 				// top layer to bottom layer
-				for (int i = layers.size() - 1; i >= 0; i--) {
-					if(layers.get(i).layerShown()){
-						if (tileAbove[x][y] == false) {
-							switch (getLayerType(layers.get(i))) {
+				for (int i = creation.layers.size() - 1; i >= 0; i--) {
+					if(creation.layers.get(i).layerShown()){
+						if (tileAbove[x][y] == false) { // no need to draw if there's already a tile above
+							switch (getLayerType(creation.layers.get(i))) {
 								case "Terrain":
-									TextureRegion tile = getTextureForTerrainValue(layers.get(i), x, y);
+									TextureRegion tile = getTextureForTerrainValue(creation.layers.get(i), x, y);
 									if (tile != null) {
 										//shaderProgram.setUniformf("hue", 0.4f);
 										//shaderProgram.setUniformf("u_time", stateTime);
@@ -194,7 +196,7 @@ public class AppScreen implements Screen {
 	
 	@Override
 	public void dispose () {
-		for (Layer layer: layers) {
+		for (Layer layer: creation.layers) {
 			((TerrainLayer) layer).tileset.getSpriteSheet().dispose();
 		}
 	}

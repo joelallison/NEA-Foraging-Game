@@ -1,4 +1,4 @@
-package com.joelallison.export;
+package com.joelallison.io;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,18 +30,22 @@ public abstract class FileHandling {
 
         return fileText.toString();
     }
-    public static void createFile(String filename) {
+    public static boolean createFile(String filename) {
         try {
             File file = new File(filename);
             if (file.createNewFile()) {
                 System.out.println("Created file: " + file.getAbsolutePath());
+                return false;
             } else {
                 System.out.println("File already exists.");
+                return true;
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return true;
     }
 
     public static void writeToFile(String filename, String[] text) {
@@ -110,8 +114,6 @@ public abstract class FileHandling {
         }
 
         outputArray = toFileFormat(mazeArray, format, true);
-
-
 
         return outputArray;
     }

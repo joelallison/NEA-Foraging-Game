@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.HashMap;
 
 public class Tileset {
-    private String name;
     private String spriteSheet;
     private Texture spriteSheetTexture;
     public int tileSize;
@@ -16,19 +15,13 @@ public class Tileset {
     private String baseColorHex;
     public HashMap<String, Tile> map = new HashMap<String, Tile>(); //Tile name : Tile data
 
-    public Tileset(String name, String spriteSheet, int tileSize) {
-        this.name = name;
-        this.spriteSheet = spriteSheet;
-        this.tileSize = tileSize;
-    }
-
-    public Tileset(String name, String spriteSheet, int tileSize, String baseColorHex, HashMap<String, Tile> map) {
-        this.name = name;
+    public Tileset(String spriteSheet, int tileSize, String baseColorHex, HashMap<String, Tile> map) {
         this.spriteSheet = spriteSheet;
         this.tileSize = tileSize;
         this.map = map;
         this.baseColorHex = baseColorHex;
     }
+
 
     public static class Tile {
         int cornerX;
@@ -88,14 +81,6 @@ public class Tileset {
 
     public void setSpriteSheet(String fileLocation) { // used specifically where using with Gdx.files.internal isn't the right option
         spriteSheetTexture = new Texture(fileLocation);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
 }
