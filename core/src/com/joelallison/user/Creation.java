@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static com.joelallison.screens.AppScreen.tilesets;
+
 public class Creation {
     public String name;
     public ArrayList<Layer> layers;
@@ -63,7 +65,7 @@ public class Creation {
     }
 
     public Color getClearColor() {
-        return layers.get(0).tileset.getColor();
+        return tilesets.get(layers.get(0).tileset).getColor();
     }
 
     public int layerCount() {

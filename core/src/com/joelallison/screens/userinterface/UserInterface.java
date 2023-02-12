@@ -1,4 +1,4 @@
-package com.joelallison.screens.UserInterface;
+package com.joelallison.screens.userinterface;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -26,6 +26,8 @@ public class UserInterface {
         chosenSkin = defaultSkin;
     }
 
+
+    /* ended up not being used
     protected Table constructMenuBar(MenuMethod[] menuButtons, Vector2 position) {
         Table table = new Table();
 
@@ -67,5 +69,5 @@ public class UserInterface {
             this.canBeRun = canBeRun;
             this.method = method;
         }
-    }
+    }*/
 }

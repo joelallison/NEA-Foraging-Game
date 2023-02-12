@@ -1,9 +1,8 @@
-package com.joelallison.screens.UserInterface;
+package com.joelallison.screens.userinterface;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;

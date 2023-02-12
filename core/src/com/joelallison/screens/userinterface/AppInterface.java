@@ -1,4 +1,4 @@
-package com.joelallison.screens.UserInterface;
+package com.joelallison.screens.userinterface;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -9,20 +9,23 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.joelallison.generation.Layer;
 import com.joelallison.generation.TerrainLayer;
+import com.joelallison.graphics.Tileset;
 import com.joelallison.screens.AppScreen;
 
 import java.text.DecimalFormat;
-import java.util.Objects;
+import java.util.*;
 
-import static com.joelallison.screens.AppScreen.creation;
-import static com.joelallison.screens.AppScreen.userInput;
+import static com.joelallison.screens.AppScreen.*;
 
 public class AppInterface extends UserInterface {
 
     //many elements of the ui are used in multiple methods, so it's best that they're all declared globally [to the class]
+
+    //for gen settings
     protected Label scaleLabel = new Label("Scale:", chosenSkin);
     protected Label octavesLabel = new Label("Octaves:", chosenSkin);
     protected Label lacunarityLabel = new Label("Lacunarity:", chosenSkin);
@@ -41,21 +44,30 @@ public class AppInterface extends UserInterface {
     protected DecimalFormat intFormat = new DecimalFormat("00000");
     protected Window generationSettingsPanel = new Window("Generation parameters:", chosenSkin);
     protected Window layerPanel = new Window("Layers:", chosenSkin);
+
+    //for tile panel
     protected Window tilePanel = new Window("Tiles and aesthetics:", chosenSkin);
+    final SelectBox tilesetSelect = new SelectBox(chosenSkin);
     final Slider hueSlider = new Slider(-1, 1, 0.001f, false, chosenSkin);
     String helpMsg = "Press TAB to toggle UI.\nUse '<' and '>' to zoom in and out. All window-box things are draggable and movable!\nThe * layer button is used to select that layer. The ! layer button is a shortcut to exporting the layer individually.";
     protected Label controlsTips = new Label(helpMsg, chosenSkin);
     protected Label displayedCoordinates = new Label("x: , y: ", chosenSkin);
     protected VerticalGroup layerGroup = new VerticalGroup();
     boolean layersChanged = false;
+    boolean tileDataChanged = false;
     Stage stage;
     public static int selectedLayerIndex;
     protected Label selectedLayerLabel = new Label("The currently selected layer is '[].", chosenSkin);
+    Table tilesetTable = new Table();
 
     public void genUI(final Stage stage) { //stage is made final here so that it can be accessed within inner classes
         //menu bar, using custom method in UserInterface
 
         this.stage = stage;
+
+        /* ended up not being used
+
+
         stage.addActor(constructMenuBar(new MenuMethod[]{new MenuMethod("File", true, new Runnable() {
             @Override
             public void run() {
@@ -69,6 +81,8 @@ public class AppInterface extends UserInterface {
         })
 
         }, new Vector2(32, Gdx.graphics.getHeight() - 10)));
+
+         */
 
         //box to edit generation settings for selected layer
         doGenerationSettingsPanel();
@@ -123,22 +137,6 @@ public class AppInterface extends UserInterface {
                 controlsTips.setText(helpMsg);
             }
         }
-    }
-
-    protected void doTilePanel() {
-        hueSlider.setValue((creation.layers.get(selectedLayerIndex)).hueShift);
-        hueSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                (creation.layers.get(selectedLayerIndex)).hueShift = (hueSlider.getValue());
-            }
-        });
-
-        tilePanel.add(hueSlider);
-    }
-
-    protected void updateTilePanel() {
-        hueSlider.setValue((creation.layers.get(selectedLayerIndex)).hueShift);
     }
 
     protected void doGenerationSettingsPanel() {
@@ -318,6 +316,8 @@ public class AppInterface extends UserInterface {
     }
 
     protected void updateLayerPanel() {
+
+        // only make updates to the layers if anything has been edited, otherwise it's unnecessary as there's no change
         if (layersChanged) {
             layerGroup.clear();
             doLayerPanel();
@@ -327,7 +327,6 @@ public class AppInterface extends UserInterface {
 
         selectedLayerLabel.setText("The currently selected layer is '" + creation.layers.get(selectedLayerIndex).getName() + "'.");
     }
-
     protected HorizontalGroup createLayerWidget(final Layer layer) {
         HorizontalGroup layerGroup = new HorizontalGroup();
         layerGroup.space(4);
@@ -411,4 +410,90 @@ public class AppInterface extends UserInterface {
         return layerGroup;
     }
 
+    protected void doTilePanel() {
+        //tilesetSelect.setItems(tilesets.keySet());
+        //tilePanel.add(tilesetSelect);
+        //tilePanel.row();
+
+        /*hueSlider.setValue((creation.layers.get(selectedLayerIndex)).hueShift);
+        hueSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                (creation.layers.get(selectedLayerIndex)).hueShift = (hueSlider.getValue());
+            }
+        });
+
+        tilePanel.add(hueSlider);*/
+
+
+        tilesetTable = doTilesetTable(selectedLayerIndex);
+        tilePanel.add(tilesetTable);
+
+        tilePanel.setSize(tilePanel.getPrefWidth() * 1.2f, tilePanel.getPrefHeight());
+    }
+
+    protected void updateTilePanel() {
+
+        // only make updates to the tiles if anything has been edited, otherwise it's unnecessary as there's no change
+
+
+        if (tileDataChanged) {
+           for (int i = 0; i < tilesetTable.getChildren().size; i++) {
+                Tileset.TileChild tile = creation.layers.get(selectedLayerIndex).tileChildren.get(i);
+
+                Actor tableLine = tilesetTable.getChild(i);
+                if (tableLine.getClass() == HorizontalGroup.class) {
+                    System.out.println("OAUHOASUD!!!!");
+                }
+            }
+
+            tileDataChanged = false;
+        }
+
+
+
+        //tilesetSelect.setSelected(creation.layers.get(selectedLayerIndex));
+        hueSlider.setValue((creation.layers.get(selectedLayerIndex)).hueShift);
+    }
+
+    protected Table doTilesetTable(int selectedLayer) {
+        Table tileEditor = new Table();
+
+        // sorting by a certain parameter -- threshold for terrain, alphabetically for maze
+        creation.layers.get(selectedLayer).sortTileChildren();
+
+        // in the list of tilechildren, create a widget for each tile
+        for (int i = 0; i < creation.layers.get(selectedLayer).tileChildren.size(); i++) {
+            tileEditor.addActor(createTileLine(tilesets.get(creation.layers.get(selectedLayer).tileset), i));
+        }
+        
+        return tileEditor;
+    }
+
+    private HorizontalGroup createTileLine(Tileset tileset, final int selectedTile) {
+        HorizontalGroup tileDataGroup = new HorizontalGroup();
+        tileDataGroup.space(4);
+        tileDataGroup.pad(2);
+
+        final Tileset.TileChild tile = creation.layers.get(selectedLayerIndex).tileChildren.get(selectedTile);
+
+        TextureRegionDrawable tileImgDrawable = new TextureRegionDrawable(tileset.getTileTexture(tileset.map.get(tile.name)));
+        tileImgDrawable.setMinSize(tileImgDrawable.getMinWidth()*2, tileImgDrawable.getMinHeight()*2);
+        Image tileImg = new Image(tileImgDrawable);
+        tileDataGroup.addActor(tileImg);
+
+        Label tileName = new Label("name: " + tile.name + ", thresh: " + floatFormat.format(tile.lowerBound), chosenSkin);
+        tileDataGroup.addActor(tileName);
+
+        final Slider lowerBoundSlider = new Slider(0, 1, 0.05f, false, chosenSkin);
+        lowerBoundSlider.setValue(tile.lowerBound);
+        lowerBoundSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                creation.layers.get(selectedLayerIndex).tileChildren.set(selectedTile, new Tileset.TileChild(tile.name, lowerBoundSlider.getValue()));
+            }
+        });
+
+        return tileDataGroup;
+    }
 }

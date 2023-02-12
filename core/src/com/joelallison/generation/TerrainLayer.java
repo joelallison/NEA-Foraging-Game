@@ -6,8 +6,12 @@ import com.joelallison.graphics.Tileset;
 import com.joelallison.screens.AppScreen;
 import tools.OpenSimplex2S;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 public class TerrainLayer extends Layer {
-    public Tileset tileset;
     private float scale;
     private int octaves;
     private float lacunarity;
@@ -40,13 +44,25 @@ public class TerrainLayer extends Layer {
     }
 
     private void defaultTileValues() {
-        this.tileset = AppScreen.tilesets.get("Trees & Rocks");
-        this.tileChildren = new Tileset.TileChild[] {
-                new Tileset.TileChild("plant", 0.35f),
-                new Tileset.TileChild("bush", 0.4f),
-                new Tileset.TileChild("tree_1", 0.6f),
-                new Tileset.TileChild("tree_2", 0.7f)
+        this.tileChildren = new ArrayList<>();
+        this.tileChildren.add(new Tileset.TileChild("left_end", 0.35f));
+        this.tileChildren.add(new Tileset.TileChild("crossroad", 0.4f));
+        this.tileChildren.add(new Tileset.TileChild("corner_topright", 0.6f));
+        this.tileChildren.add(new Tileset.TileChild("crossroad", 0.7f));
+    }
+
+    @Override
+    public void sortTileChildren() {
+        //using method outlined here: https://www.java67.com/2015/01/how-to-sort-hashmap-in-java-based-on.html
+
+        final Comparator<Tileset.TileChild> THRESHOLD_COMPARATOR  = new Comparator<Tileset.TileChild>() {
+            @Override
+            public int compare(Tileset.TileChild t1, Tileset.TileChild t2){
+                return t2.lowerBound.compareTo(t1.lowerBound);
+            }
         };
+
+        this.tileChildren.sort(THRESHOLD_COMPARATOR);
     }
 
     public void generateValueMap(Vector2 dimensions, int xOffset, int yOffset) {

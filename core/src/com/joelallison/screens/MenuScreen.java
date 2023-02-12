@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.joelallison.screens.UserInterface.MenuInterface;
+import com.joelallison.screens.userinterface.MenuInterface;
 
 public class MenuScreen implements Screen {
     SpriteBatch batch;

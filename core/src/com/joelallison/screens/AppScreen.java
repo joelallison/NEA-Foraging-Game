@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -18,9 +17,8 @@ import com.joelallison.generation.Layer;
 import com.joelallison.user.Creation;
 import com.joelallison.user.UserInput;
 import com.joelallison.generation.TerrainLayer;
-import com.joelallison.screens.UserInterface.AppInterface;
+import com.joelallison.screens.userinterface.AppInterface;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +26,6 @@ import static com.joelallison.io.JsonHandling.tilesetsJsonToMap;
 
 public class AppScreen implements Screen {
 	Stage mainUIStage;
-
 	//viewport displays the generated tiles
 	public ExtendViewport viewport;
 	public static OrthographicCamera camera;
@@ -43,8 +40,6 @@ public class AppScreen implements Screen {
 	int xPos, yPos;
 	public static UserInput userInput;
 	float stateTime;
-
-	private ShaderProgram shaderProgram;
 	public static HashMap<String, Tileset> tilesets;
 	AppInterface userInterface = new AppInterface();
 	public AppScreen() {
@@ -71,13 +66,6 @@ public class AppScreen implements Screen {
 
 		creation = new Creation("Creation");
 
-		String vertexShader = Gdx.files.internal("core/src/com/joelallison/graphics/shaders/vertex.glsl").readString();
-		String hueshiftShader = Gdx.files.internal("core/src/com/joelallison/graphics/shaders/hueshift.glsl").readString();
-		//shaderProgram = new ShaderProgram(vertexShader, hueshiftShader);
-		//shaderProgram.pedantic = false;
-
-		//batch.setShader(shaderProgram);
-
 		stateTime = 0f;
 
 		mainUIStage = userInterface.genStage(mainUIStage);
@@ -97,7 +85,7 @@ public class AppScreen implements Screen {
 		xPos = userInput.getxPosition();
 		yPos = userInput.getyPosition();
 
-		ScreenUtils.clear(creation.layers.get(0).tileset.getColor());
+		ScreenUtils.clear(tilesets.get(creation.layers.get(0).tileset).getColor());
 
 		batch.begin();
 		drawLayers();
@@ -139,9 +127,6 @@ public class AppScreen implements Screen {
 								case "Terrain":
 									TextureRegion tile = getTextureForTerrainValue(creation.layers.get(i), x, y);
 									if (tile != null) {
-										//shaderProgram.setUniformf("hue", 0.4f);
-										//shaderProgram.setUniformf("u_time", stateTime);
-										//shaderProgram.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 										batch.draw(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 										tileAbove[x][y] = true;
 									}
@@ -157,9 +142,9 @@ public class AppScreen implements Screen {
 	}
 
 	public TextureRegion getTextureForTerrainValue(Layer layer, int x, int y) {
-		for (int i = layer.tileChildren.length-1; i >= 0; i--) { // highest layer first
-			if (((TerrainLayer)layer).valueMap[x][y] > layer.tileChildren[i].lowerBound){
-				return ((TerrainLayer) layer).getTextureFromIndex(i);
+		for (int i = layer.tileChildren.size() -1; i >= 0; i--) { // highest layer first
+			if (((TerrainLayer)layer).valueMap[x][y] > layer.tileChildren.get(i).lowerBound){
+				return layer.getTextureFromIndex(i);
 			}
 		}
 
@@ -197,7 +182,7 @@ public class AppScreen implements Screen {
 	@Override
 	public void dispose () {
 		for (Layer layer: creation.layers) {
-			((TerrainLayer) layer).tileset.getSpriteSheet().dispose();
+			tilesets.get(layer.tileset).getSpriteSheet().dispose();
 		}
 	}
 }

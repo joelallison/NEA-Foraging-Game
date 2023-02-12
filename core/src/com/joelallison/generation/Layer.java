@@ -1,21 +1,21 @@
 package com.joelallison.generation;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.joelallison.graphics.Tileset;
 import com.joelallison.graphics.Tileset.*;
-import com.joelallison.screens.AppScreen;
-import tools.HSLColor;
+
+import java.util.List;
+
+import static com.joelallison.screens.AppScreen.tilesets;
 
 public abstract class Layer {
     protected String name;
     protected Long seed;
-    public Tileset tileset = AppScreen.tilesets.get("Trees & Rocks"); //default value that's needed due to the way libgdx runs its render process
+    public String tileset = "Walls"; //default value that's needed due to the way libgdx runs its render process
     protected boolean showLayer = true; // shown by default
     protected Vector2 center;
     public float hueShift;
-    public TileChild[] tileChildren;
+    public List<TileChild> tileChildren;
     protected boolean inheritSeed = false;
 
     // when you move the layer, a layer gets stored separately, another gets copied over to where it will move,
@@ -37,7 +37,11 @@ public abstract class Layer {
 
     }
     public TextureRegion getTextureFromIndex(int i) {
-        return this.tileset.getTileTexture(this.tileset.map.get(this.tileChildren[i].name));
+        return tilesets.get(tileset).getTileTexture(tilesets.get(tileset).map.get(this.tileChildren.get(i).name));
+    }
+
+    public void sortTileChildren(){
+        //does nothing
     }
     public boolean layerShown() {
         return showLayer;
