@@ -14,12 +14,14 @@ public class Creation {
     public String name;
     public ArrayList<Layer> layers;
     Timestamp dateCreated;
-    Timestamp lastEdited;
+    Timestamp lastAccessed;
     public Long seed = 0L;
 
-    public Creation(String name, ArrayList<Layer> layers, Timestamp dateCreated, Timestamp lastEdited) {
+    public Creation(String name, ArrayList<Layer> layers, Timestamp dateCreated) {
         this.name = name;
         this.layers = layers;
+        this.dateCreated = dateCreated;
+        //note: lastAccessed just gets written when the creation is being saved and sent back to the database.
     }
 
     public Creation(String name) {
@@ -27,7 +29,7 @@ public class Creation {
         this.layers = new ArrayList<Layer>(){};
         layers.add(new TerrainLayer(seed));
         dateCreated = new Timestamp(System.currentTimeMillis());
-        lastEdited = dateCreated;
+        lastAccessed = dateCreated;
     }
 
     // I wondered if I could set creation seed and then call the above constructor...
@@ -39,7 +41,7 @@ public class Creation {
         this.layers = new ArrayList<Layer>(){};
         layers.add(new TerrainLayer(seed));
         dateCreated = new Timestamp(System.currentTimeMillis());
-        lastEdited = dateCreated;
+        lastAccessed = dateCreated;
     }
 
     public void makeLayerNamesUnique() {
@@ -70,5 +72,20 @@ public class Creation {
 
     public int layerCount() {
         return layers.size();
+    }
+
+    public static class CreationPreview {
+        String name;
+        Timestamp dateCreated;
+        Timestamp lastAccessed;
+        int layerCount;
+        public CreationPreview (String name, Timestamp dateCreated, Timestamp lastAccessed, int layerCount) {
+            this.name = name;
+            this.dateCreated = dateCreated;
+            this.lastAccessed = lastAccessed;
+            this.layerCount = layerCount;
+        }
+
+
     }
 }

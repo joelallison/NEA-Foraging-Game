@@ -114,13 +114,18 @@ public class LoginScreen implements Screen {
             if (!nameConflict.next()) { //no rows (meaning no row with that username) will return false
                 nameConflict.close();
 
-                // generate the salt and store it with the password
-                String salt = genSalt();
-                if (Database.doSqlStatement("INSERT INTO users (username, password, password_salt)" +
-                        "VALUES ('" + LoginInterface.getUsernameField() + "', '" + hashString(LoginInterface.getPasswordField(), salt) + "', '" + salt + "')"
-                ).equals("Statement successfully executed.")) {
-                    LoginInterface.feedbackLabel.setText("User added.");
-                    return true;
+                if (LoginInterface.getPasswordField().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")) { //regex found here: https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
+                    // generate the salt and store it with the password
+                    String salt = genSalt();
+                    if (Database.doSqlStatement("INSERT INTO users (username, password, password_salt)" +
+                            "VALUES ('" + LoginInterface.getUsernameField() + "', '" + hashString(LoginInterface.getPasswordField(), salt) + "', '" + salt + "')"
+                    ).equals("Statement successfully executed.")) {
+                        LoginInterface.feedbackLabel.setText("User added.");
+                        return true;
+                    }
+                } else {
+                    LoginInterface.feedbackLabel.setText("Password must have a \nminimum of eight characters, \nat least one letter, \none number and \none special character.");
+                    return false;
                 }
             } else {
                 LoginInterface.feedbackLabel.setText("Username taken.");

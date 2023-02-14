@@ -7,21 +7,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.joelallison.screens.userinterface.LoginInterface;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Arrays;
-
+import com.joelallison.screens.userinterface.CreationSelectInterface;
 public class CreationSelectScreen implements Screen {
     SpriteBatch batch;
     Stage menuUIStage;
     ExtendViewport viewport;
     OrthographicCamera camera;
     float stateTime;
-    LoginInterface userInterface = new LoginInterface();
-    private String username;
+    CreationSelectInterface userInterface = new CreationSelectInterface();
+    public static String username;
 
     public CreationSelectScreen(String username) {
         camera = new OrthographicCamera(1920, 1080);
@@ -29,16 +23,10 @@ public class CreationSelectScreen implements Screen {
 
         batch = new SpriteBatch();
 
-        Gdx.input.setInputProcessor(new InputAdapter() {
-            @Override
-            public boolean keyDown(int keyCode) {
-                if (keyCode == Input.Keys.ENTER) {
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(new AppScreen());
-                    dispose();
-                }
-                return true;
-            }
-        });
+        this.username = username;
+
+        menuUIStage = userInterface.genStage(menuUIStage);
+        userInterface.genUI(menuUIStage);
     }
 
     @Override

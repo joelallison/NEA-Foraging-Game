@@ -38,30 +38,29 @@ public class LoginInterface extends UserInterface {
 
         createLoginTable();
 
-        // login screen
-        // register screen
-        // buttons to go between the two
-
-        // user account
-        // username - unique, password - hashed, meets certain requirements
-        // can store save files to server
-
-        //loginTable.setPosition((float) Gdx.graphics.getWidth() / 2, (float) Gdx.graphics.getHeight() / 2);
-
         stage.addActor(loginTable);
     }
 
     public void createLoginTable() {
         loginTable.setDebug(true);
         loginTable.setFillParent(true);
+        loginTable.center();
 
-        loginTable.add(usernameLabel).space(4).align(Align.left);
+        loginTable.defaults().align(Align.left).space(4);
+
+        loginTable.add(usernameLabel);
+
         loginTable.row();
-        loginTable.add(usernameField).space(4).colspan(3);
+        loginTable.add(usernameField).colspan(2);
+
         loginTable.row();
-        loginTable.add(passwordLabel).space(4).align(Align.left);;
+        loginTable.add(passwordLabel);
+
         loginTable.row();
-        loginTable.add(passwordField).space(4).colspan(3);
+        passwordField.setPasswordMode(true);
+        passwordField.setPasswordCharacter('*');
+        loginTable.add(passwordField).colspan(2);
+
         loginTable.row();
         registerButton.addListener(new InputListener() {
             @Override
@@ -70,7 +69,7 @@ public class LoginInterface extends UserInterface {
                 return true;
             }
         });
-        loginTable.add(registerButton).space(4);
+        loginTable.add(registerButton);
 
         loginButton.addListener(new InputListener() {
             @Override
@@ -80,7 +79,7 @@ public class LoginInterface extends UserInterface {
             }
         });
 
-        loginTable.add(loginButton).space(4);
+        loginTable.add(loginButton);
         loginTable.row();
 
         skipButton.addListener(new InputListener() {
@@ -92,7 +91,7 @@ public class LoginInterface extends UserInterface {
         });
         loginTable.add(skipButton);
         loginTable.row();
-        loginTable.add(feedbackLabel).colspan(4).align(Align.left);
+        loginTable.add(feedbackLabel).colspan(2);
     }
 
     public static String getUsernameField() {

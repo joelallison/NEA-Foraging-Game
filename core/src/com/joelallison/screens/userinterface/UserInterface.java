@@ -25,49 +25,4 @@ public class UserInterface {
         Skin defaultSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
         chosenSkin = defaultSkin;
     }
-
-
-    /* ended up not being used
-    protected Table constructMenuBar(MenuMethod[] menuButtons, Vector2 position) {
-        Table table = new Table();
-
-        for (MenuMethod m:menuButtons) {
-            table.add(processMenuBarItem(m));
-        }
-
-        //table.setFillParent(true);
-        table.setDebug(true);
-
-
-        table.setPosition(position.x, position.y);
-
-        return table;
-    }
-
-    protected TextButton processMenuBarItem(final MenuMethod method) {
-        //GlyphLayout glyphLayout = new GlyphLayout(chosenSkin.getFont("default-font"), method.displayName);
-
-        final TextButton methodButton = new TextButton(method.displayName, chosenSkin, "default");
-        methodButton.setPosition(0, 0 - methodButton.getHeight());
-        methodButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                method.method.run();
-            }
-        });
-
-        return methodButton;
-    }
-
-    protected class MenuMethod {
-        public String displayName;
-        public boolean canBeRun;
-        public Runnable method;
-
-        public MenuMethod(String displayName, boolean canBeRun, Runnable method) {
-            this.displayName = displayName;
-            this.canBeRun = canBeRun;
-            this.method = method;
-        }
-    }*/
 }
