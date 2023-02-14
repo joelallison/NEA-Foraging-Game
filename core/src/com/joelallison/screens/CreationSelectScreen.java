@@ -7,18 +7,23 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.joelallison.screens.userinterface.MenuInterface;
+import com.joelallison.screens.userinterface.LoginInterface;
 
-public class MenuScreen implements Screen {
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Arrays;
+
+public class CreationSelectScreen implements Screen {
     SpriteBatch batch;
     Stage menuUIStage;
     ExtendViewport viewport;
     OrthographicCamera camera;
     float stateTime;
-    MenuInterface userInterface = new MenuInterface();
+    LoginInterface userInterface = new LoginInterface();
     private String username;
 
-    public MenuScreen() {
+    public CreationSelectScreen(String username) {
         camera = new OrthographicCamera(1920, 1080);
         viewport = new ExtendViewport(1920, 1080, camera);
 
@@ -86,3 +91,4 @@ public class MenuScreen implements Screen {
     public void dispose () {
     }
 }
+

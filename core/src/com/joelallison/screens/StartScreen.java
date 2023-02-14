@@ -20,7 +20,7 @@ public class StartScreen extends Game {
         batch = new SpriteBatch();
         stage = new Stage();
 
-        this.setScreen(new MenuScreen());
+        this.setScreen(new LoginScreen());
     }
 
     public void render() {

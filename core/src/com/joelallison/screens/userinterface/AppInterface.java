@@ -55,10 +55,11 @@ public class AppInterface extends UserInterface {
     protected VerticalGroup layerGroup = new VerticalGroup();
     boolean layersChanged = false;
     boolean tileDataChanged = false;
+    boolean updateTileList = false;
     Stage stage;
     public static int selectedLayerIndex;
     protected Label selectedLayerLabel = new Label("The currently selected layer is '[].", chosenSkin);
-    Table tilesetTable = new Table();
+    VerticalGroup tiles = new VerticalGroup();
 
     public void genUI(final Stage stage) { //stage is made final here so that it can be accessed within inner classes
         //menu bar, using custom method in UserInterface
@@ -411,9 +412,9 @@ public class AppInterface extends UserInterface {
     }
 
     protected void doTilePanel() {
-        //tilesetSelect.setItems(tilesets.keySet());
-        //tilePanel.add(tilesetSelect);
-        //tilePanel.row();
+        tilesetSelect.setItems(tilesets.keySet());
+        tilePanel.add(tilesetSelect);
+        tilePanel.row();
 
         /*hueSlider.setValue((creation.layers.get(selectedLayerIndex)).hueShift);
         hueSlider.addListener(new ChangeListener() {
@@ -425,49 +426,45 @@ public class AppInterface extends UserInterface {
 
         tilePanel.add(hueSlider);*/
 
-
-        tilesetTable = doTilesetTable(selectedLayerIndex);
-        tilePanel.add(tilesetTable);
+        genTilesList();
+        tilePanel.add(tiles);
 
         tilePanel.setSize(tilePanel.getPrefWidth() * 1.2f, tilePanel.getPrefHeight());
+    }
+
+    public void genTilesList(){
+        // sorting by a certain parameter -- threshold for terrain, alphabetically for maze
+        creation.layers.get(selectedLayerIndex).sortTileChildren();
+
+        // in the list of tilechildren, create a widget for each tile
+        for (int i = 0; i < creation.layers.get(selectedLayerIndex).tileChildren.size(); i++) {
+            tiles.addActor(createTileLine(tilesets.get(creation.layers.get(selectedLayerIndex).tileset), i));
+        }
+
     }
 
     protected void updateTilePanel() {
 
         // only make updates to the tiles if anything has been edited, otherwise it's unnecessary as there's no change
 
-
         if (tileDataChanged) {
-           for (int i = 0; i < tilesetTable.getChildren().size; i++) {
+           for (int i = 0; i < tiles.getChildren().size; i++) {
                 Tileset.TileChild tile = creation.layers.get(selectedLayerIndex).tileChildren.get(i);
-
-                Actor tableLine = tilesetTable.getChild(i);
-                if (tableLine.getClass() == HorizontalGroup.class) {
-                    System.out.println("OAUHOASUD!!!!");
-                }
+               ((Label) ((HorizontalGroup) tiles.getChild(i)).getChild(1)).setText("name: " + tile.name + ", thresh: " + floatFormat.format(tile.lowerBound));
             }
 
             tileDataChanged = false;
         }
 
+        if (updateTileList) {
+            tilePanel.clear();
+            genTilesList();
 
-
-        //tilesetSelect.setSelected(creation.layers.get(selectedLayerIndex));
-        hueSlider.setValue((creation.layers.get(selectedLayerIndex)).hueShift);
-    }
-
-    protected Table doTilesetTable(int selectedLayer) {
-        Table tileEditor = new Table();
-
-        // sorting by a certain parameter -- threshold for terrain, alphabetically for maze
-        creation.layers.get(selectedLayer).sortTileChildren();
-
-        // in the list of tilechildren, create a widget for each tile
-        for (int i = 0; i < creation.layers.get(selectedLayer).tileChildren.size(); i++) {
-            tileEditor.addActor(createTileLine(tilesets.get(creation.layers.get(selectedLayer).tileset), i));
+            updateTileList = false;
         }
-        
-        return tileEditor;
+
+        tilesetSelect.setSelected(creation.layers.get(selectedLayerIndex));
+        //hueSlider.setValue((creation.layers.get(selectedLayerIndex)).hueShift);
     }
 
     private HorizontalGroup createTileLine(Tileset tileset, final int selectedTile) {
@@ -491,8 +488,19 @@ public class AppInterface extends UserInterface {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 creation.layers.get(selectedLayerIndex).tileChildren.set(selectedTile, new Tileset.TileChild(tile.name, lowerBoundSlider.getValue()));
+                tileDataChanged = true;
             }
         });
+
+        lowerBoundSlider.addListener(new InputListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+                updateTileList = true;
+                System.out.println("HELLO?!?!?");
+            }
+        });
+
+        tileDataGroup.addActor(lowerBoundSlider);
 
         return tileDataGroup;
     }
