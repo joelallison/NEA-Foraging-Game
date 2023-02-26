@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.joelallison.screens.userinterface.LoginInterface;
+import com.joelallison.screens.userInterface.LoginInterface;
 import com.joelallison.user.Database;
 
 import java.security.MessageDigest;
@@ -16,10 +16,8 @@ import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import static com.joelallison.user.Database.doSqlQuery;
-import static com.joelallison.user.Database.makeConnection;
 
 public class LoginScreen implements Screen {
     SpriteBatch batch;
@@ -36,16 +34,6 @@ public class LoginScreen implements Screen {
 
         batch = new SpriteBatch();
         Database.makeConnection(Database.jdbcURL, Database.username, Database.password);
-        Gdx.input.setInputProcessor(new InputAdapter() {
-            @Override
-            public boolean keyDown(int keyCode) {
-                if (keyCode == Input.Keys.ENTER) {
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(new AppScreen());
-                    dispose();
-                }
-                return true;
-            }
-        });
     }
 
     @Override
@@ -60,9 +48,9 @@ public class LoginScreen implements Screen {
         viewport.apply();
         batch.setProjectionMatrix(viewport.getCamera().combined);
         camera.update();
-        ScreenUtils.clear(new Color(0.365f, 0.525f, 0.310f, 1f));
+        ScreenUtils.clear(Color.valueOf("#5b8550"));
 
-        //userInterface.update(); --> there's no update method yet
+        //userInterface.update(); --> there's no update method, not needed for this page
 
         batch.begin();
 
@@ -114,12 +102,13 @@ public class LoginScreen implements Screen {
             if (!nameConflict.next()) { //no rows (meaning no row with that username) will return false
                 nameConflict.close();
 
-                if (LoginInterface.getPasswordField().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")) { //regex found here: https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
+                //regex found here: https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
+                if (LoginInterface.getPasswordField().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")) {
                     // generate the salt and store it with the password
                     String salt = genSalt();
                     if (Database.doSqlStatement("INSERT INTO users (username, password, password_salt)" +
                             "VALUES ('" + LoginInterface.getUsernameField() + "', '" + hashString(LoginInterface.getPasswordField(), salt) + "', '" + salt + "')"
-                    ).equals("Statement successfully executed.")) {
+                    )) {
                         LoginInterface.feedbackLabel.setText("User added.");
                         return true;
                     }

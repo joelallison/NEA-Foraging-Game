@@ -11,13 +11,13 @@ public class MazeLayer extends Layer {
     //I've found that this has a limit of 857x857, due to a StackOverflowError.
     //While I'd love to write an algorithm without this limitation, I would say that an 857x857 maze is pretty good!
 
-    private long seed;
     private int width;
     private int height;
 
     private int count = 0;
 
     public int[][] maze;
+    public List<Tileset.MazeTileSpec> tileSpecs;
     public MazeLayer(String name, long seed, int width, int height) {
         super(name, seed);
 
@@ -43,7 +43,7 @@ public class MazeLayer extends Layer {
         //because of the seed, the random starting cell will always be the same if the seed and dimensions are the same.
         Random rand = new Random(seed);
 
-        //r for row c for column
+        //r for row, c for column
         //random odd number row
         int r = rand.nextInt(height);
         while (r % 2 == 0) {
@@ -63,6 +63,7 @@ public class MazeLayer extends Layer {
         //recursively carve out the maze
         recursion(r, c);
     }
+
     private void recursion(int r, int c) {
         //put up, down, left, right in a random (seeded) order
         Integer[] randomDirections = generateRandomDirections();
@@ -124,5 +125,21 @@ public class MazeLayer extends Layer {
         Collections.shuffle(randoms, new Random(seed+count*1024L));
 
         return randoms.toArray(new Integer[4]);
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 }

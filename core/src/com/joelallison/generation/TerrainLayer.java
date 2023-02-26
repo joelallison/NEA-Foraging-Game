@@ -3,13 +3,14 @@ package com.joelallison.generation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.joelallison.graphics.Tileset;
-import com.joelallison.screens.AppScreen;
 import tools.OpenSimplex2S;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
+
+import static com.joelallison.screens.AppScreen.tilesets;
 
 public class TerrainLayer extends Layer {
     private float scale;
@@ -18,7 +19,18 @@ public class TerrainLayer extends Layer {
     private int wrap;
     private boolean invert;
     public float[][] valueMap;
+    public List<Tileset.TerrainTileSpec> tileSpecs;
 
+    static final public float SCALE_MAX = 256f;
+    static final public float SCALE_MIN = 0.005f;
+    static final public int OCTAVES_MAX = 3;
+    static final public int OCTAVES_MIN = 1;
+    static final public float LACUNARITY_MAX = 10f;
+    static final public float LACUNARITY_MIN = 0.01f;
+    static final public int WRAP_MAX = 20;
+    static final public int WRAP_MIN = 1;
+
+    //for custom loading, in which tilespecs is declared separately
     public TerrainLayer(String name, Long seed, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
         super(name, seed);
         this.scale = scaleVal;
@@ -27,92 +39,95 @@ public class TerrainLayer extends Layer {
         this.wrap = wrapVal;
         this.invert = invert;
 
-        this.defaultTileValues();
+        this.tileSpecs = new ArrayList<>();
     }
 
-    public TerrainLayer(Long seed) { //these are some [fairly bland] default values
+    //for loading with very little input
+    public TerrainLayer(Long seed) {
+        Random random = new Random();
         this.name = "Terrain Layer";
-        this.seed = seed; //seed is the only value that gets specifically set, this is so that the layer can be given the overall seed value.
-        this.scale = 20f;
-        this.octaves = 2;
-        this.lacunarity = 2f;
-        this.wrap = 1;
-        this.invert = false;
-        this.hueShift = 0;
+        if(seed == -1L){
+            this.seed = random.nextLong();
+        } else {
+            this.seed = seed;
+        }
+
+        //while I feel that the max and min values I've defined are good, I also think that the layer that users might end up starting with should be a bit tamer (so I've scaled down the value ranges).
+        this.scale = random.nextFloat(10*SCALE_MIN, SCALE_MAX/10);
+        this.octaves = random.nextInt(OCTAVES_MIN, OCTAVES_MAX);
+        this.lacunarity = random.nextFloat(10*LACUNARITY_MIN, LACUNARITY_MAX/10);
+        this.wrap = random.nextInt(WRAP_MIN, WRAP_MAX/4);
+        this.invert = random.nextBoolean();
+        //this.hueShift = 0;
 
         defaultTileValues();
     }
 
     private void defaultTileValues() {
-        this.tileChildren = new ArrayList<>();
-        this.tileChildren.add(new Tileset.TileChild("left_end", 0.35f));
-        this.tileChildren.add(new Tileset.TileChild("crossroad", 0.4f));
-        this.tileChildren.add(new Tileset.TileChild("corner_topright", 0.6f));
-        this.tileChildren.add(new Tileset.TileChild("crossroad", 0.7f));
+        this.tileSpecs = new ArrayList<>();
+        this.tileSpecs.add(new Tileset.TerrainTileSpec("bush", 0.35f));
+        this.tileSpecs.add(new Tileset.TerrainTileSpec("plant", 0.4f));
+        this.tileSpecs.add(new Tileset.TerrainTileSpec("tree_1", 0.6f));
+        this.tileSpecs.add(new Tileset.TerrainTileSpec("rock_1", 0.7f));
+        this.tileSpecs.add(new Tileset.TerrainTileSpec("tree_2", 0.75f));
+        this.tileSpecs.add(new Tileset.TerrainTileSpec("rock_2", 0.95f));
     }
 
     @Override
     public void sortTileChildren() {
         //using method outlined here: https://www.java67.com/2015/01/how-to-sort-hashmap-in-java-based-on.html
-
-        final Comparator<Tileset.TileChild> THRESHOLD_COMPARATOR  = new Comparator<Tileset.TileChild>() {
+        final Comparator<Tileset.TerrainTileSpec> THRESHOLD_COMPARATOR  = new Comparator<Tileset.TerrainTileSpec>() {
             @Override
-            public int compare(Tileset.TileChild t1, Tileset.TileChild t2){
+            public int compare(Tileset.TerrainTileSpec t1, Tileset.TerrainTileSpec t2){
                 return t2.lowerBound.compareTo(t1.lowerBound);
             }
         };
 
-        this.tileChildren.sort(THRESHOLD_COMPARATOR);
+        this.tileSpecs.sort(THRESHOLD_COMPARATOR);
     }
 
-    public void generateValueMap(Vector2 dimensions, int xOffset, int yOffset) {
-        valueMap = genTerrain(this.getSeed(), dimensions, xOffset, yOffset, this.getScale(), this.getOctaves(), this.getLacunarity(), this.getWrap(), this.isInverted());
+    public void genValueMap(Long seed, Vector2 dimensions, int xOffset, int yOffset) {
+        valueMap = genTerrain(seed, dimensions, xOffset, yOffset, this.getScale(), this.getOctaves(), this.getLacunarity(), this.getWrap(), this.isInverted());
+    }
+
+    @Override
+    public TextureRegion getTextureFromIndex(int i) {
+        return tilesets.get(tilesetName).getTileTexture(tilesets.get(tilesetName).map.get(this.tileSpecs.get(i).name));
     }
 
     public float getScale() {
         return scale;
     }
-
     public void setScale(float scale) {
         this.scale = scale;
     }
-
     public int getOctaves() {
         return octaves;
     }
-
     public void setOctaves(int octaves) {
         this.octaves = octaves;
     }
-
     public float getLacunarity() {
         return lacunarity;
     }
-
     public void setLacunarity(float lacunarity) {
         this.lacunarity = lacunarity;
     }
-
     public int getWrap() {
         return wrap;
     }
-
     public void setWrap(int wrap) {
         this.wrap = wrap;
     }
-
     public boolean isInverted() {
         return invert;
     }
-
     public void setInvert(boolean invert) {
         this.invert = invert;
     }
 
 
-
     //generation stuff is from here onwards
-
     public static float[][] genTerrain(long seed, Vector2 Dimensions, int xOffset, int yOffset, float scale, int octaves, float lacunarity, int wrapFactor, boolean invertWrap) {
         //greater scale zooms in, halved scale from normal could be used for map data. I think scale of 4 is best for most stuff
         //higher octaves adds more detail to the noise, but 2 is the best option for this [in most cases]

@@ -2,33 +2,22 @@ package com.joelallison.generation;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.joelallison.graphics.Tileset.*;
-
-import java.util.List;
-
-import static com.joelallison.screens.AppScreen.tilesets;
+import com.joelallison.user.Creation;
 
 public abstract class Layer {
     protected String name;
     protected Long seed;
-    public String tileset = "Walls"; //default value that's needed due to the way libgdx runs its render process
+    public String tilesetName = "Trees & Rocks"; //default value that's needed due to the way libgdx runs its render process
     protected boolean showLayer = true; // shown by default
-    protected Vector2 center;
-    public float hueShift;
-    public List<TileChild> tileChildren;
+    protected Vector2 center = new Vector2(0, 0);
+    public float hueShift; //something I want to implement but haven't [yet], because shaders are painful
     protected boolean inheritSeed = false;
 
-    // when you move the layer, a layer gets stored separately, another gets copied over to where it will move,
-    // and then the separate one gets stored in its final place, writing over the recently moved one's old duplicate
-
-    // layer has name, settings, chosen tileset and tile children that function in a way specific to the gen type
-    // the layer itself can be moved up or down
-    // layer settings edited on the left, upon selecting the layer
-    // children boundaries etc. are edited on the right as part of the layer box.
     // export layer button
     // clipping mode?
     // the spacing and wave collapse feature?
 
+    //the Layer class is never used on its own, these methods are only inherited / overriden etc.
     public Layer(String name, Long seed) { //for the creation of a layer with specific values
         this.name = name;
         this.seed = seed;
@@ -37,7 +26,7 @@ public abstract class Layer {
 
     }
     public TextureRegion getTextureFromIndex(int i) {
-        return tilesets.get(tileset).getTileTexture(tilesets.get(tileset).map.get(this.tileChildren.get(i).name));
+        return null;
     }
 
     public void sortTileChildren(){
@@ -47,7 +36,7 @@ public abstract class Layer {
         return showLayer;
     }
 
-    public void setShowLayer(boolean showLayer) {
+    public void showLayer(boolean showLayer) {
         this.showLayer = showLayer;
     }
 
@@ -74,4 +63,13 @@ public abstract class Layer {
     public void setName(String name) {
         this.name = name;
     }
+
+    public boolean inheritSeed() {
+        return inheritSeed;
+    }
+
+    public void setInheritSeed(boolean inheritSeed) {
+        this.inheritSeed = inheritSeed;
+    }
+
 }

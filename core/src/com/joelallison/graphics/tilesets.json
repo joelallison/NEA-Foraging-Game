@@ -1,5 +1,6 @@
 {
   "Trees & Rocks": {
+    "creator": "Joel Allison",
     "spriteSheet": "tree_tileSheet.png",
     "tileSize": 8,
     "baseColorHex": "#1F1814",
@@ -31,6 +32,7 @@
     }
   },
   "Walls": {
+    "creator": "Joel Allison",
     "spriteSheet": "wall_tileSheet.png",
     "tileSize": 8,
     "baseColorHex": "#1F1814",

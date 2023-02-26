@@ -1,12 +1,11 @@
-package com.joelallison.screens.userinterface;
+package com.joelallison.screens.userInterface;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class UserInterface {
 
@@ -24,5 +23,13 @@ public class UserInterface {
     private void setupSkins(){
         Skin defaultSkin = new Skin(Gdx.files.internal("data/defaultUI/uiskin.json"));
         chosenSkin = defaultSkin;
+    }
+
+    public void basicPopupMessage(String title, String message, final Stage stage) {
+        final Dialog dialog = new Dialog(title, chosenSkin) {public void result(Object obj) {/*nothing is needed here*/}};
+        dialog.text(message);
+        dialog.button("OK", true);
+
+        dialog.show(stage);
     }
 }

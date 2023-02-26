@@ -9,7 +9,6 @@ import java.util.HashMap;
 
 public class JsonHandling {
     static Gson gson = new Gson();
-
     public static HashMap<String, Tileset> tilesetsJsonToMap(String fileLocation) {
         Type type = new TypeToken<HashMap<String, Tileset>>(){}.getType();
         return gson.fromJson(FileHandling.readJSONTileData(fileLocation), type);

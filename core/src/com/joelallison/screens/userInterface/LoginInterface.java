@@ -1,14 +1,16 @@
-package com.joelallison.screens.userinterface;
+package com.joelallison.screens.userInterface;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.joelallison.screens.AppScreen;
+import com.joelallison.user.Creation;
 
 import static com.joelallison.screens.LoginScreen.login;
 import static com.joelallison.screens.LoginScreen.register;
@@ -27,6 +29,7 @@ public class LoginInterface extends UserInterface {
     Table loginTable = new Table();
 
     public void genUI(final Stage stage) { //stage is made final here so that it can be accessed within inner classes
+
         // TextFields don't lose focus by default when you click out, so...
         stage.getRoot().addCaptureListener(new InputListener() {
             // this code was gratefully found on a GitHub forum --> https://github.com/libgdx/libgdx/issues/2173
@@ -36,13 +39,23 @@ public class LoginInterface extends UserInterface {
             }
         });
 
-        createLoginTable();
+        Image title = new Image(new Texture(Gdx.files.internal("title.png")));
+        //title.setAlign(Align.center);
+        title.setPosition(Gdx.graphics.getWidth() / 2 - title.getPrefWidth() / 2, 200 + Gdx.graphics.getHeight() / 2 - title.getPrefHeight() / 2);
+        stage.addActor(title);
 
+        Image name = new Image(new Texture(Gdx.files.internal("name.png")));
+        //title.setAlign(Align.center);
+        name.setPosition(Gdx.graphics.getWidth() / 2 - name.getPrefWidth() / 2, (Gdx.graphics.getHeight() / 2 - (name.getPrefHeight() / 2)) - 200);
+        stage.addActor(name);
+
+
+        createLoginTable();
         stage.addActor(loginTable);
     }
 
     public void createLoginTable() {
-        loginTable.setDebug(true);
+        //loginTable.setDebug(true);
         loginTable.setFillParent(true);
         loginTable.center();
 
@@ -85,7 +98,7 @@ public class LoginInterface extends UserInterface {
         skipButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new AppScreen());
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new AppScreen(new Creation("new"), ""));
                 return true;
             }
         });

@@ -1,8 +1,7 @@
-package com.joelallison.screens.userinterface;
+package com.joelallison.screens.userInterface;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -15,6 +14,7 @@ import com.joelallison.generation.Layer;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.screens.AppScreen;
+import com.joelallison.user.Database;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -25,7 +25,11 @@ public class AppInterface extends UserInterface {
 
     //many elements of the ui are used in multiple methods, so it's best that they're all declared globally [to the class]
 
-    //for gen settings
+    //for all layer type gen settings
+    protected TextButton layerSeedButton = new TextButton("Seed: ", chosenSkin);
+    protected CheckBox inheritSeedCheck = new CheckBox("", chosenSkin);
+
+    //for terrain gen settings
     protected Label scaleLabel = new Label("Scale:", chosenSkin);
     protected Label octavesLabel = new Label("Octaves:", chosenSkin);
     protected Label lacunarityLabel = new Label("Lacunarity:", chosenSkin);
@@ -34,56 +38,43 @@ public class AppInterface extends UserInterface {
     protected CheckBox invertCheck = new CheckBox("", chosenSkin);
     protected Label centerPointLabel = new Label("x: , y:", chosenSkin); // for variable names, I'm reluctantly using the American spelling of 'centre' as it feels like convention :-(
     protected TextButton centerPointButton = new TextButton("Centre coords:", chosenSkin);
-
-    String integerFilter = "-?[0-9]+";
-    final Slider scaleSlider = new Slider(0.005f, 256f, 0.001f, false, chosenSkin);
-    final Slider octavesSlider = new Slider(1, 3, 1, false, chosenSkin);
-    final Slider lacunaritySlider = new Slider(0.01f, 10f, 0.01f, false, chosenSkin);
-    final Slider wrapFactorSlider = new Slider(1, 20, 1, false, chosenSkin);
+    String integerFilter = "[0-9]+";
+    final Slider scaleSlider = new Slider(TerrainLayer.SCALE_MIN, TerrainLayer.SCALE_MAX, 0.001f, false, chosenSkin);
+    final Slider octavesSlider = new Slider(TerrainLayer.OCTAVES_MIN, TerrainLayer.OCTAVES_MAX, 1, false, chosenSkin);
+    final Slider lacunaritySlider = new Slider(TerrainLayer.LACUNARITY_MIN, TerrainLayer.LACUNARITY_MAX, 0.01f, false, chosenSkin);
+    final Slider wrapFactorSlider = new Slider(TerrainLayer.WRAP_MIN, TerrainLayer.WRAP_MAX, 1, false, chosenSkin);
     protected DecimalFormat floatFormat = new DecimalFormat("##0.00");
     protected DecimalFormat intFormat = new DecimalFormat("00000");
     protected Window generationSettingsPanel = new Window("Generation parameters:", chosenSkin);
     protected Window layerPanel = new Window("Layers:", chosenSkin);
+    protected Label selectedLayerLabel = new Label("The currently selected layer is '[].", chosenSkin);
 
     //for tile panel
-    protected Window tilePanel = new Window("Tiles and aesthetics:", chosenSkin);
+    protected Window tilePanel = new Window("Tiles and aesthetics: ", chosenSkin);
     final SelectBox tilesetSelect = new SelectBox(chosenSkin);
     final Slider hueSlider = new Slider(-1, 1, 0.001f, false, chosenSkin);
-    String helpMsg = "Press TAB to toggle UI.\nUse '<' and '>' to zoom in and out. All window-box things are draggable and movable!\nThe * layer button is used to select that layer. The ! layer button is a shortcut to exporting the layer individually.";
-    protected Label controlsTips = new Label(helpMsg, chosenSkin);
-    protected Label displayedCoordinates = new Label("x: , y: ", chosenSkin);
+    VerticalGroup tiles = new VerticalGroup();
+    boolean updateTileList = false;
+    //layer panel
     protected VerticalGroup layerGroup = new VerticalGroup();
     boolean layersChanged = false;
     boolean tileDataChanged = false;
-    boolean updateTileList = false;
+    //misc ui
+    String helpMsg = "Press TAB to toggle UI.\nUse '<' and '>' to zoom in and out. All window-box things are draggable and movable!\nThe * layer button is used to select that layer. The ! layer button is a shortcut to exporting the layer individually.";
+    protected Label controlsTips = new Label(helpMsg, chosenSkin);
+    protected Label topLabel = new Label("Name: , Seed: \nx: , y: ", chosenSkin);
+    //global vars
     Stage stage;
     public static int selectedLayerIndex;
-    protected Label selectedLayerLabel = new Label("The currently selected layer is '[].", chosenSkin);
-    VerticalGroup tiles = new VerticalGroup();
+    public static String saveProgress = "";
 
-    public void genUI(final Stage stage) { //stage is made final here so that it can be accessed within inner classes
-        //menu bar, using custom method in UserInterface
+    //misc ui buttons at top of screen
+    TextButton saveCreationButton = new TextButton("Save", chosenSkin);
+    Label saveDialogText = new Label(saveProgress, chosenSkin);
+    TextButton exportCreationButton = new TextButton("Export", chosenSkin);
 
+    public void genUI(final Stage stage) { //stage is made final so that it can be accessed within inner classes
         this.stage = stage;
-
-        /* ended up not being used
-
-
-        stage.addActor(constructMenuBar(new MenuMethod[]{new MenuMethod("File", true, new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("test");
-            }
-        }), new MenuMethod("Edit", true, new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("other test");
-            }
-        })
-
-        }, new Vector2(32, Gdx.graphics.getHeight() - 10)));
-
-         */
 
         //box to edit generation settings for selected layer
         doGenerationSettingsPanel();
@@ -98,8 +89,37 @@ public class AppInterface extends UserInterface {
         doTilePanel();
         stage.addActor(tilePanel);
 
-        displayedCoordinates.setPosition(Gdx.graphics.getWidth() - (4 * displayedCoordinates.getPrefWidth()), Gdx.graphics.getHeight() - (2 * displayedCoordinates.getPrefHeight()));
-        stage.addActor(displayedCoordinates);
+        topLabel.setPosition(48, Gdx.graphics.getHeight() - (2 * topLabel.getPrefHeight()));
+        stage.addActor(topLabel);
+
+        saveCreationButton.setPosition(Gdx.graphics.getWidth() - saveCreationButton.getPrefWidth() * 1.5f, Gdx.graphics.getHeight() - saveCreationButton.getPrefHeight() * 1.5f);
+        saveCreationButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Dialog saveDialog = new Dialog("Saving...", chosenSkin){
+                    public void result(Object obj) {
+                        if (obj.equals(true)) {
+                            if (!saveProgress.equals("Done!")) {
+                                //if saving isn't finished, the 'OK' button does nothing
+                                cancel();
+                            }
+                        }
+                    }
+                };
+                saveDialog.add(saveDialogText);
+                saveDialog.row();
+                saveDialog.button("OK", true);
+                saveDialog.show(stage);
+
+                saveCreation();
+                return true;
+            }
+        });
+
+        stage.addActor(saveCreationButton);
+
+        exportCreationButton.setPosition(saveCreationButton.getX(), saveCreationButton.getY() - exportCreationButton.getPrefHeight() - 8);
+        stage.addActor(exportCreationButton);
 
         // TextFields don't lose focus by default when you click out, so...
         stage.getRoot().addCaptureListener(new InputListener() {
@@ -117,22 +137,26 @@ public class AppInterface extends UserInterface {
     }
 
     public void update(float delta) {
+        //updating the ui
         updateGenerationSettingsPanel();
         updateLayerPanel();
         updateTilePanel();
 
-        displayedCoordinates.setText("x: " + userInput.getxPosition() + " y: " + userInput.getyPosition());
+        topLabel.setText("Name: " + creation.name + ", Seed: " + creation.seed + "\nx: " + userInput.getxPosition() + " y: " + userInput.getyPosition());
 
+        saveDialogText.setText(saveProgress);
+
+        //hide/show ui elements, just using one of their 'isVisible' booleans as a measure of if they're hidden or not
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
             if (generationSettingsPanel.isVisible()) {
                 generationSettingsPanel.setVisible(false);
-                displayedCoordinates.setVisible(false);
+                topLabel.setVisible(false);
                 layerPanel.setVisible(false);
                 tilePanel.setVisible(false);
                 controlsTips.setText("Press TAB to toggle UI.");
             } else {
                 generationSettingsPanel.setVisible(true);
-                displayedCoordinates.setVisible(true);
+                topLabel.setVisible(true);
                 layerPanel.setVisible(true);
                 tilePanel.setVisible(true);
                 controlsTips.setText(helpMsg);
@@ -142,6 +166,48 @@ public class AppInterface extends UserInterface {
 
     protected void doGenerationSettingsPanel() {
         String selectedLayerType = creation.layers.get(selectedLayerIndex).getClass().getName().replace("com.joelallison.generation.", "").replace("Layer", "");
+
+        Label inheritLabel = new Label("Inherit global seed: ", chosenSkin);
+        generationSettingsPanel.add(inheritLabel);
+        inheritSeedCheck.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+                creation.layers.get(selectedLayerIndex).setInheritSeed(inheritSeedCheck.isChecked());
+            }
+        });
+        generationSettingsPanel.add(inheritSeedCheck);
+        generationSettingsPanel.row();
+
+        layerSeedButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                final TextField inputField = new TextField("", chosenSkin);
+                inputField.setTextFieldFilter(new TextField.TextFieldFilter() {
+                    // Accepts all Alphanumeric Characters except
+                    public boolean acceptChar(TextField textField, char c) {
+                        if (Character.toString(c).matches(integerFilter)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                Dialog dialog = new Dialog("Edit seed", chosenSkin){
+                    public void result(Object obj) {
+                        if (obj.equals(true)) {
+                            creation.layers.get(selectedLayerIndex).setSeed(Long.parseLong(inputField.getText()));
+                        }
+                    }
+                };
+                dialog.text("Current seed is " + creation.layers.get(selectedLayerIndex).getSeed() + "\nEnter new seed:");
+                dialog.add(inputField);
+                dialog.button("OK", true);
+                dialog.show(stage);
+                return true;
+            }
+        });
+
+        generationSettingsPanel.add(layerSeedButton).colspan(2).align(Align.center);
+        generationSettingsPanel.row();
 
         switch (selectedLayerType) {
             case "Terrain":
@@ -243,6 +309,8 @@ public class AppInterface extends UserInterface {
 
     protected void updateGenerationSettingsPanel() {
         generationSettingsPanel.getTitleLabel().setText("Generation Settings: " + creation.layers.get(selectedLayerIndex).getName());
+        inheritSeedCheck.setChecked(creation.layers.get(selectedLayerIndex).inheritSeed());
+        layerSeedButton.setText("Seed: " + creation.layers.get(selectedLayerIndex).getSeed());
 
         updateGenerationSettingsTerrain();
     }
@@ -281,7 +349,7 @@ public class AppInterface extends UserInterface {
         addLayer.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                creation.layers.add(new TerrainLayer(3L));
+                creation.layers.add(new TerrainLayer(creation.seed));
                 layersChanged = true;
                 return true;
             }
@@ -291,12 +359,12 @@ public class AppInterface extends UserInterface {
         removeLayer.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if(creation.layers.size() > 1){
+                if (creation.layers.size() > 1) {
                     creation.layers.remove(selectedLayerIndex);
                     layersChanged = true;
-                    if(selectedLayerIndex != 0) {
+                    if (selectedLayerIndex != 0) {
                         selectedLayerIndex = selectedLayerIndex - 1;
-                    }else {
+                    } else {
                         selectedLayerIndex = 0;
                     }
                 }
@@ -320,6 +388,7 @@ public class AppInterface extends UserInterface {
 
         // only make updates to the layers if anything has been edited, otherwise it's unnecessary as there's no change
         if (layersChanged) {
+            tileDataChanged = true;
             layerGroup.clear();
             doLayerPanel();
 
@@ -328,6 +397,7 @@ public class AppInterface extends UserInterface {
 
         selectedLayerLabel.setText("The currently selected layer is '" + creation.layers.get(selectedLayerIndex).getName() + "'.");
     }
+
     protected HorizontalGroup createLayerWidget(final Layer layer) {
         HorizontalGroup layerGroup = new HorizontalGroup();
         layerGroup.space(4);
@@ -341,7 +411,7 @@ public class AppInterface extends UserInterface {
         showOrHide.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                layer.setShowLayer(!layer.layerShown());
+                layer.showLayer(!layer.layerShown());
                 return true;
 
             }
@@ -363,7 +433,7 @@ public class AppInterface extends UserInterface {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 int layerIndex = creation.layers.indexOf(layer);
-                if (layerIndex < creation.layers.size()-1) {
+                if (layerIndex < creation.layers.size() - 1) {
                     layersChanged = true;
                     creation.swapLayers(layerIndex, layerIndex + 1);
                 }
@@ -412,7 +482,7 @@ public class AppInterface extends UserInterface {
     }
 
     protected void doTilePanel() {
-        tilesetSelect.setItems(tilesets.keySet());
+        tilesetSelect.setItems(tilesets.keySet().toArray());
         tilePanel.add(tilesetSelect);
         tilePanel.row();
 
@@ -426,19 +496,19 @@ public class AppInterface extends UserInterface {
 
         tilePanel.add(hueSlider);*/
 
-        genTilesList();
+        genTileList();
         tilePanel.add(tiles);
 
         tilePanel.setSize(tilePanel.getPrefWidth() * 1.2f, tilePanel.getPrefHeight());
     }
 
-    public void genTilesList(){
+    public void genTileList() {
         // sorting by a certain parameter -- threshold for terrain, alphabetically for maze
         creation.layers.get(selectedLayerIndex).sortTileChildren();
 
         // in the list of tilechildren, create a widget for each tile
-        for (int i = 0; i < creation.layers.get(selectedLayerIndex).tileChildren.size(); i++) {
-            tiles.addActor(createTileLine(tilesets.get(creation.layers.get(selectedLayerIndex).tileset), i));
+        for (int i = 0; i < ((TerrainLayer) creation.layers.get(selectedLayerIndex)).tileSpecs.size(); i++) {
+            tiles.addActor(createTileLine(tilesets.get(creation.layers.get(selectedLayerIndex).tilesetName), i));
         }
 
     }
@@ -448,19 +518,20 @@ public class AppInterface extends UserInterface {
         // only make updates to the tiles if anything has been edited, otherwise it's unnecessary as there's no change
 
         if (tileDataChanged) {
-           for (int i = 0; i < tiles.getChildren().size; i++) {
-                Tileset.TileChild tile = creation.layers.get(selectedLayerIndex).tileChildren.get(i);
-               ((Label) ((HorizontalGroup) tiles.getChild(i)).getChild(1)).setText("name: " + tile.name + ", thresh: " + floatFormat.format(tile.lowerBound));
+            for (int i = 0; i < tiles.getChildren().size; i++) {
+                Tileset.TerrainTileSpec tile = ((TerrainLayer) creation.layers.get(selectedLayerIndex)).tileSpecs.get(i);
+                ((Label) ((HorizontalGroup) tiles.getChild(i)).getChild(1)).setText("name: " + tile.name + ", thresh: " + floatFormat.format(tile.lowerBound));
             }
 
+            /*if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT) || updateTileList) {
+                tilePanel.clear();
+                genTileList();
+                updateTileList = false;
+            } else {
+                updateTileList = true;
+            }*/
+
             tileDataChanged = false;
-        }
-
-        if (updateTileList) {
-            tilePanel.clear();
-            genTilesList();
-
-            updateTileList = false;
         }
 
         tilesetSelect.setSelected(creation.layers.get(selectedLayerIndex));
@@ -472,31 +543,22 @@ public class AppInterface extends UserInterface {
         tileDataGroup.space(4);
         tileDataGroup.pad(2);
 
-        final Tileset.TileChild tile = creation.layers.get(selectedLayerIndex).tileChildren.get(selectedTile);
+        final Tileset.TerrainTileSpec tile = ((TerrainLayer) creation.layers.get(selectedLayerIndex)).tileSpecs.get(selectedTile);
 
         TextureRegionDrawable tileImgDrawable = new TextureRegionDrawable(tileset.getTileTexture(tileset.map.get(tile.name)));
-        tileImgDrawable.setMinSize(tileImgDrawable.getMinWidth()*2, tileImgDrawable.getMinHeight()*2);
+        tileImgDrawable.setMinSize(tileImgDrawable.getMinWidth() * 2, tileImgDrawable.getMinHeight() * 2);
         Image tileImg = new Image(tileImgDrawable);
         tileDataGroup.addActor(tileImg);
 
         Label tileName = new Label("name: " + tile.name + ", thresh: " + floatFormat.format(tile.lowerBound), chosenSkin);
         tileDataGroup.addActor(tileName);
 
-        final Slider lowerBoundSlider = new Slider(0, 1, 0.05f, false, chosenSkin);
+        final Slider lowerBoundSlider = new Slider(0, 1, 0.01f, false, chosenSkin);
         lowerBoundSlider.setValue(tile.lowerBound);
         lowerBoundSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                creation.layers.get(selectedLayerIndex).tileChildren.set(selectedTile, new Tileset.TileChild(tile.name, lowerBoundSlider.getValue()));
-                tileDataChanged = true;
-            }
-        });
-
-        lowerBoundSlider.addListener(new InputListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button){
-                updateTileList = true;
-                System.out.println("HELLO?!?!?");
+                ((TerrainLayer) creation.layers.get(selectedLayerIndex)).tileSpecs.set(selectedTile, new Tileset.TerrainTileSpec(tile.name, lowerBoundSlider.getValue()));
             }
         });
 

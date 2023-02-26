@@ -34,19 +34,20 @@ public class Database {
         return null;
     }
 
-    public static String doSqlStatement(String sql) {
+    public static boolean doSqlStatement(String sql) {
         try {
             statement = connection.createStatement();
             int rows = statement.executeUpdate(sql);
             if (rows > 0) {
-                return "Statement successfully executed.";
+                //Statement successfully executed!
+                return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return "PostgreSQL Server Connection error";
+            System.out.println("PostgreSQL Server Connection error");
         }
 
-        return null; // if the sql is right, this line should never be executed
+        return false;
     }
 
     public static void closeConnection() throws SQLException {
