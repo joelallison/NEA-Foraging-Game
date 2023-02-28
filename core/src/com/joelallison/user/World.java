@@ -12,29 +12,29 @@ import java.util.Random;
 import static com.joelallison.screens.AppScreen.tilesets;
 import static java.time.Instant.now;
 
-public class Creation {
+public class World {
     public String name;
     public ArrayList<Layer> layers;
     public Instant dateCreated;
     Instant lastAccessed;
     public Long seed = getRandomLong(Long.MAX_VALUE);
 
-    public Creation(String name, ArrayList<Layer> layers, Long seed, Instant dateCreated) {
+    public World(String name, ArrayList<Layer> layers, Long seed, Instant dateCreated) {
         this.name = name;
         this.layers = layers;
         this.seed = seed;
         this.dateCreated = dateCreated;
-        //note: lastAccessed just gets written when the creation is being saved and sent back to the database.
+        //note: lastAccessed just gets written when the world is being saved and sent back to the database.
     }
 
-    public Creation(String name) {
+    public World(String name) {
         this.name = name;
         this.layers = new ArrayList<Layer>(){};
         layers.add(new TerrainLayer(-1L));
         dateCreated = now();
         lastAccessed = dateCreated;
     }
-    public Creation(String name, Long seed) {
+    public World(String name, Long seed) {
         this.name = name;
         this.seed = seed;
         this.layers = new ArrayList<Layer>(){};

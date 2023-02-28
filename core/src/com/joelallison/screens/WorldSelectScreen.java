@@ -12,8 +12,8 @@ import com.joelallison.generation.Layer;
 import com.joelallison.generation.MazeLayer;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
-import com.joelallison.screens.userInterface.CreationSelectInterface;
-import com.joelallison.user.Creation;
+import com.joelallison.screens.userInterface.WorldUI;
+import com.joelallison.user.World;
 import com.joelallison.user.Database;
 
 import java.sql.ResultSet;
@@ -21,18 +21,16 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 
-import static com.joelallison.user.Database.closeConnection;
-
-public class CreationSelectScreen implements Screen {
+public class WorldSelectScreen implements Screen {
     SpriteBatch batch;
     Stage menuUIStage;
     ExtendViewport viewport;
     OrthographicCamera camera;
     float stateTime;
-    CreationSelectInterface userInterface = new CreationSelectInterface();
+    WorldUI userInterface = new WorldUI();
     public static String username;
 
-    public CreationSelectScreen(String username) {
+    public WorldSelectScreen(String username) {
         camera = new OrthographicCamera(1920, 1080);
         viewport = new ExtendViewport(1920, 1080, camera);
 
@@ -65,34 +63,34 @@ public class CreationSelectScreen implements Screen {
         menuUIStage.draw();
     }
 
-    public static void getCreation(String creationName, String username, Long seed, Instant dateCreated) {
+    public static void getWorld(String worldName, String username, Long seed, Instant dateCreated) {
         ArrayList<Layer> layers = new ArrayList<>();
 
-        ResultSet creationLayers = Database.doSqlQuery(
+        ResultSet worldLayers = Database.doSqlQuery(
                 "SELECT * FROM layer " +
                         "WHERE \"username\" = '" + username + "' " +
-                        "AND \"creation_name\" = '" + creationName + "'" +
+                        "AND \"world_name\" = '" + worldName + "'" +
                         "ORDER BY layer_number ASC;"
         );
 
         try {
-            while(creationLayers.next()) {
+            while(worldLayers.next()) {
                 //loading all layers found from the query into the arraylist
-                switch(creationLayers.getString("layer_type").charAt(0)) {
+                switch(worldLayers.getString("layer_type").charAt(0)) {
                     //need to be processed differently based on type (different constructors etc.)
                     //I could have the different types of layer-loading as methods, but I don't need to get individual layers from the database in any other place so it's pointless
                     case 'T':
                         ResultSet terrainLayerRS = Database.doSqlQuery(
                                 "SELECT * FROM terrain_layer " +
-                                        "WHERE \"layer_id\" = " + creationLayers.getInt("layer_id")
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
                         );
 
-                        //as creationLayers.next() == true, and that layer is marked 'T', a terrain layer will be returned from the query, terrainLayerRS shouldn't be null
+                        //as worldLayers.next() == true, and that layer is marked 'T', a terrain layer will be returned from the query, terrainLayerRS shouldn't be null
                         terrainLayerRS.next();
 
                         TerrainLayer terrainLayer = new TerrainLayer(
-                                creationLayers.getString("layer_name"),
-                                creationLayers.getLong("seed"),
+                                worldLayers.getString("layer_name"),
+                                worldLayers.getLong("seed"),
                                 terrainLayerRS.getFloat("scale"),
                                 terrainLayerRS.getInt("octaves"),
                                 terrainLayerRS.getFloat("lacunarity"),
@@ -100,12 +98,12 @@ public class CreationSelectScreen implements Screen {
                                 terrainLayerRS.getBoolean("invert")
                                 );
 
-                        terrainLayer.setInheritSeed(creationLayers.getBoolean("inherit_seed"));
-                        terrainLayer.setCenter(new Vector2(creationLayers.getInt("center_x"), creationLayers.getInt("center_y")));
+                        terrainLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
+                        terrainLayer.setCenter(new Vector2(worldLayers.getInt("center_x"), worldLayers.getInt("center_y")));
 
                         ResultSet terrainTileSpecsRS = Database.doSqlQuery(
                                 "SELECT * FROM terrain_tile_specs " +
-                                        "WHERE \"layer_id\" = " + creationLayers.getInt("layer_id")
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
                         );
 
                         while(terrainTileSpecsRS.next()) {
@@ -117,26 +115,26 @@ public class CreationSelectScreen implements Screen {
                     case 'M':
                         ResultSet mazeLayerRS = Database.doSqlQuery(
                                 "SELECT * FROM maze_layer " +
-                                        "WHERE \"layer_id\" = " + creationLayers.getInt("layer_id")
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
                         );
 
-                        //as creationLayers.next() == true, and that layer is marked 'M', a maze layer will be returned from the query, mazeLayerRS shouldn't be null
+                        //as worldLayers.next() == true, and that layer is marked 'M', a maze layer will be returned from the query, mazeLayerRS shouldn't be null
                         mazeLayerRS.next();
 
                         MazeLayer mazeLayer = new MazeLayer(
-                                creationLayers.getString("name"),
-                                creationLayers.getLong("seed"),
+                                worldLayers.getString("name"),
+                                worldLayers.getLong("seed"),
                                 mazeLayerRS.getInt("width"),
                                 mazeLayerRS.getInt("height")
 
                         );
 
-                        mazeLayer.setInheritSeed(creationLayers.getBoolean("inherit_seed"));
-                        mazeLayer.setCenter(new Vector2(creationLayers.getInt("center_x"), creationLayers.getInt("center_y")));
+                        mazeLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
+                        mazeLayer.setCenter(new Vector2(worldLayers.getInt("center_x"), worldLayers.getInt("center_y")));
 
                         ResultSet mazeTileSpecsRS = Database.doSqlQuery(
                                 "SELECT * FROM maze_tile_specs " +
-                                        "WHERE \"layer_id\" = " + creationLayers.getInt("layer_id")
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
                         );
 
                         while(mazeTileSpecsRS.next()) {
@@ -151,12 +149,12 @@ public class CreationSelectScreen implements Screen {
             System.out.println(e);
         }
 
-        Creation creation = new Creation(creationName, layers, seed, dateCreated);
-        loadCreationIntoApp(creation, username);
+        World world = new World(worldName, layers, seed, dateCreated);
+        loadWorldIntoApp(world, username);
     }
 
-    public static void loadCreationIntoApp(Creation creation, String username) {
-        ((Game) Gdx.app.getApplicationListener()).setScreen(new AppScreen(creation, username));
+    public static void loadWorldIntoApp(World world, String username) {
+        ((Game) Gdx.app.getApplicationListener()).setScreen(new AppScreen(world, username));
     }
 
     @Override

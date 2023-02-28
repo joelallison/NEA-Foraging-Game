@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.joelallison.screens.userInterface.LoginInterface;
+import com.joelallison.screens.userInterface.LoginUI;
 import com.joelallison.user.Database;
 
 import java.security.MessageDigest;
@@ -25,7 +25,7 @@ public class LoginScreen implements Screen {
     ExtendViewport viewport;
     OrthographicCamera camera;
     float stateTime;
-    LoginInterface userInterface = new LoginInterface();
+    LoginUI userInterface = new LoginUI();
     private String username;
 
     public LoginScreen() {
@@ -62,27 +62,27 @@ public class LoginScreen implements Screen {
 
     public static void login() {
         if (checkPassword()) {
-            ((Game) Gdx.app.getApplicationListener()).setScreen(new CreationSelectScreen(LoginInterface.getUsernameField()));
+            ((Game) Gdx.app.getApplicationListener()).setScreen(new WorldSelectScreen(LoginUI.getUsernameField()));
         }
     }
 
     public static boolean checkPassword() {
-        ResultSet rs = doSqlQuery("SELECT password, password_salt FROM users WHERE username = '" + LoginInterface.getUsernameField() + "'");
+        ResultSet rs = doSqlQuery("SELECT password, password_salt FROM users WHERE username = '" + LoginUI.getUsernameField() + "'");
         try {
             if (rs.next()) { // if there is an entry with that username...
                 String salt = rs.getString("password_salt");
                 //checking hashed & salted password against stored hashed & salted password
-                if (hashString(LoginInterface.getPasswordField(), salt).equals(rs.getString("password"))) {
-                    LoginInterface.feedbackLabel.setText("Login successful.");
+                if (hashString(LoginUI.getPasswordField(), salt).equals(rs.getString("password"))) {
+                    LoginUI.feedbackLabel.setText("Login successful.");
                     return true;
                 } else {
                     //writing 'username or password', when it's clear within the code that the issue is that the username is not in the database, increases security.
-                    LoginInterface.feedbackLabel.setText("Username or password is incorrect.");
+                    LoginUI.feedbackLabel.setText("Username or password is incorrect.");
                     return false;
                 }
             } else {
                 //writing 'username or password', when it's clear within the code that the issue is that the username is not in the database, increases security.
-                LoginInterface.feedbackLabel.setText("Username or password is incorrect.");
+                LoginUI.feedbackLabel.setText("Username or password is incorrect.");
                 return false;
             }
         } catch (SQLException e) {
@@ -92,44 +92,51 @@ public class LoginScreen implements Screen {
 
     public static void register() {
         if (addNewUser()) {
-            ((Game) Gdx.app.getApplicationListener()).setScreen(new CreationSelectScreen(LoginInterface.getUsernameField()));
+            ((Game) Gdx.app.getApplicationListener()).setScreen(new WorldSelectScreen(LoginUI.getUsernameField()));
         }
     }
 
     public static boolean addNewUser() {
-        ResultSet nameConflict = doSqlQuery("SELECT * FROM users where username = '" + LoginInterface.getUsernameField() + "'");
-        try {
-            if (!nameConflict.next()) { //no rows (meaning no row with that username) will return false
-                nameConflict.close();
-
+            if (nameAvailable(LoginUI.getUsernameField())) { //no rows (meaning no row with that username) will return false
                 //regex found here: https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
-                if (LoginInterface.getPasswordField().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")) {
+                if (LoginUI.getPasswordField().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")) {
                     // generate the salt and store it with the password
                     String salt = genSalt();
-                    if (Database.doSqlStatement("INSERT INTO users (username, password, password_salt)" +
-                            "VALUES ('" + LoginInterface.getUsernameField() + "', '" + hashString(LoginInterface.getPasswordField(), salt) + "', '" + salt + "')"
+                    if (Database.doSqlStatement("INSERT INTO users (username, password, password_salt) " +
+                            "VALUES ('" + LoginUI.getUsernameField() + "', '" + hashString(LoginUI.getPasswordField(), salt) + "', '" + salt + "')"
                     )) {
-                        LoginInterface.feedbackLabel.setText("User added.");
+                        LoginUI.feedbackLabel.setText("User added.");
                         return true;
                     }
                 } else {
-                    LoginInterface.feedbackLabel.setText("Password must have a \nminimum of eight characters, \nat least one letter, \none number and \none special character.");
+                    LoginUI.feedbackLabel.setText("Password must have a \nminimum of eight characters, \nat least one letter, \none number and \none special character.");
                     return false;
                 }
             } else {
-                LoginInterface.feedbackLabel.setText("Username taken.");
+                LoginUI.feedbackLabel.setText("Username taken.");
+                return false;
+            }
+        return false;
+    }
+
+    static boolean nameAvailable(String username) {
+        ResultSet nameConflict = doSqlQuery("SELECT * FROM users where username = '" + username + "'");
+        try {
+            if (!nameConflict.next()) { //no rows (meaning no row with that username) will return false
+                nameConflict.close();
+                return true;
+            } else {
                 return false;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        return false;
     }
 
     public static String hashString(String inputString, String salt) {
         //a hash implementation using SHA-512 and a salt, adapted from https://subscription.packtpub.com/book/security/9781849697767/1/ch01lvl1sec09/creating-a-strong-hash-simple
-        //I found these two pages really useful for learning about salting hashes https://auth0.com/blog/adding-salt-to-hashing-a-better-way-to-store-passwords/ & https://security.stackexchange.com/questions/17421/how-to-store-salt/17435#17435
+        //I found these two pages really useful for learning about salting hashes - https://auth0.com/blog/adding-salt-to-hashing-a-better-way-to-store-passwords/ & https://security.stackexchange.com/questions/17421/how-to-store-salt/17435#17435
+        //I recognise that this level of encryption is overkill, but I feel that there's little reason not to.
 
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");

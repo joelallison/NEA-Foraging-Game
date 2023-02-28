@@ -3,7 +3,7 @@ package com.joelallison.generation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.joelallison.graphics.Tileset;
-import tools.OpenSimplex2S;
+import tools.OpenSimplex2S; //K.jpg's OpenSimplex 2, smooth variant ("SuperSimplex") - https://github.com/KdotJPG/OpenSimplex2/blob/master/java/OpenSimplex2S.java
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -74,7 +74,7 @@ public class TerrainLayer extends Layer {
     }
 
     @Override
-    public void sortTileChildren() {
+    public void sortTileSpecs() {
         //using method outlined here: https://www.java67.com/2015/01/how-to-sort-hashmap-in-java-based-on.html
         final Comparator<Tileset.TerrainTileSpec> THRESHOLD_COMPARATOR  = new Comparator<Tileset.TerrainTileSpec>() {
             @Override

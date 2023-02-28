@@ -2,7 +2,6 @@ package com.joelallison.generation;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.joelallison.user.Creation;
 
 public abstract class Layer {
     protected String name;
@@ -29,7 +28,7 @@ public abstract class Layer {
         return null;
     }
 
-    public void sortTileChildren(){
+    public void sortTileSpecs(){
         //does nothing
     }
     public boolean layerShown() {

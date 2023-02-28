@@ -6,8 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
-import com.joelallison.screens.CreationSelectScreen;
-import com.joelallison.user.Creation;
+import com.joelallison.screens.WorldSelectScreen;
+import com.joelallison.user.World;
 import com.joelallison.user.Database;
 
 import java.sql.ResultSet;
@@ -16,44 +16,44 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-import static com.joelallison.screens.CreationSelectScreen.loadCreationIntoApp;
-import static com.joelallison.screens.CreationSelectScreen.username;
+import static com.joelallison.screens.WorldSelectScreen.loadWorldIntoApp;
+import static com.joelallison.screens.WorldSelectScreen.username;
 
-public class CreationSelectInterface extends UserInterface {
+public class WorldUI extends UI {
     //this https://stackoverflow.com/a/17999317 was incredibly useful in getting the scrollpane to work
     Table containerTable = new Table();
-    Table creations = new Table();
+    Table worlds = new Table();
     private static final String PATTERN_FORMAT = "dd/MM/yyyy - HH:mm";
-    Dialog newCreation = newCreationPopup();
+    Dialog newworld = newWorldPopup();
 
     public void genUI(final Stage stage) { //stage is made final here so that it can be accessed within inner classes
-        creations.defaults().space(8);
-        loadCreations(stage);
-        creations.row();
+        worlds.defaults().space(8);
+        loadWorlds(stage);
+        worlds.row();
 
-        TextButton newCreationButton = new TextButton("New Creation", chosenSkin);
-        newCreationButton.addListener(
+        TextButton newworldButton = new TextButton("New World", chosenSkin);
+        newworldButton.addListener(
                 new InputListener() {
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        newCreation.show(stage);
+                        newworld.show(stage);
                         return true;
                     }
                 });
 
-        creations.add(newCreationButton);
+        worlds.add(newworldButton);
 
-        creations.setSize(creations.getPrefWidth(), creations.getPrefHeight());
-        //creations.setDebug(true);
+        worlds.setSize(worlds.getPrefWidth(), worlds.getPrefHeight());
+        //worlds.setDebug(true);
 
-        ScrollPane selectionScroll = new ScrollPane(creations);
+        ScrollPane selectionScroll = new ScrollPane(worlds);
         selectionScroll.setSize(Gdx.graphics.getWidth() * 0.3f, Gdx.graphics.getHeight());
         selectionScroll.setPosition(Gdx.graphics.getWidth() / 2 - selectionScroll.getWidth() / 2, Gdx.graphics.getHeight() / 2 - selectionScroll.getHeight() / 2);
         selectionScroll.setScrollbarsVisible(true);
         selectionScroll.setScrollingDisabled(false, true);
         //selectionScroll.setDebug(true);
 
-        //containerTable.add(new Label("Creations - Load", chosenSkin));
+        //containerTable.add(new Label("worlds - Load", chosenSkin));
         //containerTable.row();
         //containerTable.add(selectionScroll);
         //containerTable.row();
@@ -61,37 +61,37 @@ public class CreationSelectInterface extends UserInterface {
         stage.addActor(selectionScroll);
     }
 
-    public void loadCreations(Stage stage) {
-        //getting the metadata of the creations so that the user can have more information about what they're choosing before they choose it.
+    public void loadWorlds(Stage stage) {
+        //getting the metadata of the worlds so that the user can have more information about what they're choosing before they choose it.
 
         try {
-            ResultSet getCreationsResults = Database.doSqlQuery(
-                    "SELECT * FROM creation " +
+            ResultSet getWorldsResults = Database.doSqlQuery(
+                    "SELECT * FROM world " +
                             "WHERE \"username\" = '" + username + "' " +
                             "ORDER BY last_accessed_timestamp DESC;"
             );
 
 
-            if (getCreationsResults.next()) {
+            if (getWorldsResults.next()) {
                 try {
                     do {
-                        String name = getCreationsResults.getString("creation_name");
-                        Instant dateCreated = getCreationsResults.getTimestamp("created_timestamp").toInstant();
-                        Instant lastAccessed = getCreationsResults.getTimestamp("last_accessed_timestamp").toInstant();
-                        Long seed = getCreationsResults.getLong("creation_seed");
+                        String name = getWorldsResults.getString("world_name");
+                        Instant dateCreated = getWorldsResults.getTimestamp("created_timestamp").toInstant();
+                        Instant lastAccessed = getWorldsResults.getTimestamp("last_accessed_timestamp").toInstant();
+                        Long seed = getWorldsResults.getLong("world_seed");
 
-                        //get number of layers which are part of this creation
-                        ResultSet layerCountRS = Database.doSqlQuery("SELECT COUNT(*) FROM layer WHERE creation_name = '" + name + "' AND username = '" + username + "'");
+                        //get number of layers which are part of this world
+                        ResultSet layerCountRS = Database.doSqlQuery("SELECT COUNT(*) FROM layer WHERE world_name = '" + name + "' AND username = '" + username + "'");
 
                         int layerCount = 0;
                         if (layerCountRS.next()) {
                             layerCount = layerCountRS.getInt("count");
                         }
 
-                        creations.row();
-                        creations.add(selectCreationButton(name, dateCreated, lastAccessed, layerCount, seed));
+                        worlds.row();
+                        worlds.add(selectWorldButton(name, dateCreated, lastAccessed, layerCount, seed));
 
-                    } while (getCreationsResults.next());
+                    } while (getWorldsResults.next());
                 } catch (SQLException e) {
                     basicPopupMessage("Error!", e.getMessage(), stage);
                 }
@@ -101,10 +101,10 @@ public class CreationSelectInterface extends UserInterface {
         }
     }
 
-    public TextButton selectCreationButton(final String name, final Instant dateCreated, final Instant lastAccessed, int layerCount, final Long seed) {
+    public TextButton selectWorldButton(final String name, final Instant dateCreated, final Instant lastAccessed, int layerCount, final Long seed) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_FORMAT).withZone(ZoneId.systemDefault());
 
-        TextButton button = new TextButton("Creation name: " + name +
+        TextButton button = new TextButton("World name: " + name +
                 "\nDate created: " + formatter.format(dateCreated) +
                 "\nLast accessed: " + formatter.format(lastAccessed) +
                 "\nNumber of layers: " + Integer.toString(layerCount) +
@@ -114,7 +114,7 @@ public class CreationSelectInterface extends UserInterface {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 //even though I could just pass name and username through, and then query to find the other details again, I think it's better to keep passing the values through
-                CreationSelectScreen.getCreation(name, username, seed, dateCreated);
+                WorldSelectScreen.getWorld(name, username, seed, dateCreated);
                 return true;
             }
         });
@@ -122,7 +122,7 @@ public class CreationSelectInterface extends UserInterface {
         return button;
     }
 
-    public static Dialog newCreationPopup() {
+    public static Dialog newWorldPopup() {
         final Dialog popupBox = new Dialog("New creation", chosenSkin);
 
         Table table = new Table();
@@ -148,9 +148,9 @@ public class CreationSelectInterface extends UserInterface {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (seedField.getText().equals("")) {
-                    loadCreationIntoApp(new Creation(nameField.getText()), username);
+                    loadWorldIntoApp(new World(nameField.getText()), username);
                 } else {
-                    loadCreationIntoApp(new Creation(nameField.getText(), Long.parseLong(seedField.getText())), username);
+                    loadWorldIntoApp(new World(nameField.getText(), Long.parseLong(seedField.getText())), username);
                 }
 
                 return true;

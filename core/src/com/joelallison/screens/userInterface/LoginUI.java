@@ -10,13 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.joelallison.screens.AppScreen;
-import com.joelallison.user.Creation;
+import com.joelallison.user.World;
 
 import static com.joelallison.screens.LoginScreen.login;
 import static com.joelallison.screens.LoginScreen.register;
 
 
-public class LoginInterface extends UserInterface {
+public class LoginUI extends UI {
 
     Label usernameLabel = new Label("Username", chosenSkin);
     static TextField usernameField = new TextField("", chosenSkin);
@@ -98,7 +98,7 @@ public class LoginInterface extends UserInterface {
         skipButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new AppScreen(new Creation("new"), ""));
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new AppScreen(new World("new"), ""));
                 return true;
             }
         });
