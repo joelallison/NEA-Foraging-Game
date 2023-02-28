@@ -22,7 +22,7 @@ import com.joelallison.screens.userInterface.AppUI;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.joelallison.io.JsonHandling.tilesetsJsonToMap;
+import static com.joelallison.io.FileHandling.importTilesets;
 
 public class AppScreen implements Screen {
 	Stage mainUIStage;
@@ -63,10 +63,7 @@ public class AppScreen implements Screen {
 		//declare player stuff
 		userInput = new UserInput(0, 0);
 
-		tilesets = tilesetsJsonToMap("core/src/com/joelallison/tilesets/tilesets.json");
-		for (Map.Entry<String, Tileset> set : tilesets.entrySet()) {
-			set.getValue().initTileset();
-		}
+		tilesets = importTilesets("core/src/com/joelallison/tilesets/");
 
 		stateTime = 0f;
 

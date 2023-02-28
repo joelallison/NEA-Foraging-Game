@@ -1,19 +1,22 @@
 package com.joelallison.user;
 
+import com.badlogic.gdx.math.Vector2;
+import com.joelallison.generation.Layer;
 import com.joelallison.generation.MazeLayer;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.screens.AppScreen;
+import com.joelallison.screens.WorldSelectScreen;
 
 import java.sql.*;
 import java.time.Instant;
+import java.util.ArrayList;
 
 import static com.joelallison.screens.userInterface.AppUI.saveProgress;
 
 public class Database {
     static Connection connection;
     static Statement statement;
-
     //specific values for my server so I don't have to type them out more than once!
     public static String jdbcURL = "jdbc:postgresql://localhost:5432/levelgentool";
     public static String username = "postgres";
@@ -63,11 +66,12 @@ public class Database {
     }
 
     public static void saveWorld(String username, World world) {
-        // update world entry
-        // for each layer, update layer
-        // 		then get specific layer id
-        // 		using that, edit the layer-type specific details
-        //		THAT INCLUDES TILE STUFF
+        //these were notes to self when writing, but I've left them in:
+        //update world entry
+        //for each layer, update layer
+        //		then get specific layer id
+        //		using that, edit the layer-type specific details
+        //  	THAT INCLUDES TILE SPECS
 
         int localLayersCount = world.layers.size();
         int layersInDatabase = 0;
@@ -245,5 +249,95 @@ public class Database {
         }
 
         return false;
+    }
+
+    public static void getWorld(String worldName, String username, Long seed, Instant dateCreated) {
+        ArrayList<Layer> layers = new ArrayList<>();
+
+        ResultSet worldLayers = doSqlQuery(
+                "SELECT * FROM layer " +
+                        "WHERE \"username\" = '" + username + "' " +
+                        "AND \"world_name\" = '" + worldName + "'" +
+                        "ORDER BY layer_number ASC;"
+        );
+
+        try {
+            while(worldLayers.next()) {
+                //loading all layers found from the query into the arraylist
+                switch(worldLayers.getString("layer_type").charAt(0)) {
+                    //need to be processed differently based on type (different constructors etc.)
+                    //I could have the different types of layer-loading as methods, but I don't need to get individual layers from the database in any other place so it's pointless
+                    case 'T':
+                        ResultSet terrainLayerRS = doSqlQuery(
+                                "SELECT * FROM terrain_layer " +
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
+                        );
+
+                        //as worldLayers.next() == true, and that layer is marked 'T', a terrain layer will be returned from the query, terrainLayerRS shouldn't be null
+                        terrainLayerRS.next();
+
+                        TerrainLayer terrainLayer = new TerrainLayer(
+                                worldLayers.getString("layer_name"),
+                                worldLayers.getLong("seed"),
+                                terrainLayerRS.getFloat("scale"),
+                                terrainLayerRS.getInt("octaves"),
+                                terrainLayerRS.getFloat("lacunarity"),
+                                terrainLayerRS.getInt("wrap"),
+                                terrainLayerRS.getBoolean("invert")
+                                );
+
+                        terrainLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
+                        terrainLayer.setCenter(new Vector2(worldLayers.getInt("center_x"), worldLayers.getInt("center_y")));
+
+                        ResultSet terrainTileSpecsRS = doSqlQuery(
+                                "SELECT * FROM terrain_tile_specs " +
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
+                        );
+
+                        while(terrainTileSpecsRS.next()) {
+                            terrainLayer.tileSpecs.add(new Tileset.TerrainTileSpec(terrainTileSpecsRS.getString("tile_name"), terrainTileSpecsRS.getFloat("lower_bound")));
+                        }
+
+                        layers.add(terrainLayer);
+                        break;
+                    case 'M':
+                        ResultSet mazeLayerRS = doSqlQuery(
+                                "SELECT * FROM maze_layer " +
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
+                        );
+
+                        //as worldLayers.next() == true, and that layer is marked 'M', a maze layer will be returned from the query, mazeLayerRS shouldn't be null
+                        mazeLayerRS.next();
+
+                        MazeLayer mazeLayer = new MazeLayer(
+                                worldLayers.getString("name"),
+                                worldLayers.getLong("seed"),
+                                mazeLayerRS.getInt("width"),
+                                mazeLayerRS.getInt("height")
+
+                        );
+
+                        mazeLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
+                        mazeLayer.setCenter(new Vector2(worldLayers.getInt("center_x"), worldLayers.getInt("center_y")));
+
+                        ResultSet mazeTileSpecsRS = doSqlQuery(
+                                "SELECT * FROM maze_tile_specs " +
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
+                        );
+
+                        while(mazeTileSpecsRS.next()) {
+                            mazeLayer.tileSpecs.add(new Tileset.MazeTileSpec(mazeTileSpecsRS.getString("tile_name"), mazeTileSpecsRS.getInt("orientation_id")));
+                        }
+
+                        layers.add(mazeLayer);
+                        break;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+
+        World world = new World(worldName, layers, seed, dateCreated);
+        WorldSelectScreen.loadWorldIntoApp(world, username);
     }
 }

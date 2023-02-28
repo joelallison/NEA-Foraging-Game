@@ -1,21 +1,65 @@
 package com.joelallison.io;
 
+import com.joelallison.graphics.Tileset;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+
+import static com.joelallison.io.JsonHandling.tilesetJsonToMapEntry;
 
 public abstract class FileHandling {
 
-    public static String readJSONTileData(String filename) {
+    public static HashMap<String, Tileset> importTilesets(String folderName) {
+        HashMap<String, Tileset> tilesets = new HashMap<>(0);
+        File directory = new File(folderName);
+        try {
+            for (File subfolder: directory.listFiles()) {
+                TilesetEntry<String, Tileset> tilesetEntry = tilesetJsonToMapEntry(new File(subfolder.getAbsolutePath() + "/data.json"));
+                tilesetEntry.getValue().initTileset(subfolder.getAbsolutePath() + "/" + tilesetEntry.getValue().getSpriteSheetName());
+                tilesets.put(tilesetEntry.getKey(), tilesetEntry.getValue());
+            }
+        } catch (NullPointerException e) {
+            System.out.println("No tilesets found in directory '" + directory.getAbsolutePath() + "'...\n" + e);
+        }
+
+        return tilesets;
+    }
+
+    final class TilesetEntry<K, V> implements Map.Entry<K, V> {
+        private final K key;
+        private V value;
+
+        public TilesetEntry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public K getKey() {
+            return key;
+        }
+
+        @Override
+        public V getValue() {
+            return value;
+        }
+
+        @Override
+        public V setValue(V value) {
+            V old = this.value;
+            this.value = value;
+            return old;
+        }
+    }
+
+    public static String jsonFileToString(File file) {
 
         //this first part is similar to the readFromFile method, but reads the file all onto one line.
         StringBuilder fileText = new StringBuilder();
         try {
-            File file = new File(filename);
             Scanner myReader = new Scanner(file);
             while (myReader.hasNextLine()) {
                 String currentLine = myReader.nextLine();

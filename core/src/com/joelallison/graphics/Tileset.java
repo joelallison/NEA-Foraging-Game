@@ -61,8 +61,8 @@ public class Tileset {
         }
     }
 
-    public void initTileset() {
-        spriteSheetTexture = new Texture(Gdx.files.internal(this.spriteSheet));
+    public void initTileset(String spritesheetLocation) {
+        spriteSheetTexture = new Texture(spritesheetLocation);
         baseColor = Color.valueOf(this.baseColorHex);
     }
 

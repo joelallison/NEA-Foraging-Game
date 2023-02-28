@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
-import com.joelallison.screens.WorldSelectScreen;
 import com.joelallison.user.World;
 import com.joelallison.user.Database;
 
@@ -114,7 +113,7 @@ public class WorldUI extends UI {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 //even though I could just pass name and username through, and then query to find the other details again, I think it's better to keep passing the values through
-                WorldSelectScreen.getWorld(name, username, seed, dateCreated);
+                Database.getWorld(name, username, seed, dateCreated);
                 return true;
             }
         });
