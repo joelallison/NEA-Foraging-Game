@@ -1,89 +1,89 @@
-{"Walls": {
-    "creator": "Joel Allison",
-    "spriteSheet": "wall_tileSheet.png",
-    "tileSize": 8,
-    "baseColorHex": "#1F1814",
-    "map": {
-      "cabbage": {
-        "cornerX": 0,
-        "cornerY": 0
-      },
-      "beans": {
-        "cornerX": 1,
-        "cornerY": 0
-      },
-      "something": {
-        "cornerX": 2,
-        "cornerY": 0
-      },
-      "crossroad": {
-        "cornerX": 3,
-        "cornerY": 0
-      },
-      "t_up": {
-        "cornerX": 4,
-        "cornerY": 0
-      },
-      "singular": {
-        "cornerX": 0,
-        "cornerY": 1
-      },
-      "left_end": {
-        "cornerX": 1,
-        "cornerY": 1
-      },
-      "right_end": {
-        "cornerX": 2,
-        "cornerY": 1
-      },
-      "t_left": {
-        "cornerX": 3,
-        "cornerY": 1
-      },
-      "t_right": {
-        "cornerX": 4,
-        "cornerY": 1
-      },
-      "corner_topright": {
-        "cornerX": 0,
-        "cornerY": 2
-      },
-      "corner_topleft": {
-        "cornerX": 1,
-        "cornerY": 2
-      },
-      "vertical_full": {
-        "cornerX": 2,
-        "cornerY": 2
-      },
-      "top_end": {
-        "cornerX": 3,
-        "cornerY": 2
-      },
-      "t_down": {
-        "cornerX": 4,
-        "cornerY": 2
-      },
-      "corner_bottomleft": {
-        "cornerX": 0,
-        "cornerY": 3
-      },
-      "corner_bottomright": {
-        "cornerX": 1,
-        "cornerY": 3
-      },
-      "horizontal_full": {
-        "cornerX": 2,
-        "cornerY": 3
-      },
-      "bottom_end": {
-        "cornerX": 3,
-        "cornerY": 3
-      },
-      "hrmm": {
-        "cornerX": 4,
-        "cornerY": 3
-      }
+{
+  "name": "Walls",
+  "creator": "Joel Allison",
+  "spriteSheet": "wall_tileSheet.png",
+  "tileSize": 8,
+  "baseColorHex": "#1F1814",
+  "map": {
+    "cabbage": {
+      "cornerX": 0,
+      "cornerY": 0
+    },
+    "beans": {
+      "cornerX": 1,
+      "cornerY": 0
+    },
+    "something": {
+      "cornerX": 2,
+      "cornerY": 0
+    },
+    "crossroad": {
+      "cornerX": 3,
+      "cornerY": 0
+    },
+    "t_up": {
+      "cornerX": 4,
+      "cornerY": 0
+    },
+    "singular": {
+      "cornerX": 0,
+      "cornerY": 1
+    },
+    "left_end": {
+      "cornerX": 1,
+      "cornerY": 1
+    },
+    "right_end": {
+      "cornerX": 2,
+      "cornerY": 1
+    },
+    "t_left": {
+      "cornerX": 3,
+      "cornerY": 1
+    },
+    "t_right": {
+      "cornerX": 4,
+      "cornerY": 1
+    },
+    "corner_topright": {
+      "cornerX": 0,
+      "cornerY": 2
+    },
+    "corner_topleft": {
+      "cornerX": 1,
+      "cornerY": 2
+    },
+    "vertical_full": {
+      "cornerX": 2,
+      "cornerY": 2
+    },
+    "top_end": {
+      "cornerX": 3,
+      "cornerY": 2
+    },
+    "t_down": {
+      "cornerX": 4,
+      "cornerY": 2
+    },
+    "corner_bottomleft": {
+      "cornerX": 0,
+      "cornerY": 3
+    },
+    "corner_bottomright": {
+      "cornerX": 1,
+      "cornerY": 3
+    },
+    "horizontal_full": {
+      "cornerX": 2,
+      "cornerY": 3
+    },
+    "bottom_end": {
+      "cornerX": 3,
+      "cornerY": 3
+    },
+    "hrmm": {
+      "cornerX": 4,
+      "cornerY": 3
     }
   }
 }

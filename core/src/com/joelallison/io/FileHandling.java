@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-import static com.joelallison.io.JsonHandling.tilesetJsonToMapEntry;
+import static com.joelallison.io.JsonHandling.tilesetJsonToObject;
 
 public abstract class FileHandling {
 
@@ -17,49 +17,35 @@ public abstract class FileHandling {
         File directory = new File(folderName);
         try {
             for (File subfolder: directory.listFiles()) {
-                TilesetEntry<String, Tileset> tilesetEntry = tilesetJsonToMapEntry(new File(subfolder.getAbsolutePath() + "/data.json"));
-                tilesetEntry.getValue().initTileset(subfolder.getAbsolutePath() + "/" + tilesetEntry.getValue().getSpriteSheetName());
-                tilesets.put(tilesetEntry.getKey(), tilesetEntry.getValue());
+                String json = jsonFileToString(subfolder.getPath() + "/data.json");
+                json = json.replaceAll("\\s{2,}", " "); //replace any areas with two or more consecutive spaces with just a single space
+                int nameStartIndex = json.indexOf("\"name\""); //find the location of the start of the name parameter in the string
+                int i = 0;
+                //go through the json until the end of the name value is found
+                while(json.charAt(nameStartIndex + "\"name\": \"".length() + i) != '"') {
+                    i++;
+                }
+                System.out.println(i);
+                int nameEndIndex = nameStartIndex + "\"name\": \"".length() + i;
+                String name = json.substring(nameStartIndex + "\"name\": \"".length(), nameEndIndex);
+                json = json.replace(json.substring(nameStartIndex, nameEndIndex + 3), ""); //remove the name declaration line from the json - the extra three chars are '", '
+
+                tilesets.put(name, tilesetJsonToObject(json));
+                tilesets.get(name).initTileset(subfolder.getPath() + "/" + tilesets.get(name).getSpriteSheetName());
             }
         } catch (NullPointerException e) {
-            System.out.println("No tilesets found in directory '" + directory.getAbsolutePath() + "'...\n" + e);
+            System.out.println("Tilesets missing in directory '" + directory.getAbsolutePath() + "'...\n" + e);
         }
 
         return tilesets;
     }
 
-    final class TilesetEntry<K, V> implements Map.Entry<K, V> {
-        private final K key;
-        private V value;
-
-        public TilesetEntry(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V value) {
-            V old = this.value;
-            this.value = value;
-            return old;
-        }
-    }
-
-    public static String jsonFileToString(File file) {
+    public static String jsonFileToString(String filename) {
 
         //this first part is similar to the readFromFile method, but reads the file all onto one line.
         StringBuilder fileText = new StringBuilder();
         try {
+            File file = new File(filename);
             Scanner myReader = new Scanner(file);
             while (myReader.hasNextLine()) {
                 String currentLine = myReader.nextLine();

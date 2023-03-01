@@ -1,34 +1,34 @@
 {
-  "Trees & Rocks": {
-    "creator": "Joel Allison",
-    "spriteSheet": "tree_tileSheet.png",
-    "tileSize": 8,
-    "baseColorHex": "#1F1814",
-    "map": {
-      "plant": {
-        "cornerX": 0,
-        "cornerY": 0
-      },
-      "bush": {
-        "cornerX": 1,
-        "cornerY": 0
-      },
-      "tree_1": {
-        "cornerX": 2,
-        "cornerY": 0
-      },
-      "tree_2": {
-        "cornerX": 3,
-        "cornerY": 0
-      },
-      "rock_1": {
-        "cornerX": 4,
-        "cornerY": 0
-      },
-      "rock_2": {
-        "cornerX": 5,
-        "cornerY": 0
-      }
+  "name": "Trees & Rocks",
+  "creator": "Joel Allison",
+  "spriteSheet": "tree_tileSheet.png",
+  "tileSize": 8,
+  "baseColorHex": "#1F1814",
+  "map": {
+    "plant": {
+      "cornerX": 0,
+      "cornerY": 0
+    },
+    "bush": {
+      "cornerX": 1,
+      "cornerY": 0
+    },
+    "tree_1": {
+      "cornerX": 2,
+      "cornerY": 0
+    },
+    "tree_2": {
+      "cornerX": 3,
+      "cornerY": 0
+    },
+    "rock_1": {
+      "cornerX": 4,
+      "cornerY": 0
+    },
+    "rock_2": {
+      "cornerX": 5,
+      "cornerY": 0
     }
   }
 }
+
