@@ -1,16 +1,12 @@
 package com.joelallison.user;
 
-import com.badlogic.gdx.math.Vector2;
-import com.joelallison.generation.Layer;
 import com.joelallison.generation.MazeLayer;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.screens.AppScreen;
-import com.joelallison.screens.WorldSelectScreen;
 
 import java.sql.*;
 import java.time.Instant;
-import java.util.ArrayList;
 
 import static com.joelallison.screens.userInterface.AppUI.saveProgress;
 
@@ -245,99 +241,77 @@ public class Database {
             //UPDATE layer_type_tile_spec
             //SET
             //WHERE layer_id
+            /*
+            if (doSqlStatement(saveType + "layer" + " SET "
+                    "'" + username + "', "
+                    + "'" + AppScreen.world.name + "', "
+                    + layerIndex + ", "
+                    + "'" + AppScreen.world.layers.get(layerIndex).getName() + "', "
+                    + Boolean.toString(AppScreen.world.layers.get(layerIndex).layerShown()) + ", "
+                    + "'" + layer_type + "', "
+                    + layer_id + ", "
+                    + AppScreen.world.layers.get(layerIndex).inheritSeed() + ", "
+                    + Long.toString(AppScreen.world.layers.get(layerIndex).getSeed()) + ", "
+                    + AppScreen.world.layers.get(layerIndex).getCenter().x + ", "
+                    + AppScreen.world.layers.get(layerIndex).getCenter().y + ", "
+                    + "'" + AppScreen.world.layers.get(layerIndex).tilesetName + "')")) {
+                switch (layer_type) {
+                    case 'T':
+                        if (doSqlStatement(saveType + " terrain_layer (layer_type, layer_id, scale, octaves, lacunarity, wrap, invert)" +
+                                "VALUES ("
+                                + "'" + layer_type + "', "
+                                + layer_id + ", "
+                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getScale() + ", "
+                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getOctaves() + ", "
+                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getLacunarity() + ", "
+                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getWrap() + ", "
+                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).isInverted() + ");"))
+                        {
+                            for (Tileset.TerrainTileSpec tileSpec: ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).tileSpecs) {
+                                if (!doSqlStatement(saveType + " terrain_tile_specs (layer_id, tile_name, lower_bound)" +
+                                        "VALUES ("
+                                        + layer_id + ", "
+                                        + "'" + tileSpec.name + "', "
+                                        + tileSpec.lowerBound + ")"
+                                )) {
+                                    saveProgress = "Unable to save tile " + tileSpec.name + " | " + tileSpec.lowerBound;
+                                    return false; //if a tile isn't able to be saved to the database
+                                }
+                            }
+                            saveProgress = "Layer " + layerIndex + " saved.";
+                            return true;
+                        }
+                        break;
+                    case 'M':
+                        if (doSqlStatement(saveType + " maze_layer (layer_type, layer_id, width, height)" +
+                                "VALUES ("
+                                + "'" + layer_type + "', "
+                                + layer_id + ", "
+                                + ((MazeLayer) AppScreen.world.layers.get(layerIndex)).getWidth() + ", "
+                                + ((MazeLayer) AppScreen.world.layers.get(layerIndex)).getHeight() + ");"))
+                        {
+                            for (Tileset.MazeTileSpec tileSpec: ((MazeLayer) AppScreen.world.layers.get(layerIndex)).tileSpecs) {
+                                if (!doSqlStatement(saveType + " maze_tile_specs (layer_id, tile_name, lower_bound)" +
+                                        "VALUES ("
+                                        + layer_id + ", "
+                                        + "'" + tileSpec.name + "', "
+                                        + tileSpec.orientationID + ")"
+                                )) {
+                                    saveProgress = "Unable to save tile " + tileSpec.name + " | " + tileSpec.orientationID;
+                                    return false; //if a tile isn't able to be saved to the database
+                                }
+                            }
+                            saveProgress = "Layer " + layerIndex + " saved.";
+                            return true;
+                        }
+                        break;
+                }*/
+
+
             return true;
         }
 
         return false;
     }
 
-    public static void getWorld(String worldName, String username, Long seed, Instant dateCreated) {
-        ArrayList<Layer> layers = new ArrayList<>();
-
-        ResultSet worldLayers = doSqlQuery(
-                "SELECT * FROM layer " +
-                        "WHERE \"username\" = '" + username + "' " +
-                        "AND \"world_name\" = '" + worldName + "'" +
-                        "ORDER BY layer_number ASC;"
-        );
-
-        try {
-            while(worldLayers.next()) {
-                //loading all layers found from the query into the arraylist
-                switch(worldLayers.getString("layer_type").charAt(0)) {
-                    //need to be processed differently based on type (different constructors etc.)
-                    //I could have the different types of layer-loading as methods, but I don't need to get individual layers from the database in any other place so it's pointless
-                    case 'T':
-                        ResultSet terrainLayerRS = doSqlQuery(
-                                "SELECT * FROM terrain_layer " +
-                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
-                        );
-
-                        //as worldLayers.next() == true, and that layer is marked 'T', a terrain layer will be returned from the query, terrainLayerRS shouldn't be null
-                        terrainLayerRS.next();
-
-                        TerrainLayer terrainLayer = new TerrainLayer(
-                                worldLayers.getString("layer_name"),
-                                worldLayers.getLong("seed"),
-                                terrainLayerRS.getFloat("scale"),
-                                terrainLayerRS.getInt("octaves"),
-                                terrainLayerRS.getFloat("lacunarity"),
-                                terrainLayerRS.getInt("wrap"),
-                                terrainLayerRS.getBoolean("invert")
-                                );
-
-                        terrainLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
-                        terrainLayer.setCenter(new Vector2(worldLayers.getInt("center_x"), worldLayers.getInt("center_y")));
-
-                        ResultSet terrainTileSpecsRS = doSqlQuery(
-                                "SELECT * FROM terrain_tile_specs " +
-                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
-                        );
-
-                        while(terrainTileSpecsRS.next()) {
-                            terrainLayer.tileSpecs.add(new Tileset.TerrainTileSpec(terrainTileSpecsRS.getString("tile_name"), terrainTileSpecsRS.getFloat("lower_bound")));
-                        }
-
-                        layers.add(terrainLayer);
-                        break;
-                    case 'M':
-                        ResultSet mazeLayerRS = doSqlQuery(
-                                "SELECT * FROM maze_layer " +
-                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
-                        );
-
-                        //as worldLayers.next() == true, and that layer is marked 'M', a maze layer will be returned from the query, mazeLayerRS shouldn't be null
-                        mazeLayerRS.next();
-
-                        MazeLayer mazeLayer = new MazeLayer(
-                                worldLayers.getString("name"),
-                                worldLayers.getLong("seed"),
-                                mazeLayerRS.getInt("width"),
-                                mazeLayerRS.getInt("height")
-
-                        );
-
-                        mazeLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
-                        mazeLayer.setCenter(new Vector2(worldLayers.getInt("center_x"), worldLayers.getInt("center_y")));
-
-                        ResultSet mazeTileSpecsRS = doSqlQuery(
-                                "SELECT * FROM maze_tile_specs " +
-                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
-                        );
-
-                        while(mazeTileSpecsRS.next()) {
-                            mazeLayer.tileSpecs.add(new Tileset.MazeTileSpec(mazeTileSpecsRS.getString("tile_name"), mazeTileSpecsRS.getInt("orientation_id")));
-                        }
-
-                        layers.add(mazeLayer);
-                        break;
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-
-        World world = new World(worldName, layers, seed, dateCreated);
-        WorldSelectScreen.loadWorldIntoApp(world, username);
-    }
 }

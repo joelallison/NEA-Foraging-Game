@@ -307,7 +307,12 @@ public class AppUI extends UI {
     }
 
     protected void updateGenerationSettingsPanel() {
-        generationSettingsPanel.getTitleLabel().setText("Generation Settings: " + world.layers.get(selectedLayerIndex).getName());
+        String layerShown = "(hidden)";
+        if (world.layers.get(selectedLayerIndex).layerShown()) {
+            layerShown = "(shown)";
+        }
+
+        generationSettingsPanel.getTitleLabel().setText("Generation Settings: " + world.layers.get(selectedLayerIndex).getName() + " " + layerShown);
         inheritSeedCheck.setChecked(world.layers.get(selectedLayerIndex).inheritSeed());
         layerSeedButton.setText("Seed: " + world.layers.get(selectedLayerIndex).getSeed());
 
