@@ -44,6 +44,7 @@ public class TerrainLayer extends Layer {
 
     //for loading with very little input
     public TerrainLayer(Long seed) {
+        super(seed);
         Random random = new Random();
         this.name = "Terrain Layer";
         if(seed == -1L){
@@ -63,7 +64,8 @@ public class TerrainLayer extends Layer {
         defaultTileValues();
     }
 
-    private void defaultTileValues() {
+    @Override
+    public void defaultTileValues() {
         this.tileSpecs = new ArrayList<>();
         this.tileSpecs.add(new Tileset.TerrainTileSpec("bush", 0.35f));
         this.tileSpecs.add(new Tileset.TerrainTileSpec("plant", 0.4f));
@@ -88,11 +90,6 @@ public class TerrainLayer extends Layer {
 
     public void genValueMap(Long seed, Vector2 dimensions, int xOffset, int yOffset) {
         valueMap = genTerrain(seed, dimensions, xOffset, yOffset, this.getScale(), this.getOctaves(), this.getLacunarity(), this.getWrap(), this.isInverted());
-    }
-
-    @Override
-    public TextureRegion getTextureFromIndex(int i) {
-        return tilesets.get(tilesetName).getTileTexture(tilesets.get(tilesetName).map.get(this.tileSpecs.get(i).name));
     }
 
     public float getScale() {

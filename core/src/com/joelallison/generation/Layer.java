@@ -2,8 +2,13 @@ package com.joelallison.generation;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.joelallison.graphics.Tileset;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Layer {
+    int layerID = -1; //this parameter is used solely for keeping track of layers within the database, -1 means it hasn't been saved to the database yet
     protected String name;
     protected Long seed;
     public String tilesetName = "Trees & Rocks"; //default value that's needed due to the way libgdx runs its render process
@@ -11,26 +16,40 @@ public abstract class Layer {
     protected Vector2 center = new Vector2(0, 0);
     public float hueShift; //something I want to implement but haven't [yet], because shaders are painful
     protected boolean inheritSeed = false;
+    public List<Tileset.TileSpec> tileSpecs;
 
     // export layer button
     // clipping mode?
     // the spacing and wave collapse feature?
 
     //the Layer class is never used on its own, these methods are only inherited / overriden etc.
-    public Layer(String name, Long seed) { //for the creation of a layer with specific values
+    public Layer(String name, Long seed) {
         this.name = name;
         this.seed = seed;
     }
-    public Layer() { //for the creation of a layer with default values
-
-    }
-    public TextureRegion getTextureFromIndex(int i) {
-        return null;
+    public Layer(Long seed) {
+        this.seed = seed;
     }
 
     public void sortTileSpecs(){
-        //does nothing
+        //does nothing, class is abstract
     }
+    public void clearTileSpecs() {
+        this.tileSpecs = new ArrayList<>();
+    }
+
+    public void defaultTileValues() {
+        //does nothing, class is abstract
+    }
+
+    public int getLayerID() {
+        return layerID;
+    }
+
+    public void setLayerID(int layerID) {
+        this.layerID = layerID;
+    }
+
     public boolean layerShown() {
         return showLayer;
     }

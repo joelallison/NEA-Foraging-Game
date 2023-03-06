@@ -15,23 +15,28 @@ public abstract class FileHandling {
     public static HashMap<String, Tileset> importTilesets(String folderName) {
         HashMap<String, Tileset> tilesets = new HashMap<>(0);
         File directory = new File(folderName);
+
         try {
             for (File subfolder: directory.listFiles()) {
-                String json = jsonFileToString(subfolder.getPath() + "/data.json");
-                json = json.replaceAll("\\s{2,}", " "); //replace any areas with two or more consecutive spaces with just a single space
-                int nameStartIndex = json.indexOf("\"name\""); //find the location of the start of the name parameter in the string
-                int i = 0;
-                //go through the json until the end of the name value is found
-                while(json.charAt(nameStartIndex + "\"name\": \"".length() + i) != '"') {
-                    i++;
-                }
-                System.out.println(i);
-                int nameEndIndex = nameStartIndex + "\"name\": \"".length() + i;
-                String name = json.substring(nameStartIndex + "\"name\": \"".length(), nameEndIndex);
-                json = json.replace(json.substring(nameStartIndex, nameEndIndex + 3), ""); //remove the name declaration line from the json - the extra three chars are '", '
+                if (subfolder.isDirectory()) {
+                    String json = jsonFileToString(subfolder.getPath() + "/data.json");
+                    if (!json.equals("")) {
+                        json = json.replaceAll("\\s{2,}", " "); //replace any areas with two or more consecutive spaces with just a single space
+                        int nameStartIndex = json.indexOf("\"name\""); //find the location of the start of the name parameter in the string
+                        int i = 0;
+                        //go through the json until the end of the name value is found
+                        while(json.charAt(nameStartIndex + "\"name\": \"".length() + i) != '"') {
+                            i++;
+                        }
+                        int nameEndIndex = nameStartIndex + "\"name\": \"".length() + i;
+                        String name = json.substring(nameStartIndex + "\"name\": \"".length(), nameEndIndex);
+                        json = json.replace(json.substring(nameStartIndex, nameEndIndex + 3), ""); //remove the name declaration line from the json - the extra three chars are '", '
 
-                tilesets.put(name, tilesetJsonToObject(json));
-                tilesets.get(name).initTileset(subfolder.getPath() + "/" + tilesets.get(name).getSpriteSheetName());
+                        tilesets.put(name, tilesetJsonToObject(json));
+                        tilesets.get(name).initTileset(subfolder.getPath() + "/" + tilesets.get(name).getSpriteSheetName());
+                    }
+
+                }
             }
         } catch (NullPointerException e) {
             System.out.println("Tilesets missing in directory '" + directory.getAbsolutePath() + "'...\n" + e);
@@ -41,7 +46,6 @@ public abstract class FileHandling {
     }
 
     public static String jsonFileToString(String filename) {
-
         //this first part is similar to the readFromFile method, but reads the file all onto one line.
         StringBuilder fileText = new StringBuilder();
         try {
@@ -55,8 +59,8 @@ public abstract class FileHandling {
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
+            return "";
         }
-
 
         return fileText.toString();
     }

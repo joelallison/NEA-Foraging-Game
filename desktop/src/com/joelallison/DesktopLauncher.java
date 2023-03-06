@@ -2,6 +2,8 @@ package com.joelallison;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.joelallison.generation.MazeLayer;
+import com.joelallison.io.FileHandling;
 import com.joelallison.screens.StartScreen;
 
 import static com.joelallison.screens.AppScreen.LEVEL_ASPECT_RATIO;
@@ -13,9 +15,9 @@ public class DesktopLauncher {
 		config.useVsync(true);
 		config.setForegroundFPS(60);
 
-		//FileHandling.createFile("aaaaa.txt");
-		//int size = 33;
-		//Maze maze = new Maze("a maze ing",1, size,  size);
+		//FileHandling.createFile("Maze.txt");
+		//int size = 2;
+		//MazeLayer maze = new MazeLayer("a maze ing",1, size,  size);
 		//maze.genMaze();
 		//FileHandling.writeToFile("Maze.txt", FileHandling.mazeToStringArray(maze.maze, "pgm", true, true));
 

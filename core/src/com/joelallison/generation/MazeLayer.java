@@ -13,22 +13,47 @@ public class MazeLayer extends Layer {
 
     private int width;
     private int height;
-
+    public final int MAX_ACROSS = 857;
+    public final int MIN_ACROSS = 3;
     private int count = 0;
-
     public int[][] maze;
     public List<Tileset.MazeTileSpec> tileSpecs;
-    public MazeLayer(String name, long seed, int width, int height) {
+    public MazeLayer(String name, long seed, int width, int height, String tilesetName) {
         super(name, seed);
 
         //each 'wall' and 'path' tiles are full cells, so the maze needs to be an odd width and height
         //this means that, in a way, the maze is half the dimensions that were specified.
         this.width = width + ((width+1)%2); //ensures width is odd
         this.height = height + ((height+1)%2); //ensures height is odd
+        this.tilesetName = tilesetName;
+
+        this.tileSpecs = new ArrayList<>();
     }
 
-    private void defaultTileValues() {
-        //NEEDS WORK!!
+    public MazeLayer(long seed) {
+        super(seed);
+        Random random = new Random();
+        name = "Maze Layer";
+
+        //each 'wall' and 'path' tiles are full cells, so the maze needs to be an odd width and height
+        //this means that, in a way, the maze is half the dimensions that were specified.
+        int dimension = random.nextInt(MIN_ACROSS, MAX_ACROSS);
+        this.width = dimension + ((dimension+1)%2); //ensures width is odd
+        this.height = dimension + ((dimension+1)%2); //ensures height is odd
+        this.tilesetName = "Walls";
+
+        defaultTileValues();
+    }
+
+    @Override
+    public void defaultTileValues() {
+        this.tileSpecs = new ArrayList<>();
+        this.tileSpecs.add(new Tileset.MazeTileSpec("singular", 1));
+    }
+
+    @Override
+    public void sortTileSpecs() {
+        //doesn't need to be sorted.
     }
 
     public void genMaze() {

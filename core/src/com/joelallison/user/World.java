@@ -83,7 +83,6 @@ public class World {
     public Color getClearColor() {
         return tilesets.get(layers.get(0).tilesetName).getColor();
     }
-
     public int layerCount() {
         return layers.size();
     }

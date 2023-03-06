@@ -10,9 +10,12 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.joelallison.screens.userInterface.LoginUI;
 import com.joelallison.user.Database;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -70,19 +73,22 @@ public class LoginScreen implements Screen {
         ResultSet rs = doSqlQuery("SELECT password, password_salt FROM users WHERE username = '" + LoginUI.getUsernameField() + "'");
         try {
             if (rs.next()) { // if there is an entry with that username...
-                String salt = rs.getString("password_salt");
+                byte[] salt = rs.getBytes("password_salt");
                 //checking hashed & salted password against stored hashed & salted password
                 if (hashString(LoginUI.getPasswordField(), salt).equals(rs.getString("password"))) {
                     LoginUI.feedbackLabel.setText("Login successful.");
+                    rs.close();
                     return true;
                 } else {
                     //writing 'username or password', when it's clear within the code that the issue is that the username is not in the database, increases security.
                     LoginUI.feedbackLabel.setText("Username or password is incorrect.");
+                    rs.close();
                     return false;
                 }
             } else {
                 //writing 'username or password', when it's clear within the code that the issue is that the username is not in the database, increases security.
                 LoginUI.feedbackLabel.setText("Username or password is incorrect.");
+                rs.close();
                 return false;
             }
         } catch (SQLException e) {
@@ -91,25 +97,44 @@ public class LoginScreen implements Screen {
     }
 
     public static void register() {
+        StringBuilder result = new StringBuilder();
+        for (byte aByte : genSalt()) {
+            result.append(String.format("%02x", aByte));
+        }
+        System.out.println(result.toString());
         if (addNewUser()) {
             ((Game) Gdx.app.getApplicationListener()).setScreen(new WorldSelectScreen(LoginUI.getUsernameField()));
         }
     }
 
     public static boolean addNewUser() {
-            if (nameAvailable(LoginUI.getUsernameField())) { //no rows (meaning no row with that username) will return false
-                //regex found here: https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
-                if (LoginUI.getPasswordField().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")) {
-                    // generate the salt and store it with the password
-                    String salt = genSalt();
-                    if (Database.doSqlStatement("INSERT INTO users (username, password, password_salt) " +
-                            "VALUES ('" + LoginUI.getUsernameField() + "', '" + hashString(LoginUI.getPasswordField(), salt) + "', '" + salt + "')"
-                    )) {
-                        LoginUI.feedbackLabel.setText("User added.");
-                        return true;
+            if (nameAvailable(LoginUI.getUsernameField())) {
+                if (LoginUI.getUsernameField().matches(".{1,20}")) {
+                    //password regex found here: https://www.ocpsoft.org/tutorials/regular-expressions/password-regular-expression/
+                    if (LoginUI.getPasswordField().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%_?/~+-=]).{8,32}$")) {
+
+                        // generate the salt and store it with the password
+                        try {
+                        byte[] salt = genSalt();
+                        PreparedStatement addUser = Database.doPreparedStatement("INSERT INTO users (username, password, password_salt) " +
+                                "VALUES ('" + LoginUI.getUsernameField() + "', '" + hashString(LoginUI.getPasswordField(), salt) + "', ?)");
+
+                            addUser.setBinaryStream(1, new ByteArrayInputStream(salt), salt.length);
+
+                            if (addUser.executeUpdate() > 0) {
+                                LoginUI.feedbackLabel.setText("User added.");
+                                return true;
+                            }
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    } else {
+                        LoginUI.feedbackLabel.setText("Password must have a \nminimum of eight characters and maximum of 32, \nat least one letter, one number, \none of these: *.!@$%_?/~+-=, \none uppercase character, one lowercase character.");
+                        return false;
                     }
                 } else {
-                    LoginUI.feedbackLabel.setText("Password must have a \nminimum of eight characters, \nat least one letter, \none number and \none special character.");
+                    LoginUI.feedbackLabel.setText("Username must have a length <= 20.");
                     return false;
                 }
             } else {
@@ -126,6 +151,7 @@ public class LoginScreen implements Screen {
                 nameConflict.close();
                 return true;
             } else {
+                nameConflict.close();
                 return false;
             }
         } catch (SQLException e) {
@@ -133,15 +159,15 @@ public class LoginScreen implements Screen {
         }
     }
 
-    public static String hashString(String inputString, String salt) {
+    public static String hashString(String inputString, byte[] salt) {
         //a hash implementation using SHA-512 and a salt, adapted from https://subscription.packtpub.com/book/security/9781849697767/1/ch01lvl1sec09/creating-a-strong-hash-simple
         //I found these two pages really useful for learning about salting hashes - https://auth0.com/blog/adding-salt-to-hashing-a-better-way-to-store-passwords/ & https://security.stackexchange.com/questions/17421/how-to-store-salt/17435#17435
         //I recognise that this level of encryption is overkill, but I feel that there's little reason not to.
 
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.update((salt + inputString).getBytes()); //loading the salted password into the messagedigest instance
-            byte[] byteData = md.digest();
+            md.update(salt); //loading the salt into the message digest instance
+            byte[] byteData = md.digest(inputString.getBytes());
             StringBuilder sb = new StringBuilder();
 
             for (int i = 0; i < byteData.length; i++) {
@@ -155,13 +181,13 @@ public class LoginScreen implements Screen {
         return null;
     }
 
-    public static String genSalt() {
+    public static byte[] genSalt() {
         //generating a salt to add to the password
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);
 
-        return (Arrays.toString(salt));
+        return (salt);
     }
 
     @Override

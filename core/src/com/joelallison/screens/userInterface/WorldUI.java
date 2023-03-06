@@ -162,6 +162,7 @@ public class WorldUI extends UI {
                                 terrainLayerRS.getBoolean("invert")
                         );
 
+                        terrainLayer.tilesetName = worldLayers.getString("tileset_name");
                         terrainLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
                         terrainLayer.setCenter(new Vector2(worldLayers.getInt("center_x"), worldLayers.getInt("center_y")));
 
@@ -190,8 +191,8 @@ public class WorldUI extends UI {
                                 worldLayers.getString("name"),
                                 worldLayers.getLong("seed"),
                                 mazeLayerRS.getInt("width"),
-                                mazeLayerRS.getInt("height")
-
+                                mazeLayerRS.getInt("height"),
+                                worldLayers.getString("tileset_name")
                         );
 
                         mazeLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
@@ -228,13 +229,13 @@ public class WorldUI extends UI {
         table.defaults().align(Align.left).space(8);
         table.pad(16);
 
-        Label nameLabel = new Label("Name:", chosenSkin);
+        final Label nameLabel = new Label("Name:", chosenSkin);
         table.add(nameLabel).colspan(100); //colspan is to allow the 'go' and 'cancel' buttons to be a lot closer together
         final TextField nameField = new TextField("", chosenSkin);
         table.add(nameField);
 
         table.row();
-        Label seedLabel = new Label("Seed: (leave blank for random) ", chosenSkin);
+        final Label seedLabel = new Label("Seed: (leave blank for random) ", chosenSkin);
         table.add(seedLabel).colspan(100); //colspan is to allow the 'go' and 'cancel' buttons to be a lot closer together
         final TextField seedField = new TextField("", chosenSkin);
         table.add(seedField);
@@ -244,12 +245,19 @@ public class WorldUI extends UI {
         goButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (seedField.getText().equals("")) {
-                    loadWorldIntoApp(new World(nameField.getText()), username);
+                if (!nameField.getText().equals("")) {
+                    if (seedField.getText().matches("[0-9]*")) {
+                        if (seedField.getText().equals("")) {
+                            loadWorldIntoApp(new World(nameField.getText()), username);
+                        } else {
+                            loadWorldIntoApp(new World(nameField.getText(), Long.parseLong(seedField.getText())), username);
+                        }
+                    } else {
+                        seedLabel.setText("Seed: (leave blank for random)\nMust be a positive int.");
+                    }
                 } else {
-                    loadWorldIntoApp(new World(nameField.getText(), Long.parseLong(seedField.getText())), username);
+                    nameLabel.setText("Name: (must not be left blank!)");
                 }
-
                 return true;
             }
         });

@@ -57,6 +57,17 @@ public class Database {
         return false;
     }
 
+    public static PreparedStatement doPreparedStatement(String sql) {
+        try {
+            return connection.prepareStatement(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("PostgreSQL Server Connection error");
+        }
+
+        return null;
+    }
+
     public static void closeConnection() throws SQLException {
         connection.close();
     }

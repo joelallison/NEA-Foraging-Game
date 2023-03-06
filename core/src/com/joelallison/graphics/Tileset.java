@@ -1,11 +1,12 @@
 package com.joelallison.graphics;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.HashMap;
+
+import static com.joelallison.screens.userInterface.AppUI.switchingTilesets;
 
 public class Tileset {
     public String creator;
@@ -14,14 +15,16 @@ public class Tileset {
     public int tileSize;
     private Color baseColor;
     private String baseColorHex;
+    public String defaultTile;
     public HashMap<String, TileCorners> map = new HashMap<String, TileCorners>(); //Tile name : Tile location
 
-    public Tileset(String creator, String spriteSheet, int tileSize, String baseColorHex, HashMap<String, TileCorners> map) {
+    public Tileset(String creator, String spriteSheet, int tileSize, String baseColorHex, String defaultTile, HashMap<String, TileCorners> map) {
         this.creator = creator;
         this.spriteSheet = spriteSheet;
         this.tileSize = tileSize;
         this.map = map;
         this.baseColorHex = baseColorHex;
+        this.defaultTile = defaultTile;
     }
 
 
@@ -51,13 +54,23 @@ public class Tileset {
             super(name);
             this.lowerBound = lowerBound;
         }
+        public TerrainTileSpec(String name) {
+            super(name);
+            this.lowerBound = 0.5f;
+        }
     }
 
+    //for Maze
     public static class MazeTileSpec extends TileSpec {
         public int orientationID;
         public MazeTileSpec(String name, int orientationID) {
             super(name);
             this.orientationID = orientationID;
+        }
+
+        public MazeTileSpec(String name) {
+            super(name);
+            this.orientationID = 1;
         }
     }
 
@@ -74,8 +87,10 @@ public class Tileset {
         this.baseColor = color;
     }
 
-    public TextureRegion getTileTexture(TileCorners tileCorners) {
-        return new TextureRegion(this.spriteSheetTexture, getActualTileLocation(tileCorners.cornerX), getActualTileLocation(tileCorners.cornerY), tileSize, tileSize);
+    public TextureRegion getTileTextureFromName(String name) {
+        System.out.println(switchingTilesets + " " + name);
+        TileCorners corners = this.map.get(name);
+        return new TextureRegion(this.spriteSheetTexture, getActualTileLocation(corners.cornerX), getActualTileLocation(corners.cornerY), tileSize, tileSize);
     }
 
     public int getActualTileLocation(int location) { //input will be cornerX or cornerY, as those values are relative and not actual pixel values
