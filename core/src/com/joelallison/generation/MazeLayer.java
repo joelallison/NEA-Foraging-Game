@@ -92,52 +92,54 @@ public class MazeLayer extends Layer {
     private void recursion(int r, int c) {
         //put up, down, left, right in a random (seeded) order
         Integer[] randomDirections = generateRandomDirections();
+        //count makes direction picking seeded - for a specific count and specific seed, shuffle will be the same
+        //this means that for a particular seed, randomDirections gets shuffled the same way over the course of generation, making the carved out path be the same
         count++;
         //check each direction
         for (int i = 0; i < randomDirections.length; i++) {
 
             switch(randomDirections[i]) {
                 case 1: //up
-                    if (r - 2 <= 0) {
+                    if (r - 2 <= 0) { //checks not at edge
                         continue;
                     }
-                    if (maze[r - 2][c] != 0) {
+                    if (maze[r - 2][c] != 0) { //if path cell above hasn't been carved out yet, go there
                         maze[r-2][c] = 0;
                         maze[r-1][c] = 0;
-                        recursion(r - 2, c);
+                        recursion(r - 2, c); //move to path cell above, do the process again
                     }
                     break;
                 case 2: //right
-                    if (c + 2 >= width - 1) {
+                    if (c + 2 >= width - 1) { //checks not at edge
                         continue;
                     }
-                    if (maze[r][c + 2] != 0) {
+                    if (maze[r][c + 2] != 0) { //if path to the right hasn't been carved out yet, go there
                         maze[r][c + 2] = 0;
                         maze[r][c + 1] = 0;
-                        recursion(r, c + 2);
+                        recursion(r, c + 2); //move to path cell to the right, do the process again
                     }
                     break;
                 case 3: //down
-                    if (r + 2 >= height - 1) {
+                    if (r + 2 >= height - 1) { //checks not at edge
                         continue;
                     }
-                    if (maze[r + 2][c] != 0) {
+                    if (maze[r + 2][c] != 0) { //if path cell below hasn't been carved out yet, go there
                         maze[r+2][c] = 0;
                         maze[r+1][c] = 0;
-                        recursion(r + 2, c);
+                        recursion(r + 2, c); //move to path cell to the right, do the process again
                     }
                     break;
                 case 4: //left
-                    if (c - 2 <= 0) {
+                    if (c - 2 <= 0) { //checks not at edge
                         continue;
                     }
-                    if (maze[r][c - 2] != 0) {
+                    if (maze[r][c - 2] != 0) { //if path cell to the left hasn't been carved out yet, go there
                         maze[r][c - 2] = 0;
                         maze[r][c - 1] = 0;
-                        recursion(r, c - 2);
+                        recursion(r, c - 2); //move to path cell to the right, do the process again
                     }
                     break;
-            } // recursively backtracks just due to trying directions again and again
+            }
         }
     }
 
