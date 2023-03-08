@@ -1,16 +1,14 @@
 package com.joelallison.generation;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.joelallison.graphics.Tileset;
+import com.joelallison.screens.AppScreen;
 import tools.OpenSimplex2S; //K.jpg's OpenSimplex 2, smooth variant ("SuperSimplex") - https://github.com/KdotJPG/OpenSimplex2/blob/master/java/OpenSimplex2S.java
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-
-import static com.joelallison.screens.AppScreen.tilesets;
 
 public class TerrainLayer extends Layer {
     private float scale;

@@ -18,14 +18,14 @@ import static com.joelallison.screens.LoginScreen.register;
 
 public class LoginUI extends UI {
 
-    Label usernameLabel = new Label("Username", chosenSkin);
-    static TextField usernameField = new TextField("", chosenSkin);
-    Label passwordLabel = new Label("Password", chosenSkin);
-    static TextField passwordField = new TextField("", chosenSkin);
-    TextButton loginButton = new TextButton("Login", chosenSkin);
-    TextButton registerButton = new TextButton("Register", chosenSkin);
-    TextButton skipButton = new TextButton("Go to app", chosenSkin);
-    public static Label feedbackLabel = new Label("", chosenSkin);
+    Label usernameLabel = new Label("Username", skin);
+    static TextField usernameField = new TextField("", skin);
+    Label passwordLabel = new Label("Password", skin);
+    static TextField passwordField = new TextField("", skin);
+    TextButton loginButton = new TextButton("Login", skin);
+    TextButton registerButton = new TextButton("Register", skin);
+    TextButton skipButton = new TextButton("Go to app", skin);
+    public static Label feedbackLabel = new Label("", skin);
     Table loginTable = new Table();
 
     public void genUI(final Stage stage) { //stage is made final here so that it can be accessed within inner classes

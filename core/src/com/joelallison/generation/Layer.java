@@ -34,9 +34,6 @@ public abstract class Layer {
     public void sortTileSpecs(){
         //does nothing, class is abstract
     }
-    public void clearTileSpecs() {
-        this.tileSpecs = new ArrayList<>();
-    }
 
     public void defaultTileValues() {
         //does nothing, class is abstract

@@ -148,15 +148,7 @@ public class Database {
     static boolean saveLayer(String username, int layerIndex, String saveType) {
         System.out.println("SAVE LAYER");
         if (saveType.equals("INSERT INTO")) {
-            char layer_type = ' ';
-            switch (AppScreen.getLayerType(AppScreen.world.layers.get(layerIndex))){
-                case "Terrain":
-                    layer_type = 'T';
-                    break;
-                case "Maze":
-                    layer_type = 'M';
-                    break;
-            }
+            char layer_type = AppScreen.getLayerTypeChar(AppScreen.world.layers.get(layerIndex));
 
             int layer_id = -1;
             //I found the auto-increment for this particular case (of having what's called a two-way exlusive arc) too complex to implement within PostgreSQL,

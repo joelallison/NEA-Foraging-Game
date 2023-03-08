@@ -2,8 +2,7 @@ package com.joelallison;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.joelallison.generation.MazeLayer;
-import com.joelallison.io.FileHandling;
+import com.joelallison.screens.AppScreen;
 import com.joelallison.screens.StartScreen;
 
 import static com.joelallison.screens.AppScreen.LEVEL_ASPECT_RATIO;

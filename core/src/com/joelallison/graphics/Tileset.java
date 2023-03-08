@@ -1,12 +1,12 @@
 package com.joelallison.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.joelallison.screens.AppScreen;
 
 import java.util.HashMap;
-
-import static com.joelallison.screens.userInterface.AppUI.switchingTilesets;
 
 public class Tileset {
     public String creator;
@@ -27,8 +27,20 @@ public class Tileset {
         this.defaultTile = defaultTile;
     }
 
+    public static class TileRef {
+        public String tilesetName;
+        public String tileName;
+
+        public TileRef(String tileset, String tile) {
+            this.tilesetName = tileset;
+            this.tileName = tile;
+        }
+
+    }
+
 
     public static class TileCorners {
+        //basically identical to IntPair from AppScreen, but the different name improves legibility.
         int cornerX;
         int cornerY;
         public TileCorners(int cornerX, int cornerY) {
@@ -88,9 +100,12 @@ public class Tileset {
     }
 
     public TextureRegion getTileTextureFromName(String name) {
-        System.out.println(switchingTilesets + " " + name);
-        TileCorners corners = this.map.get(name);
-        return new TextureRegion(this.spriteSheetTexture, getActualTileLocation(corners.cornerX), getActualTileLocation(corners.cornerY), tileSize, tileSize);
+        if (!name.equals("-")) {
+            TileCorners corners = this.map.get(name);
+            return new TextureRegion(this.spriteSheetTexture, getActualTileLocation(corners.cornerX), getActualTileLocation(corners.cornerY), tileSize, tileSize);
+        }
+
+        else { return null; }
     }
 
     public int getActualTileLocation(int location) { //input will be cornerX or cornerY, as those values are relative and not actual pixel values

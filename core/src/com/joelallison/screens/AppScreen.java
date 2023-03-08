@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.joelallison.graphics.Tileset;
@@ -21,10 +20,10 @@ import com.joelallison.user.UserInput;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.userInterface.AppUI;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import static com.joelallison.io.FileHandling.importTilesets;
-import static com.joelallison.screens.userInterface.AppUI.switchingTilesets;
 
 public class AppScreen implements Screen {
     Stage mainUIStage;
@@ -36,9 +35,9 @@ public class AppScreen implements Screen {
     public static World world;
     public static String username;
     public static final int TILE_SIZE = 32;
-    public static final int CHUNK_SIZE = 7;
+    public static final int CHUNK_SIZE = 14;
     public static final Vector2 LEVEL_ASPECT_RATIO = new Vector2(4, 3);
-    public static final int LEVEL_ASPECT_SCALAR = 2;
+    public static final int LEVEL_ASPECT_SCALAR = 1;
     public static final Vector2 MAP_DIMENSIONS = new Vector2((int) CHUNK_SIZE * LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.x, (int) CHUNK_SIZE * LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.y);
     Texture missing_tile = new Texture(Gdx.files.internal("missing_tile.png"));
     int xPos, yPos;
@@ -90,8 +89,10 @@ public class AppScreen implements Screen {
 
         ScreenUtils.clear(world.getClearColor());
 
+
         batch.begin();
         drawLayers();
+        //drawLayers();
         batch.end();
 
         drawUIShapes();
@@ -115,7 +116,7 @@ public class AppScreen implements Screen {
 
     public void drawLayers() {
         for (int i = 0; i < world.layers.size(); i++) {
-            if (getLayerType(world.layers.get(i)).equals("Terrain")) {
+            if (getLayerTypeChar(world.layers.get(i)) == 'T') {
                 ((TerrainLayer) world.layers.get(i)).genValueMap(world.getLayerSeed(i), MAP_DIMENSIONS, xPos + (int) (world.layers.get(i).getCenter().x), yPos + (int) (world.layers.get(i).getCenter().y));
             }
         }
@@ -128,22 +129,20 @@ public class AppScreen implements Screen {
                 for (int i = world.layers.size() - 1; i >= 0; i--) {
                     if (world.layers.get(i).layerShown()) {
                         if (tileAbove[x][y] == false) { // no need to draw if there's already a tile above
-                            if (!switchingTilesets) {
-                                switch (getLayerType(world.layers.get(i))) {
-                                    case "Terrain":
+                                switch (getLayerTypeChar(world.layers.get(i))) {
+                                    case 'T':
                                         TextureRegion tile = getTextureForTerrainValue(world.layers.get(i), x, y);
                                         if (tile != null) {
                                             batch.draw(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                                             tileAbove[x][y] = true;
                                         }
                                         break;
-                                    case "Maze":
+                                    case 'M':
                                         batch.draw(missing_tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                                         break;
                                     default:
                                         batch.draw(missing_tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                                 }
-                            }
                         }
                     }
                 }
@@ -153,18 +152,34 @@ public class AppScreen implements Screen {
     }
 
     public TextureRegion getTextureForTerrainValue(Layer layer, int x, int y) {
+        String tileName = getTileNameForTerrainValue(layer, x, y);
+        if (!tileName.equals("-")){
+            return tilesets.get(layer.tilesetName).getTileTextureFromName(tileName);
+        } else {
+            return null; // if there should be no tile drawn at this position for this layer
+        }
+    }
+
+    public String getTileNameForTerrainValue(Layer layer, int x, int y) {
         for (int i = 0; i < ((TerrainLayer) layer).tileSpecs.size(); i++) {
             if (((TerrainLayer) layer).valueMap[x][y] > ((TerrainLayer) layer).tileSpecs.get(i).lowerBound) {
-                //for layer's chosen tileset, get current tile's texture from the tileset.
-                return tilesets.get(layer.tilesetName).getTileTextureFromName(((TerrainLayer) layer).tileSpecs.get(i).name);
+                return ((TerrainLayer) layer).tileSpecs.get(i).name;
             }
         }
 
-        return null; // if there should be no tile drawn at this position for this layer
+        return "-"; //if there's nothing to be drawn here, return this
     }
 
-    public static String getLayerType(Layer layer) {
+    public static char getLayerTypeChar(Layer layer) {
+        return getLayerTypeString(layer).charAt(0);
+    }
+
+    public static String getLayerTypeString(Layer layer) {
         return layer.getClass().getName().replace("com.joelallison.generation.", "").replace("Layer", "");
+    }
+
+    public Vector2 getChunkPos() {
+        return new Vector2(((int) xPos / CHUNK_SIZE), ((int) yPos / CHUNK_SIZE));
     }
 
 

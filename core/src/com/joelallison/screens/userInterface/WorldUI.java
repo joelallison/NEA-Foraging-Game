@@ -36,7 +36,7 @@ public class WorldUI extends UI {
         loadWorlds(stage);
         worlds.row();
 
-        TextButton newworldButton = new TextButton("New World", chosenSkin);
+        TextButton newworldButton = new TextButton("New World", skin);
         newworldButton.addListener(
                 new InputListener() {
                     @Override
@@ -58,7 +58,7 @@ public class WorldUI extends UI {
         selectionScroll.setScrollingDisabled(false, true);
         //selectionScroll.setDebug(true);
 
-        //containerTable.add(new Label("worlds - Load", chosenSkin));
+        //containerTable.add(new Label("worlds - Load", skin));
         //containerTable.row();
         //containerTable.add(selectionScroll);
         //containerTable.row();
@@ -113,7 +113,7 @@ public class WorldUI extends UI {
                 "\nDate created: " + formatter.format(dateCreated) +
                 "\nLast accessed: " + formatter.format(lastAccessed) +
                 "\nNumber of layers: " + Integer.toString(layerCount) +
-                "\nSeed: " + Long.toString(seed), chosenSkin);
+                "\nSeed: " + Long.toString(seed), skin);
 
         button.addListener(new InputListener() {
             @Override
@@ -221,7 +221,7 @@ public class WorldUI extends UI {
 
 
     public static Dialog newWorldPopup() {
-        final Dialog popupBox = new Dialog("New creation", chosenSkin);
+        final Dialog popupBox = new Dialog("New creation", skin);
 
         Table table = new Table();
         //table.setDebug(true);
@@ -229,19 +229,19 @@ public class WorldUI extends UI {
         table.defaults().align(Align.left).space(8);
         table.pad(16);
 
-        final Label nameLabel = new Label("Name:", chosenSkin);
+        final Label nameLabel = new Label("Name:", skin);
         table.add(nameLabel).colspan(100); //colspan is to allow the 'go' and 'cancel' buttons to be a lot closer together
-        final TextField nameField = new TextField("", chosenSkin);
+        final TextField nameField = new TextField("", skin);
         table.add(nameField);
 
         table.row();
-        final Label seedLabel = new Label("Seed: (leave blank for random) ", chosenSkin);
+        final Label seedLabel = new Label("Seed: (leave blank for random) ", skin);
         table.add(seedLabel).colspan(100); //colspan is to allow the 'go' and 'cancel' buttons to be a lot closer together
-        final TextField seedField = new TextField("", chosenSkin);
+        final TextField seedField = new TextField("", skin);
         table.add(seedField);
 
         table.row();
-        TextButton goButton = new TextButton("Go", chosenSkin);
+        TextButton goButton = new TextButton("Go", skin);
         goButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -263,7 +263,7 @@ public class WorldUI extends UI {
         });
 
         table.add(goButton);
-        TextButton cancelButton = new TextButton("Cancel", chosenSkin);
+        TextButton cancelButton = new TextButton("Cancel", skin);
         cancelButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
