@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.joelallison.screens.userInterface.WorldUI;
-import com.joelallison.user.World;
+import com.joelallison.generation.World;
 
 public class WorldSelectScreen implements Screen {
     SpriteBatch batch;

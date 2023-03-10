@@ -1,9 +1,10 @@
-package com.joelallison.user;
+package com.joelallison.io;
 
 import com.joelallison.generation.MazeLayer;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.screens.AppScreen;
+import com.joelallison.generation.World;
 
 import java.sql.*;
 import java.time.Instant;
@@ -85,9 +86,9 @@ public class Database {
 
         boolean done = true;
 
-        ResultSet worldInDatabase = doSqlQuery("SELECT * FROM world WHERE username = '" + username + "' AND world_name = '" + world.name + "';" );
+        ResultSet worldInDatabase = doSqlQuery("SELECT * FROM world WHERE username = '" + username + "' AND world_name = '" + world.name + "';");
         try {
-            if(worldInDatabase.next()) { //if world is found in database, update it
+            if (worldInDatabase.next()) { //if world is found in database, update it
                 doSqlStatement(
                         "UPDATE world " +
                                 "SET world_name = '" + world.name + "', last_accessed_timestamp = '" + Instant.now().toString() + "', world_seed = " + world.seed +
@@ -103,7 +104,7 @@ public class Database {
                 } catch (SQLException e) {
                     System.out.println(e.getMessage());
                 }
-            }else { //world not found? make a new entry into database
+            } else { //world not found? make a new entry into database
                 saveProgress = "World not in database, saving as new world...";
                 doSqlStatement("INSERT INTO world (username, world_name, created_timestamp, last_accessed_timestamp, world_seed)" +
                         "VALUES ("
@@ -146,19 +147,18 @@ public class Database {
     }
 
     static boolean saveLayer(String username, int layerIndex, String saveType) {
-        System.out.println("SAVE LAYER");
+        char layerType = AppScreen.getLayerTypeChar(AppScreen.world.layers.get(layerIndex));
         if (saveType.equals("INSERT INTO")) {
-            char layer_type = AppScreen.getLayerTypeChar(AppScreen.world.layers.get(layerIndex));
+
 
             int layer_id = -1;
             //I found the auto-increment for this particular case (of having what's called a two-way exlusive arc) too complex to implement within PostgreSQL,
             //so I'm generating the layer_id with code
             try {
-                ResultSet maxLayerID = doSqlQuery("SELECT MAX(layer_id)+1 FROM layer WHERE layer_type = '" + layer_type + "';");
+                ResultSet maxLayerID = doSqlQuery("SELECT MAX(layer_id)+1 FROM layer WHERE layer_type = '" + layerType + "';");
                 maxLayerID.next();
                 //gets next biggest layer_id
                 layer_id = maxLayerID.getInt("?column?");
-                System.out.println(layer_id);
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
@@ -170,26 +170,25 @@ public class Database {
                     + layerIndex + ", "
                     + "'" + AppScreen.world.layers.get(layerIndex).getName() + "', "
                     + Boolean.toString(AppScreen.world.layers.get(layerIndex).layerShown()) + ", "
-                    + "'" + layer_type + "', "
+                    + "'" + layerType + "', "
                     + layer_id + ", "
                     + AppScreen.world.layers.get(layerIndex).inheritSeed() + ", "
                     + Long.toString(AppScreen.world.layers.get(layerIndex).getSeed()) + ", "
                     + AppScreen.world.layers.get(layerIndex).getCenter().x + ", "
                     + AppScreen.world.layers.get(layerIndex).getCenter().y + ", "
                     + "'" + AppScreen.world.layers.get(layerIndex).tilesetName + "')")) {
-                switch (layer_type) {
+                switch (layerType) {
                     case 'T':
                         if (doSqlStatement(saveType + " terrain_layer (layer_type, layer_id, scale, octaves, lacunarity, wrap, invert)" +
                                 "VALUES ("
-                                + "'" + layer_type + "', "
+                                + "'" + layerType + "', "
                                 + layer_id + ", "
                                 + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getScale() + ", "
                                 + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getOctaves() + ", "
                                 + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getLacunarity() + ", "
                                 + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getWrap() + ", "
-                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).isInverted() + ");"))
-                        {
-                            for (Tileset.TerrainTileSpec tileSpec: ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).tileSpecs) {
+                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).isInverted() + ");")) {
+                            for (Tileset.TerrainTileSpec tileSpec : ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).tileSpecs) {
                                 if (!doSqlStatement(saveType + " terrain_tile_specs (layer_id, tile_name, lower_bound)" +
                                         "VALUES ("
                                         + layer_id + ", "
@@ -205,21 +204,21 @@ public class Database {
                         }
                         break;
                     case 'M':
-                        if (doSqlStatement(saveType + " maze_layer (layer_type, layer_id, width, height)" +
+                        if (doSqlStatement(saveType + " maze_layer (layer_type, layer_id, width, height, opaque)" +
                                 "VALUES ("
-                                + "'" + layer_type + "', "
+                                + "'" + layerType + "', "
                                 + layer_id + ", "
                                 + ((MazeLayer) AppScreen.world.layers.get(layerIndex)).getWidth() + ", "
-                                + ((MazeLayer) AppScreen.world.layers.get(layerIndex)).getHeight() + ");"))
-                        {
-                            for (Tileset.MazeTileSpec tileSpec: ((MazeLayer) AppScreen.world.layers.get(layerIndex)).tileSpecs) {
-                                if (!doSqlStatement(saveType + " maze_tile_specs (layer_id, tile_name, lower_bound)" +
+                                + ((MazeLayer) AppScreen.world.layers.get(layerIndex)).getHeight() + ", "
+                                + Boolean.toString(((MazeLayer) AppScreen.world.layers.get(layerIndex)).isOpaque()) + ");")) {
+                            for (Tileset.MazeTileSpec tileSpec : ((MazeLayer) AppScreen.world.layers.get(layerIndex)).tileSpecs) {
+                                if (!doSqlStatement(saveType + " maze_tile_specs (layer_id, tile_name, neighbour_map)" +
                                         "VALUES ("
                                         + layer_id + ", "
                                         + "'" + tileSpec.name + "', "
-                                        + tileSpec.orientationID + ")"
+                                        + "'" + tileSpec.neighbourMapToString() + "')"
                                 )) {
-                                    saveProgress = "Unable to save tile " + tileSpec.name + " | " + tileSpec.orientationID;
+                                    saveProgress = "Unable to save tile " + tileSpec.name;
                                     return false; //if a tile isn't able to be saved to the database
                                 }
                             }
@@ -231,8 +230,7 @@ public class Database {
             }
 
             return true;
-        }else if(saveType.equals("UPDATE")) {
-            System.out.println("update");
+        } else if (saveType.equals("UPDATE")) {
             //UPDATE layer
             //SET x = y, etc.
             //WHERE layer_number = i, world_name, username
@@ -244,38 +242,40 @@ public class Database {
             //UPDATE layer_type_tile_spec
             //SET
             //WHERE layer_id
-            /*
-            if (doSqlStatement(saveType + "layer" + " SET "
-                    "'" + username + "', "
-                    + "'" + AppScreen.world.name + "', "
-                    + layerIndex + ", "
-                    + "'" + AppScreen.world.layers.get(layerIndex).getName() + "', "
-                    + Boolean.toString(AppScreen.world.layers.get(layerIndex).layerShown()) + ", "
-                    + "'" + layer_type + "', "
-                    + layer_id + ", "
-                    + AppScreen.world.layers.get(layerIndex).inheritSeed() + ", "
-                    + Long.toString(AppScreen.world.layers.get(layerIndex).getSeed()) + ", "
-                    + AppScreen.world.layers.get(layerIndex).getCenter().x + ", "
-                    + AppScreen.world.layers.get(layerIndex).getCenter().y + ", "
-                    + "'" + AppScreen.world.layers.get(layerIndex).tilesetName + "')")) {
-                switch (layer_type) {
+
+            if (doSqlStatement(saveType + " layer SET "
+                    + "username = '" + username + "', "
+                    + "world_name = '" + AppScreen.world.name + "', "
+                    + "layer_number = " + layerIndex + ", "
+                    + "layer_name = '" + AppScreen.world.layers.get(layerIndex).getName() + "', "
+                    + "show_layer = " + Boolean.toString(AppScreen.world.layers.get(layerIndex).layerShown()) + ", "
+                    + "layer_type = '" + layerType + "', "
+                    + "layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + ", "
+                    + "inherit_seed = " + AppScreen.world.layers.get(layerIndex).inheritSeed() + ", "
+                    + "seed = " + Long.toString(AppScreen.world.layers.get(layerIndex).getSeed()) + ", "
+                    + "center_x = " + AppScreen.world.layers.get(layerIndex).getCenter().x + ", "
+                    + "center_y = " + AppScreen.world.layers.get(layerIndex).getCenter().y + ", "
+                    + "tileset_name = '" + AppScreen.world.layers.get(layerIndex).tilesetName + "' "
+                    + "WHERE layer_type = '" + layerType + "' AND layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + ";"
+
+            )) {
+                switch (layerType) {
                     case 'T':
-                        if (doSqlStatement(saveType + " terrain_layer (layer_type, layer_id, scale, octaves, lacunarity, wrap, invert)" +
-                                "VALUES ("
-                                + "'" + layer_type + "', "
-                                + layer_id + ", "
-                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getScale() + ", "
-                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getOctaves() + ", "
-                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getLacunarity() + ", "
-                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getWrap() + ", "
-                                + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).isInverted() + ");"))
-                        {
-                            for (Tileset.TerrainTileSpec tileSpec: ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).tileSpecs) {
-                                if (!doSqlStatement(saveType + " terrain_tile_specs (layer_id, tile_name, lower_bound)" +
-                                        "VALUES ("
-                                        + layer_id + ", "
-                                        + "'" + tileSpec.name + "', "
-                                        + tileSpec.lowerBound + ")"
+                        if (doSqlStatement(saveType + " terrain_layer SET "
+                                + "layer_type = '" + layerType + "', "
+                                + "layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + ", "
+                                + "scale = " + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getScale() + ", "
+                                + "octaves = " + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getOctaves() + ", "
+                                + "lacunarity = " + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getLacunarity() + ", "
+                                + "wrap = " + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).getWrap() + ", "
+                                + "invert = " + ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).isInverted()
+                                + " WHERE layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + ";")) {
+                            for (Tileset.TerrainTileSpec tileSpec : ((TerrainLayer) AppScreen.world.layers.get(layerIndex)).tileSpecs) {
+                                if (!doSqlStatement(saveType + " terrain_tile_specs SET "
+                                        + "layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + ", "
+                                        + "tile_name = '" + tileSpec.name + "', "
+                                        + "lower_bound = " + tileSpec.lowerBound
+                                        + " WHERE layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + " AND tile_name = '" + tileSpec.name + "';"
                                 )) {
                                     saveProgress = "Unable to save tile " + tileSpec.name + " | " + tileSpec.lowerBound;
                                     return false; //if a tile isn't able to be saved to the database
@@ -286,21 +286,20 @@ public class Database {
                         }
                         break;
                     case 'M':
-                        if (doSqlStatement(saveType + " maze_layer (layer_type, layer_id, width, height)" +
-                                "VALUES ("
-                                + "'" + layer_type + "', "
-                                + layer_id + ", "
-                                + ((MazeLayer) AppScreen.world.layers.get(layerIndex)).getWidth() + ", "
-                                + ((MazeLayer) AppScreen.world.layers.get(layerIndex)).getHeight() + ");"))
-                        {
-                            for (Tileset.MazeTileSpec tileSpec: ((MazeLayer) AppScreen.world.layers.get(layerIndex)).tileSpecs) {
-                                if (!doSqlStatement(saveType + " maze_tile_specs (layer_id, tile_name, lower_bound)" +
-                                        "VALUES ("
-                                        + layer_id + ", "
-                                        + "'" + tileSpec.name + "', "
-                                        + tileSpec.orientationID + ")"
+                        if (doSqlStatement(saveType + " maze_layer SET "
+                                + "layer_type = '" + layerType + "', "
+                                + "layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + ", "
+                                + "width = " + ((MazeLayer) AppScreen.world.layers.get(layerIndex)).getWidth() + ", "
+                                + "height = " + ((MazeLayer) AppScreen.world.layers.get(layerIndex)).getHeight()
+                                + " WHERE layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + ";")) {
+                            for (Tileset.MazeTileSpec tileSpec : ((MazeLayer) AppScreen.world.layers.get(layerIndex)).tileSpecs) {
+                                if (!doSqlStatement(saveType + " maze_tile_specs SET "
+                                        + "layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + ", "
+                                        + "tile_name = '" + tileSpec.name + "', "
+                                        + "neighbour_map = '" + tileSpec.neighbourMapToString() + "'"
+                                        + " WHERE layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + " AND tile_name = '" + tileSpec.name + "';"
                                 )) {
-                                    saveProgress = "Unable to save tile " + tileSpec.name + " | " + tileSpec.orientationID;
+                                    saveProgress = "Unable to save tile " + tileSpec.name;
                                     return false; //if a tile isn't able to be saved to the database
                                 }
                             }
@@ -308,13 +307,12 @@ public class Database {
                             return true;
                         }
                         break;
-                }*/
+                }
 
 
-            return true;
+                return true;
+            }
         }
-
         return false;
     }
-
 }

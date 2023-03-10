@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.joelallison.screens.AppScreen;
-import com.joelallison.user.World;
+import com.joelallison.generation.World;
 
 import static com.joelallison.screens.LoginScreen.login;
 import static com.joelallison.screens.LoginScreen.register;

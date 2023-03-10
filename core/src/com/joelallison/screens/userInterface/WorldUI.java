@@ -11,8 +11,8 @@ import com.joelallison.generation.Layer;
 import com.joelallison.generation.MazeLayer;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
-import com.joelallison.user.World;
-import com.joelallison.user.Database;
+import com.joelallison.generation.World;
+import com.joelallison.io.Database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -153,6 +153,7 @@ public class WorldUI extends UI {
                         terrainLayerRS.next();
 
                         TerrainLayer terrainLayer = new TerrainLayer(
+                                worldLayers.getInt("layer_id"),
                                 worldLayers.getString("layer_name"),
                                 worldLayers.getLong("seed"),
                                 terrainLayerRS.getFloat("scale"),
@@ -187,16 +188,23 @@ public class WorldUI extends UI {
                         //as worldLayers.next() == true, and that layer is marked 'M', a maze layer will be returned from the query, mazeLayerRS shouldn't be null
                         mazeLayerRS.next();
 
-                        MazeLayer mazeLayer = new MazeLayer(
-                                worldLayers.getString("name"),
+                        MazeLayer mazeLayer
+                                = new MazeLayer(
+                                mazeLayerRS.getInt("layer_id"),
+                                worldLayers.getString("layer_name"),
                                 worldLayers.getLong("seed"),
                                 mazeLayerRS.getInt("width"),
                                 mazeLayerRS.getInt("height"),
-                                worldLayers.getString("tileset_name")
+                                worldLayers.getString("tileset_name"),
+                                mazeLayerRS.getBoolean("opaque")
                         );
+
+
 
                         mazeLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
                         mazeLayer.setCenter(new Vector2(worldLayers.getInt("center_x"), worldLayers.getInt("center_y")));
+
+
 
                         ResultSet mazeTileSpecsRS = Database.doSqlQuery(
                                 "SELECT * FROM maze_tile_specs " +
@@ -204,7 +212,7 @@ public class WorldUI extends UI {
                         );
 
                         while(mazeTileSpecsRS.next()) {
-                            mazeLayer.tileSpecs.add(new Tileset.MazeTileSpec(mazeTileSpecsRS.getString("tile_name"), mazeTileSpecsRS.getInt("orientation_id")));
+                            mazeLayer.tileSpecs.add(new Tileset.MazeTileSpec(mazeTileSpecsRS.getString("tile_name"), Tileset.MazeTileSpec.neighbourMapParseString(mazeTileSpecsRS.getString("neighbour_map"))));
                         }
 
                         layers.add(mazeLayer);

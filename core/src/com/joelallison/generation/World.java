@@ -1,8 +1,6 @@
-package com.joelallison.user;
+package com.joelallison.generation;
 
 import com.badlogic.gdx.graphics.Color;
-import com.joelallison.generation.Layer;
-import com.joelallison.generation.TerrainLayer;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -44,17 +42,18 @@ public class World {
     }
 
     public void makeLayerNamesUnique() {
-        HashMap<String, Integer> layerCounts = new HashMap<>(this.layers.size());
+        HashMap<String, Integer> layerCounts = new HashMap<>(this.layers.size()); //generates a hashmap with size equivalent to num of layers
 
         for (Layer layer:this.layers) {
             String rawLayerName = layer.getName().replaceAll(" \\([0-9]*\\)$", ""); //strips trailing numbers
-            if (!layerCounts.containsKey(rawLayerName)){
-                layerCounts.put(rawLayerName, 1); //stores layer name without any numbers at the end
+            if (!layerCounts.containsKey(rawLayerName)) {
+                layerCounts.put(rawLayerName, 1); //stores layer name without any numbers at the end, and appropriate count
             } else {
-                layerCounts.put(rawLayerName, layerCounts.get(rawLayerName)+1);
+                layerCounts.put(rawLayerName, layerCounts.get(rawLayerName)+1); //stores layer name without any numbers at the end, and appropriate count
             }
 
-            if (layer.getName() == rawLayerName) {layer.setName(rawLayerName + " (" + layerCounts.get(rawLayerName) + ")");}
+            //if a layer with the same name (without the numbers) also exists, then this layer is displayed with the appropriate number on the end
+            if (layer.getName().equals(rawLayerName)) {layer.setName(rawLayerName + " (" + layerCounts.get(rawLayerName) + ")");}
 
         }
     }

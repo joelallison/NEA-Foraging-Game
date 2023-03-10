@@ -42,7 +42,6 @@ project(":desktop") {
 
     dependencies {
         implementation project(":core")
-        implementation group: 'com.sun.mail', name: 'jakarta.mail', version: '1.6.3'
         implementation 'org.postgresql:postgresql:42.5.0'
         implementation 'com.google.code.gson:gson:2.10'
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"

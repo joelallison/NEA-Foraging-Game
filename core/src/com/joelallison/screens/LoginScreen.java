@@ -8,19 +8,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.joelallison.screens.userInterface.LoginUI;
-import com.joelallison.user.Database;
+import com.joelallison.io.Database;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 
-import static com.joelallison.user.Database.doSqlQuery;
+import static com.joelallison.io.Database.doSqlQuery;
 
 public class LoginScreen implements Screen {
     SpriteBatch batch;

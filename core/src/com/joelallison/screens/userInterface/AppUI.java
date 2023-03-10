@@ -14,7 +14,7 @@ import com.joelallison.generation.Layer;
 import com.joelallison.generation.MazeLayer;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
-import com.joelallison.user.Database;
+import com.joelallison.io.Database;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -103,11 +103,11 @@ public class AppUI extends UI {
                         }
                     }
                 };
-                saveDialog.add(saveDialogText);
+                saveDialog.add(saveDialogText).align(Align.center);
                 saveDialog.row();
                 saveDialog.button("OK", true);
-                saveDialog.setSize(200, 200);
                 saveDialog.show(stage);
+                saveDialog.setSize(80, 60);
 
                 Database.saveWorld(username, world);
                 return true;
@@ -429,7 +429,7 @@ public class AppUI extends UI {
                             if (!useDefaults.isChecked()) {
                                 terrainLayer.tilesetName = (String) tilesetSelect.getSelected();
                                 terrainLayer.tileSpecs = new ArrayList<>();
-                                terrainLayer.tileSpecs.add(new Tileset.TerrainTileSpec(tilesets.get(terrainLayer.tilesetName).defaultTile));
+                                terrainLayer.tileSpecs.add(new Tileset.TerrainTileSpec(tilesets.get(terrainLayer.tilesetName).getDefaultTile()));
                             }
                             world.layers.add(terrainLayer);
                             selectedLayerIndex = selectedLayerIndex + 1;
@@ -453,7 +453,7 @@ public class AppUI extends UI {
                             if (!useDefaults.isChecked()) {
                                 mazeLayer.tilesetName = (String) tilesetSelect.getSelected();
                                 mazeLayer.tileSpecs = new ArrayList<>();
-                                mazeLayer.tileSpecs.add(new Tileset.MazeTileSpec(tilesets.get(mazeLayer.tilesetName).defaultTile));
+                                mazeLayer.tileSpecs.add(new Tileset.MazeTileSpec(tilesets.get(mazeLayer.tilesetName).getDefaultTile()));
                             }
                             world.layers.add(mazeLayer);
                             selectedLayerIndex = selectedLayerIndex + 1;
@@ -513,6 +513,7 @@ public class AppUI extends UI {
                 for (int i = 0; i < world.layers.size(); i++) {
                     if (Objects.equals(world.layers.get(i), layer)) {
                         AppUI.selectedLayerIndex = i;
+                        tileDataChanged = true;
                     }
                 }
                 return true;
@@ -565,16 +566,6 @@ public class AppUI extends UI {
     protected void doTilePanel() {
         tilePanel.add(selectedLayerTilesetLabel);
         tilePanel.row();
-
-        /*hueSlider.setValue((world.layers.get(selectedLayerIndex)).hueShift);
-        hueSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                (world.layers.get(selectedLayerIndex)).hueShift = (hueSlider.getValue());
-            }
-        });
-
-        tilePanel.add(hueSlider);*/
 
         genTileList();
         tilePanel.add(tiles);
@@ -634,24 +625,15 @@ public class AppUI extends UI {
                         break;
                     case 'M':
                         Tileset.MazeTileSpec mazeTile = ((MazeLayer) world.layers.get(selectedLayerIndex)).tileSpecs.get(i);
-                        ((Label) ((HorizontalGroup) tiles.getChild(i)).getChild(1)).setText("name: " + mazeTile.name + ", orientation: " + floatFormat.format(mazeTile.orientationID));
+                        ((Label) ((HorizontalGroup) tiles.getChild(i)).getChild(1)).setText("name: " + mazeTile.name);
                         break;
                 }
 
 
             }
 
-            /*if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT) || updateTileList) {
-                tilePanel.clear();
-                genTileList();
-                updateTileList = false;
-            } else {
-                updateTileList = true;
-            }*/
-
             tileDataChanged = false;
         }
-        //hueSlider.setValue((world.layers.get(selectedLayerIndex)).hueShift);
     }
 
     private static HorizontalGroup createTileLine(Tileset tileset, final int selectedTile) {
@@ -690,8 +672,16 @@ public class AppUI extends UI {
                 Image mazeTileImg = new Image(mazeTileImgDrawable);
                 tileDataGroup.addActor(mazeTileImg);
 
-                Label mazeTileName = new Label("name: " + mazeTile.name + ", orientation: " + intFormat.format(mazeTile.orientationID), skin);
+                Label mazeTileName = new Label("name: " + mazeTile.name, skin);
                 tileDataGroup.addActor(mazeTileName);
+
+                TextButton neighbourMapButton = new TextButton("[define condition]", skin);
+                neighbourMapButton.addListener(new InputListener() {
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        //NEIGHBOUR MAP DIALOG
+                        return false;
+                    }
+                });
                 break;
         }
 

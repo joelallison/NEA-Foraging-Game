@@ -1,10 +1,8 @@
 package com.joelallison.generation;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.joelallison.graphics.Tileset;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Layer {
@@ -23,9 +21,10 @@ public abstract class Layer {
     // the spacing and wave collapse feature?
 
     //the Layer class is never used on its own, these methods are only inherited / overriden etc.
-    public Layer(String name, Long seed) {
+    public Layer(String name, Long seed, int layerID) {
         this.name = name;
         this.seed = seed;
+        this.layerID = layerID;
     }
     public Layer(Long seed) {
         this.seed = seed;

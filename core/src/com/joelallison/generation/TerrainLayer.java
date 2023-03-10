@@ -2,7 +2,6 @@ package com.joelallison.generation;
 
 import com.badlogic.gdx.math.Vector2;
 import com.joelallison.graphics.Tileset;
-import com.joelallison.screens.AppScreen;
 import tools.OpenSimplex2S; //K.jpg's OpenSimplex 2, smooth variant ("SuperSimplex") - https://github.com/KdotJPG/OpenSimplex2/blob/master/java/OpenSimplex2S.java
 
 import java.util.ArrayList;
@@ -29,8 +28,8 @@ public class TerrainLayer extends Layer {
     static final public int WRAP_MIN = 1;
 
     //for custom loading, in which tilespecs is declared separately
-    public TerrainLayer(String name, Long seed, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
-        super(name, seed);
+    public TerrainLayer(int layerID, String name, Long seed, float scaleVal, int octavesVal, float lacunarityVal, int wrapVal, boolean invert) {
+        super(name, seed, layerID);
         this.scale = scaleVal;
         this.octaves = octavesVal;
         this.lacunarity = lacunarityVal;
@@ -51,13 +50,13 @@ public class TerrainLayer extends Layer {
             this.seed = seed;
         }
 
-        //while I feel that the max and min values I've defined are good, I also think that the layer that users might end up starting with should be a bit tamer (so I've scaled down the value ranges).
+        //while I feel that the max and min values I've defined are good,
+        // I also think that the layer that users might end up starting with should be a bit tamer (so I've scaled down the value ranges).
         this.scale = random.nextFloat(10*SCALE_MIN, SCALE_MAX/10);
         this.octaves = random.nextInt(OCTAVES_MIN, OCTAVES_MAX);
         this.lacunarity = random.nextFloat(10*LACUNARITY_MIN, LACUNARITY_MAX/10);
         this.wrap = random.nextInt(WRAP_MIN, WRAP_MAX/4);
         this.invert = random.nextBoolean();
-        //this.hueShift = 0;
 
         defaultTileValues();
     }
@@ -145,10 +144,11 @@ public class TerrainLayer extends Layer {
 
                 for (int i = 0; i < octaves; i++) {
 
-                    float sampleX = (x-(Dimensions.x/2)) / scale * frequency;
-                    float sampleY = (y-(Dimensions.y/2)) / scale * frequency;
+                    float sampleX = (x-(Dimensions.x/2f)) / scale * frequency;
+                    float sampleY = (y-(Dimensions.y/2f)) / scale * frequency;
 
-                    float noiseValue = (OpenSimplex2S.noise2_ImproveX(seed, sampleX, sampleY) * 2 - 1);
+                    // x2 - 1 moves the noise to be between 0 and 1, the noise function returns values between -1 and 1.
+                    float noiseValue = (OpenSimplex2S.noise2_ImproveX(seed, sampleX, sampleY) * 2f - 1f);
                     noiseHeight = noiseValue * amplitude;
 
                     frequency *= lacunarity;
@@ -164,32 +164,29 @@ public class TerrainLayer extends Layer {
             }
         }
 
-        if(wrapFactor != -1){
             for (int y = 0; y < Dimensions.y; y++) { //normalises the noise
                 for (int x = 0; x < Dimensions.x; x++) {
+                    //does the wrap
                     noiseMap[x][y] = wrapValue((inverseLERP(noiseMap[x][y], minNoiseHeight, maxNoiseHeight)), wrapFactor, invertWrap);
                 }
             }
-        }else{
-            for (int y = 0; y < Dimensions.y; y++) { //normalises the noise
-                for (int x = 0; x < Dimensions.x; x++) {
-                    noiseMap[x][y] = (inverseLERP(noiseMap[x][y], minNoiseHeight, maxNoiseHeight));
-                }
-            }
-        }
 
         return noiseMap;
     }
 
-    public static float inverseLERP(float x, float a, float b){
+    public static float inverseLERP(float x, float a, float b) {
         return (x - a) / (b - a);
     }
 
     public static float wrapValue(float input, int factor, boolean invert) {
+        float value = input;
+        if (factor != 1) {
+            value = Math.abs(((input * factor) - factor / 2));
+        }
         if (invert) {
-            return ((Math.abs(((input * factor) - factor / 2))) * -1) + 1;
+            return (value * -1) + 1;
         } else {
-            return Math.abs(((input * factor) - factor / 2));
+            return value;
         }
 
     }

@@ -16,16 +16,18 @@ public class MazeLayer extends Layer {
     public final int MAX_ACROSS = 857;
     public final int MIN_ACROSS = 3;
     private int count = 0;
-    public int[][] maze;
+    private boolean opaque = true;
+    public int[][] maze; //I thought about using a 2D boolean array, but an int array makes the conversion to a file slightly simpler.
     public List<Tileset.MazeTileSpec> tileSpecs;
-    public MazeLayer(String name, long seed, int width, int height, String tilesetName) {
-        super(name, seed);
+    public MazeLayer(int layerID, String name, long seed, int width, int height, String tilesetName, boolean opaque) {
+        super(name, seed, layerID);
 
         //each 'wall' and 'path' tiles are full cells, so the maze needs to be an odd width and height
         //this means that, in a way, the maze is half the dimensions that were specified.
         this.width = width + ((width+1)%2); //ensures width is odd
         this.height = height + ((height+1)%2); //ensures height is odd
         this.tilesetName = tilesetName;
+        this.opaque = opaque;
 
         this.tileSpecs = new ArrayList<>();
     }
@@ -37,9 +39,11 @@ public class MazeLayer extends Layer {
 
         //each 'wall' and 'path' tiles are full cells, so the maze needs to be an odd width and height
         //this means that, in a way, the maze is half the dimensions that were specified.
-        int dimension = random.nextInt(MIN_ACROSS, MAX_ACROSS);
-        this.width = dimension + ((dimension+1)%2); //ensures width is odd
-        this.height = dimension + ((dimension+1)%2); //ensures height is odd
+        int dimension = random.nextInt(MIN_ACROSS, MAX_ACROSS / 4);
+        //this.width = dimension + ((dimension+1)%2); //ensures width is odd
+        //this.height = dimension + ((dimension+1)%2); //ensures height is odd
+        this.width = 33;
+        this.height = 33;
         this.tilesetName = "Walls";
 
         defaultTileValues();
@@ -48,7 +52,7 @@ public class MazeLayer extends Layer {
     @Override
     public void defaultTileValues() {
         this.tileSpecs = new ArrayList<>();
-        this.tileSpecs.add(new Tileset.MazeTileSpec("singular", 1));
+        this.tileSpecs.add(new Tileset.MazeTileSpec("singular"));
     }
 
     @Override
@@ -57,6 +61,7 @@ public class MazeLayer extends Layer {
     }
 
     public void genMaze() {
+        count = 0;
         maze = new int[height][width];
         // initialize the 2D array with 1s
         for (int i = 0; i < height; i++) {
@@ -84,9 +89,16 @@ public class MazeLayer extends Layer {
         //starting cell
         maze[r][c] = 0;
 
-        System.out.println(r + " " + c);
         //recursively carve out the maze
         recursion(r, c);
+
+        for(int y = 0; y < height; y++) {
+            maze[y][0] = 1;
+        }
+
+        for(int x = 0; x < width; x++) {
+            maze[0][x] = 1;
+        }
     }
 
     private void recursion(int r, int c) {
@@ -152,6 +164,14 @@ public class MazeLayer extends Layer {
         Collections.shuffle(randoms, new Random(seed+count*1024L));
 
         return randoms.toArray(new Integer[4]);
+    }
+
+    public boolean isOpaque() {
+        return opaque;
+    }
+
+    public void setOpaque(boolean opaque) {
+        this.opaque = opaque;
     }
 
     public int getWidth() {

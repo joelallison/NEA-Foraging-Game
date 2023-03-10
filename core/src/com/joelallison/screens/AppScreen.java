@@ -13,14 +13,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.joelallison.generation.MazeLayer;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.generation.Layer;
-import com.joelallison.user.World;
-import com.joelallison.user.UserInput;
+import com.joelallison.generation.World;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.userInterface.AppUI;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import static com.joelallison.io.FileHandling.importTilesets;
@@ -116,8 +115,12 @@ public class AppScreen implements Screen {
 
     public void drawLayers() {
         for (int i = 0; i < world.layers.size(); i++) {
-            if (getLayerTypeChar(world.layers.get(i)) == 'T') {
-                ((TerrainLayer) world.layers.get(i)).genValueMap(world.getLayerSeed(i), MAP_DIMENSIONS, xPos + (int) (world.layers.get(i).getCenter().x), yPos + (int) (world.layers.get(i).getCenter().y));
+            switch(getLayerTypeChar(world.layers.get(i))) {
+                case 'T':
+                    ((TerrainLayer) world.layers.get(i)).genValueMap(world.getLayerSeed(i), MAP_DIMENSIONS, xPos + (int) (world.layers.get(i).getCenter().x), yPos + (int) (world.layers.get(i).getCenter().y));
+                    break;
+                case 'M':
+                    ((MazeLayer) world.layers.get(i)).genMaze();
             }
         }
 
@@ -138,7 +141,18 @@ public class AppScreen implements Screen {
                                         }
                                         break;
                                     case 'M':
-                                        batch.draw(missing_tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                                        //if x is within maze
+                                        if (x + xPos < (world.layers.get(i)).getCenter().x + ((MazeLayer) world.layers.get(i)).getWidth()+1 && (x + xPos > (world.layers.get(i)).getCenter().x)) {
+                                            //if y is within maze
+                                            if (y + yPos < (world.layers.get(i)).getCenter().y + ((MazeLayer) world.layers.get(i)).getHeight()+1 && (y + yPos > (world.layers.get(i)).getCenter().y)) {
+                                                if (((MazeLayer) world.layers.get(i)).maze[(int) (y + yPos - world.layers.get(i).getCenter().y-1)][(int) (x + xPos - world.layers.get(i).getCenter().x-1)] == 1) {
+                                                    batch.draw(tilesets.get(world.layers.get(i).tilesetName).getTileTextureFromName(getTileNameForMazeLoc(world.layers.get(i), (int) (x + xPos - world.layers.get(i).getCenter().x-1), (int) (y + yPos - world.layers.get(i).getCenter().y-1))), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                                                    tileAbove[x][y] = true;
+                                                } else if (((MazeLayer) world.layers.get(i)).isOpaque()) {
+                                                    tileAbove[x][y] = true;
+                                                }
+                                            }
+                                        }
                                         break;
                                     default:
                                         batch.draw(missing_tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -168,6 +182,10 @@ public class AppScreen implements Screen {
         }
 
         return "-"; //if there's nothing to be drawn here, return this
+    }
+
+    public String getTileNameForMazeLoc(Layer layer, int x, int y) {
+        return ((MazeLayer) layer).tileSpecs.get(0).name;
     }
 
     public static char getLayerTypeChar(Layer layer) {
@@ -212,7 +230,7 @@ public class AppScreen implements Screen {
         sr.dispose();
         batch.dispose();
         for (Layer layer : world.layers) {
-            tilesets.get(layer.tilesetName).getSpriteSheet().dispose();
+            tilesets.get(layer.tilesetName).getSpritesheetTexture().dispose();
         }
     }
 }

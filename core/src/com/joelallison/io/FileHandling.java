@@ -33,7 +33,7 @@ public abstract class FileHandling {
                         json = json.replace(json.substring(nameStartIndex, nameEndIndex + 3), ""); //remove the name declaration line from the json - the extra three chars are '", '
 
                         tilesets.put(name, tilesetJsonToObject(json));
-                        tilesets.get(name).initTileset(subfolder.getPath() + "/" + tilesets.get(name).getSpriteSheetName());
+                        tilesets.get(name).initTileset(subfolder.getPath() + "/" + tilesets.get(name).getSpritesheetName());
                     }
 
                 }
