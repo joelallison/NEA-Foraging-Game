@@ -38,7 +38,7 @@ public class AppScreen implements Screen {
     public static int levelAspectScalar = 2;
     public static Vector2 mapDimensions = new Vector2((int) CHUNK_SIZE * levelAspectScalar * LEVEL_ASPECT_RATIO.x, (int) CHUNK_SIZE * levelAspectScalar * LEVEL_ASPECT_RATIO.y);
     Texture missing_tile = new Texture(Gdx.files.internal("missing_tile.png"));
-    int xPos, yPos;
+    public static int xPos, yPos;
     public static UserInput userInput;
     float stateTime;
     public static HashMap<String, Tileset> tilesets;
@@ -119,6 +119,7 @@ public class AppScreen implements Screen {
     }
 
     public void drawLayers() {
+        //generate
         for (int i = 0; i < world.layers.size(); i++) {
             switch(getLayerTypeChar(world.layers.get(i))) {
                 case 'T':
@@ -129,8 +130,8 @@ public class AppScreen implements Screen {
             }
         }
 
+        //draw
         boolean[][] tileAbove = new boolean[(int) mapDimensions.x][(int) mapDimensions.y];
-
         for (int x = 0; x < mapDimensions.x; x++) {
             for (int y = 0; y < mapDimensions.y; y++) {
                 // top layer to bottom layer
@@ -162,8 +163,6 @@ public class AppScreen implements Screen {
                                             }
                                         }
                                         break;
-                                    default:
-                                        batch.draw(missing_tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                                 }
                         }
                     }
@@ -173,7 +172,7 @@ public class AppScreen implements Screen {
         }
     }
 
-    public TextureRegion getTextureForNeighbourMap(Layer layer, int x, int y) {
+    public static TextureRegion getTextureForNeighbourMap(Layer layer, int x, int y) {
         String tileName = getTileNameForNeighbourMap(layer, getNeighbourMap(layer, x, y));
         if (!tileName.equals("-")){
             return tilesets.get(layer.tilesetName).getTileTextureFromName(tileName);
@@ -183,7 +182,7 @@ public class AppScreen implements Screen {
     }
 
 
-    public String getTileNameForNeighbourMap(Layer layer, boolean[][] map) {
+    public static String getTileNameForNeighbourMap(Layer layer, boolean[][] map) {
         for (int i = 0; i < ((MazeLayer) layer).tileSpecs.size(); i++) {
             if (Arrays.deepEquals(((MazeLayer) layer).tileSpecs.get(i).neighbourMap, map)) {
                 return ((MazeLayer) layer).tileSpecs.get(i).name;
@@ -192,7 +191,7 @@ public class AppScreen implements Screen {
 
         return "-";
     }
-    boolean[][] getNeighbourMap(Layer layer, int y, int x) {
+    public static boolean[][] getNeighbourMap(Layer layer, int y, int x) {
         boolean[][] neighbourMap = new boolean[3][3];
         //top to bottom, left to right
         try {
@@ -226,7 +225,7 @@ public class AppScreen implements Screen {
         return neighbourMap;
     }
 
-    public TextureRegion getTextureForTerrainValue(Layer layer, int x, int y) {
+    public static TextureRegion getTextureForTerrainValue(Layer layer, int x, int y) {
         String tileName = getTileNameForTerrainValue(layer, x, y);
         if (!tileName.equals("-")){
             return tilesets.get(layer.tilesetName).getTileTextureFromName(tileName);
@@ -235,7 +234,7 @@ public class AppScreen implements Screen {
         }
     }
 
-    public String getTileNameForTerrainValue(Layer layer, int x, int y) {
+    public static String getTileNameForTerrainValue(Layer layer, int x, int y) {
         for (int i = 0; i < ((TerrainLayer) layer).tileSpecs.size(); i++) {
             if (((TerrainLayer) layer).valueMap[x][y] > ((TerrainLayer) layer).tileSpecs.get(i).lowerBound) {
                 return ((TerrainLayer) layer).tileSpecs.get(i).name;
@@ -251,10 +250,6 @@ public class AppScreen implements Screen {
 
     public static String getLayerTypeString(Layer layer) {
         return layer.getClass().getName().replace("com.joelallison.generation.", "").replace("Layer", "");
-    }
-
-    public Vector2 getChunkPos() {
-        return new Vector2(((int) xPos / CHUNK_SIZE), ((int) yPos / CHUNK_SIZE));
     }
 
     @Override

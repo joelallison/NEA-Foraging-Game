@@ -12,11 +12,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Timer;
 import com.joelallison.generation.Layer;
 import com.joelallison.generation.MazeLayer;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.io.Database;
+import com.joelallison.io.FileHandling;
 import com.joelallison.screens.WorldSelectScreen;
 
 import java.text.DecimalFormat;
@@ -49,7 +51,7 @@ public class AppUI extends UI {
     protected Label wrapFactorLabel = new Label("Wrap factor:", skin);
     protected Label invertLabel = new Label("Invert:", skin);
     protected CheckBox invertCheck = new CheckBox("", skin);
-    String integerFilter = "[0-9]+";
+    String integerFilter = "-?[0-9]+";
     final Slider scaleSlider = new Slider(TerrainLayer.SCALE_MIN, TerrainLayer.SCALE_MAX, 0.001f, false, skin);
     final Slider octavesSlider = new Slider(TerrainLayer.OCTAVES_MIN, TerrainLayer.OCTAVES_MAX, 1, false, skin);
     final Slider lacunaritySlider = new Slider(TerrainLayer.LACUNARITY_MIN, TerrainLayer.LACUNARITY_MAX, 0.01f, false, skin);
@@ -211,6 +213,70 @@ public class AppUI extends UI {
         });
 
         stage.addActor(saveWorldButton);
+
+
+
+        exportWorldButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                final Label filenameLabel = new Label("Filename: ", skin);
+                final TextField filenameField = new TextField("export.csv", skin);
+                final Label startXLabel = new Label("X Start Pos: ", skin);
+                final TextField startXField = new TextField(String.valueOf((int) xPos), skin);
+                final Label endXLabel = new Label("X End Pos: ", skin);
+                final TextField endXField = new TextField(String.valueOf((int) (xPos + mapDimensions.x)), skin);
+                final Label startYLabel = new Label("Y Start Pos: ", skin);
+                final TextField startYField = new TextField(String.valueOf((int) yPos), skin);
+                final Label endYLabel = new Label("Y End Pos: ", skin);
+                final TextField endYField = new TextField(String.valueOf((int)  (yPos + mapDimensions.y)), skin);
+                final Label outputLabel = new Label("", skin);
+                final Dialog exportDialog = new Dialog("Export CSV", skin) {
+                    public void result(Object obj) {
+                        if (obj.equals(1)) {
+                            String filename = filenameField.getText();
+                            if (!filename.endsWith(".csv")) {
+                                filename = filename + ".csv";
+                            }
+                            if ((startXField.getText().matches(integerFilter)) && (endXField.getText().matches(integerFilter)) && (startYField.getText().matches(integerFilter)) && (endYField.getText().matches(integerFilter))) {
+                                outputLabel.setText(FileHandling.export(world, filename, Integer.parseInt(startXField.getText()), Integer.parseInt(endXField.getText()), Integer.parseInt(startYField.getText()), Integer.parseInt(endYField.getText())));
+                            } else {
+                                outputLabel.setText("Position values must be integers.");
+                            }
+                            cancel();
+                        }
+                    }
+                };
+
+                //yay ui! :\
+                exportDialog.getContentTable().setFillParent(true);
+                exportDialog.getContentTable().defaults().align(Align.left).space(8);
+                exportDialog.getContentTable().pad(16);
+                //a new line was needed, hence the blank label
+                exportDialog.getContentTable().add(new Label("", skin));
+                exportDialog.getContentTable().row();
+                exportDialog.getContentTable().add(filenameLabel).colspan(1).align(Align.right);
+                exportDialog.getContentTable().add(filenameField).colspan(3).fill();
+                exportDialog.getContentTable().row();
+                exportDialog.getContentTable().add(startXLabel).align(Align.right);
+                exportDialog.getContentTable().add(startXField);
+                exportDialog.getContentTable().add(endXLabel).align(Align.right);
+                exportDialog.getContentTable().add(endXField);
+                exportDialog.getContentTable().row();
+                exportDialog.getContentTable().add(startYLabel).align(Align.right);
+                exportDialog.getContentTable().add(startYField);
+                exportDialog.getContentTable().add(endYLabel).align(Align.right);
+                exportDialog.getContentTable().add(endYField);
+                exportDialog.getContentTable().row();
+                exportDialog.getContentTable().add(outputLabel).colspan(4).align(Align.center);
+                exportDialog.getContentTable().pack();
+                exportDialog.button("Export", 1);
+                exportDialog.button("Close", 2);
+                exportDialog.button("Cancel", 3);
+                exportDialog.pack();
+                exportDialog.show(stage);
+                return true;
+            }
+        });
 
         exportWorldButton.setPosition(saveWorldButton.getX(), saveWorldButton.getY() - exportWorldButton.getPrefHeight() - 8);
         stage.addActor(exportWorldButton);
