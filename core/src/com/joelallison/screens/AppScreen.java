@@ -23,8 +23,6 @@ import com.joelallison.screens.userInterface.AppUI;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static com.joelallison.io.FileHandling.importTilesets;
-
 public class AppScreen implements Screen {
     Stage mainUIStage;
     //viewport displays the generated tiles
@@ -37,8 +35,8 @@ public class AppScreen implements Screen {
     public static final int TILE_SIZE = 32;
     public static final int CHUNK_SIZE = 14;
     public static final Vector2 LEVEL_ASPECT_RATIO = new Vector2(4, 3);
-    public static final int LEVEL_ASPECT_SCALAR = 1;
-    public static final Vector2 MAP_DIMENSIONS = new Vector2((int) CHUNK_SIZE * LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.x, (int) CHUNK_SIZE * LEVEL_ASPECT_SCALAR * LEVEL_ASPECT_RATIO.y);
+    public static int levelAspectScalar = 2;
+    public static Vector2 mapDimensions = new Vector2((int) CHUNK_SIZE * levelAspectScalar * LEVEL_ASPECT_RATIO.x, (int) CHUNK_SIZE * levelAspectScalar * LEVEL_ASPECT_RATIO.y);
     Texture missing_tile = new Texture(Gdx.files.internal("missing_tile.png"));
     int xPos, yPos;
     public static UserInput userInput;
@@ -56,17 +54,18 @@ public class AppScreen implements Screen {
         batch = new SpriteBatch();
         sr = new ShapeRenderer();
 
-        camera.zoom = 1.2f; //default viewport size
+        //declare player stuff
+        userInput = new UserInput(0, 0);
+    }
+
+    @Override
+    public void show() {
+        camera.zoom = 2.4f; //default viewport size
         viewport.apply(true);
 
         // declare default coords
         xPos = 0;
         yPos = 0;
-
-        //declare player stuff
-        userInput = new UserInput(0, 0);
-
-        //tilesets = importTilesets("core/src/com/joelallison/tilesets/");
 
         stateTime = 0f;
 
@@ -75,10 +74,15 @@ public class AppScreen implements Screen {
     }
 
     @Override
+    public void hide() {
+        userInterface.clearUI();
+    }
+
+    @Override
     public void render(float delta) {
         stateTime += Gdx.graphics.getDeltaTime();
         viewport.apply();
-        camera.zoom = MathUtils.clamp(camera.zoom, 0.2f, 4f); //set limits for the size of the viewport
+        camera.zoom = MathUtils.clamp(camera.zoom, 0.2f, 4); //set limits for the size of the viewport
         batch.setProjectionMatrix(viewport.getCamera().combined);
         sr.setProjectionMatrix(viewport.getCamera().combined);
         camera.update();
@@ -109,7 +113,7 @@ public class AppScreen implements Screen {
 
         //draw border around the generated outcome
         sr.setColor(Color.WHITE);
-        sr.rect(0f, 0f, MAP_DIMENSIONS.x * TILE_SIZE, MAP_DIMENSIONS.y * TILE_SIZE);
+        sr.rect(0f, 0f, mapDimensions.x * TILE_SIZE, mapDimensions.y * TILE_SIZE);
 
         sr.end();
     }
@@ -118,17 +122,17 @@ public class AppScreen implements Screen {
         for (int i = 0; i < world.layers.size(); i++) {
             switch(getLayerTypeChar(world.layers.get(i))) {
                 case 'T':
-                    ((TerrainLayer) world.layers.get(i)).genValueMap(world.getLayerSeed(i), MAP_DIMENSIONS, xPos + (int) (world.layers.get(i).getCenter().x), yPos + (int) (world.layers.get(i).getCenter().y));
+                    ((TerrainLayer) world.layers.get(i)).genValueMap(world.getLayerSeed(i), mapDimensions, xPos + (int) (world.layers.get(i).getCenter().x), yPos + (int) (world.layers.get(i).getCenter().y));
                     break;
                 case 'M':
-                    ((MazeLayer) world.layers.get(i)).genMaze();
+                    ((MazeLayer) world.layers.get(i)).genMaze(world.getLayerSeed(i));
             }
         }
 
-        boolean[][] tileAbove = new boolean[(int) MAP_DIMENSIONS.x][(int) MAP_DIMENSIONS.y];
+        boolean[][] tileAbove = new boolean[(int) mapDimensions.x][(int) mapDimensions.y];
 
-        for (int x = 0; x < MAP_DIMENSIONS.x; x++) {
-            for (int y = 0; y < MAP_DIMENSIONS.y; y++) {
+        for (int x = 0; x < mapDimensions.x; x++) {
+            for (int y = 0; y < mapDimensions.y; y++) {
                 // top layer to bottom layer
                 for (int i = world.layers.size() - 1; i >= 0; i--) {
                     if (world.layers.get(i).layerShown()) {
@@ -147,7 +151,7 @@ public class AppScreen implements Screen {
                                             //if y is within maze
                                             if (y + yPos < (world.layers.get(i)).getCenter().y + ((MazeLayer) world.layers.get(i)).getHeight()+1 && (y + yPos > (world.layers.get(i)).getCenter().y)) {
                                                 if (((MazeLayer) world.layers.get(i)).maze[(int) (y + yPos - world.layers.get(i).getCenter().y-1)][(int) (x + xPos - world.layers.get(i).getCenter().x-1)] == 1) {
-                                                    TextureRegion mazeTile = getTextureForNeighbourMap(world.layers.get(i), (int) (x + xPos - world.layers.get(i).getCenter().x-1), (int) (((MazeLayer) world.layers.get(i)).getHeight() - (y + yPos - world.layers.get(i).getCenter().y-1) - 1));
+                                                    TextureRegion mazeTile = getTextureForNeighbourMap(world.layers.get(i), ((int) (x + xPos - world.layers.get(i).getCenter().x-1)), (int) (((MazeLayer) world.layers.get(i)).getHeight() - (y + yPos - world.layers.get(i).getCenter().y-1) - 1));
                                                     if (mazeTile != null) {
                                                         batch.draw(mazeTile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                                                         tileAbove[x][y] = true;
@@ -190,20 +194,25 @@ public class AppScreen implements Screen {
     }
     boolean[][] getNeighbourMap(Layer layer, int y, int x) {
         boolean[][] neighbourMap = new boolean[3][3];
-        for (int row = y + 1; row > y - 2; row--) {
-            for (int col = x - 1; col < x + 2; col++) {
-                //first if statement deals with corners
-                if (((row >= 0)) && (row < ((MazeLayer) layer).maze.length) && ((col >= 0)) && (col < ((MazeLayer) layer).maze[0].length)) {
-                    neighbourMap[col - x + 1][row - y + 1] = !((((MazeLayer) layer).maze[((MazeLayer) layer).maze[0].length - col - 1][row]) == 0);
-                } else {
-                    //if either row or column is out of bounds of the maze
-                    neighbourMap[col - x + 1][row - y + 1] = false;
+        //top to bottom, left to right
+        try {
+            for (int row = y + 1; row > y - 2; row--) {
+                for (int col = x - 1; col < x + 2; col++) {
+                    if (((row >= 0)) && (row < ((MazeLayer) layer).getHeight()) && ((col >= 0)) && (col < ((MazeLayer) layer).getWidth())) {
+                        neighbourMap[col - x + 1][row - y + 1] = !((((MazeLayer) layer).maze[((MazeLayer) layer).maze[0].length - col - 1][row]) == 0);
+                    } else {
+                        //if either row or column is out of bounds of the maze
+                        neighbourMap[col - x + 1][row - y + 1] = false;
+                    }
                 }
             }
+        } catch (IndexOutOfBoundsException e) {
+            //when maze size is changed, the maze.length is then out of date, and the program crashes
         }
 
+
         //if any one of the corners is false, set them all to false
-        //-- this is becausethere is no actual tile where you would want an L-shaped mapping,
+        //-- this is because there is no actual tile where you would want an L-shaped mapping,
         //but there are still tiles which are identified by having corners true
         //e.g. a tile with tiles ALL around it
         if (!neighbourMap[0][0] || !neighbourMap[0][2] || !neighbourMap[2][0] || !neighbourMap[2][2]) {
@@ -248,16 +257,6 @@ public class AppScreen implements Screen {
         return new Vector2(((int) xPos / CHUNK_SIZE), ((int) yPos / CHUNK_SIZE));
     }
 
-
-    @Override
-    public void show() {
-        // when the screen is shown
-    }
-
-    @Override
-    public void hide() {
-    }
-
     @Override
     public void pause() {
     }
@@ -269,7 +268,7 @@ public class AppScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
-        camera.position.set(MAP_DIMENSIONS.x * TILE_SIZE / 2, MAP_DIMENSIONS.y * TILE_SIZE / 2, 0);
+        camera.position.set(mapDimensions.x * TILE_SIZE / 2, mapDimensions.y * TILE_SIZE / 2, 0);
         viewport.getCamera().update();
     }
 

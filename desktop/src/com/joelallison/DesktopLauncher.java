@@ -9,7 +9,7 @@ import static com.joelallison.screens.AppScreen.LEVEL_ASPECT_RATIO;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		//Creates window of size (2 * 4 * 320)x(2 * 3 * 320) -- 2560x1920. This scales down on Windows but is 4:3 on the system I'm running on.
+		//Creates window of size (2 * 4 * 320)x(2 * 3 * 320) -- 2560x1920. This scales down on smaller screens but is 4:3 on the system I'm running on.
 		config.setWindowedMode((int) LEVEL_ASPECT_RATIO.x * 320, (int) LEVEL_ASPECT_RATIO.y * 320);
 		config.useVsync(true);
 		config.setForegroundFPS(60);

@@ -31,7 +31,6 @@ public class WorldUI extends UI {
     //this https://stackoverflow.com/a/17999317 was incredibly useful in getting the scrollpane to work
     Table worlds = new Table();
     private static final String DATE_FORMAT = "dd/MM/yyyy - HH:mm";
-    Dialog newWorld = newWorldPopup();
     TextButton newWorldButton = new TextButton("New World", skin);
     TextButton backButton = new TextButton("Back", skin);
 
@@ -56,7 +55,63 @@ public class WorldUI extends UI {
                 new InputListener() {
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        newWorld.show(stage);
+                        //for this popup, I decided to see if it was worth making a custom table instead of the default Dialog one
+                        //While this is definitely a better looking popup than others, the default system still works quite well
+                        final Dialog popupBox = new Dialog("New creation", skin);
+
+                        Table table = new Table();
+                        //table.setDebug(true);
+                        table.setFillParent(true);
+                        table.defaults().align(Align.left).space(8);
+                        table.pad(16);
+
+                        final Label nameLabel = new Label("Name:", skin);
+                        table.add(nameLabel).colspan(100); //colspan is to allow the 'go' and 'cancel' buttons to be a lot closer together
+                        final TextField nameField = new TextField("", skin);
+                        table.add(nameField);
+
+                        table.row();
+                        final Label seedLabel = new Label("Seed: (leave blank for random) ", skin);
+                        table.add(seedLabel).colspan(100); //colspan is to allow the 'go' and 'cancel' buttons to be a lot closer together
+                        final TextField seedField = new TextField("", skin);
+                        table.add(seedField);
+
+                        table.row();
+                        TextButton goButton = new TextButton("Go", skin);
+                        goButton.addListener(new InputListener() {
+                            @Override
+                            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                                if (!nameField.getText().equals("")) {
+                                    if (seedField.getText().matches("[0-9]*")) {
+                                        if (seedField.getText().equals("")) {
+                                            loadWorldIntoApp(new World(nameField.getText()), username);
+                                        } else {
+                                            loadWorldIntoApp(new World(nameField.getText(), Long.parseLong(seedField.getText())), username);
+                                        }
+                                    } else {
+                                        seedLabel.setText("Seed: (leave blank for random)\nMust be a positive int.");
+                                    }
+                                } else {
+                                    nameLabel.setText("Name: (must not be left blank!)");
+                                }
+                                return true;
+                            }
+                        });
+
+                        table.add(goButton);
+                        TextButton cancelButton = new TextButton("Cancel", skin);
+                        cancelButton.addListener(new InputListener() {
+                            @Override
+                            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                                popupBox.hide();
+                                return true;
+                            }
+                        });
+                        table.add(cancelButton);
+
+                        popupBox.add(table);
+
+                        popupBox.show(stage);
                         return true;
                     }
                 });
@@ -340,7 +395,7 @@ public class WorldUI extends UI {
 
         popupBox.add(table);
 
-        return popupBox;
+        return null;
     }
 
 }

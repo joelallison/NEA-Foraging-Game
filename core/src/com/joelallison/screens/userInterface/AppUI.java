@@ -3,6 +3,7 @@ package com.joelallison.screens.userInterface;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -32,14 +33,12 @@ public class AppUI extends UI {
     protected Table genSettingsTable = new Table();
     protected TextButton layerSeedButton = new TextButton("Seed: ", skin);
     protected CheckBox inheritSeedCheck = new CheckBox("", skin);
-    protected Label centerPointLabel = new Label("x: , y:", skin); // for variable names, I'm reluctantly using the American spelling of 'centre' as it feels like convention :-(
+    protected Label centerPointLabel = new Label("x: , y: ", skin); // for variable names, I'm reluctantly using the American spelling of 'centre' as it feels like convention :-(
     protected TextButton centerPointButton = new TextButton("Centre coords:", skin);
 
     //for maze gen settings
-    protected TextButton widthButton = new TextButton("Width:", skin);
-    final Slider widthSlider = new Slider(MazeLayer.MIN_ACROSS, MazeLayer.MAX_ACROSS, 1, false, skin);
-    protected TextButton heightButton = new TextButton("Height:", skin);
-    final Slider heightSlider = new Slider(MazeLayer.MIN_ACROSS, MazeLayer.MAX_ACROSS, 0.5f, false, skin);
+    protected TextButton sizeButton = new TextButton("Width:", skin);
+    final Slider sizeSlider = new Slider(MazeLayer.MIN_ACROSS, MazeLayer.MAX_ACROSS, 1, false, skin);
     protected Label opaqueLabel = new Label ("Opaque:", skin);
     protected CheckBox opaqueCheck = new CheckBox("", skin);
 
@@ -70,9 +69,11 @@ public class AppUI extends UI {
     boolean layersChanged = false;
     boolean tileDataChanged = false;
     //misc ui
-    String helpMsg = "Press TAB to toggle UI.\nUse '<' and '>' to zoom in and out. All window-box things are draggable and movable!\nThe * layer button is used to select that layer. The ! layer button is a shortcut to exporting the layer individually.";
+    String helpMsg = "Press TAB to toggle UI.\nUse '<' and '>' to zoom in and out. All window-box things are draggable and movable!\nThe * layer button is used to select that layer. Use + and - (top right) to adjust render size.";
     protected Label controlsTips = new Label(helpMsg, skin);
     protected Label topLabel = new Label("Name: , Seed: \nx: , y: ", skin);
+    protected TextButton increaseScale = new TextButton ("+", skin);
+    protected TextButton decreaseScale = new TextButton ("-", skin);
     //global vars
     static Stage stage;
     public static int selectedLayerIndex;
@@ -94,10 +95,12 @@ public class AppUI extends UI {
         //box for managing the different layers of generation
         layerPanel.add(layerGroup);
         initLayerPanel();
+        layerPanel.pack();
         stage.addActor(layerPanel);
 
         //box to edit tiles and visuals
         initTilePanel();
+        tilePanel.pack();
         stage.addActor(tilePanel);
 
         topLabel.setPosition(48, Gdx.graphics.getHeight() - (2 * topLabel.getPrefHeight()));
@@ -126,23 +129,55 @@ public class AppUI extends UI {
 
         stage.addActor(backButton);
 
+        increaseScale.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (levelAspectScalar < 3) {
+                    levelAspectScalar++;
+                    handleRescale();
+                }
+                return true;
+            }
+        });
+        increaseScale.setPosition(Gdx.graphics.getWidth() - 7 * increaseScale.getPrefWidth(), Gdx.graphics.getHeight() - increaseScale.getPrefHeight() * 2.8f);
+        stage.addActor(increaseScale);
+        decreaseScale.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (levelAspectScalar > 1) {
+                    levelAspectScalar--;
+                    handleRescale();
+                }
+                return true;
+            }
+        });
+        decreaseScale.setPosition(Gdx.graphics.getWidth() - 6.5f * decreaseScale.getPrefWidth(), Gdx.graphics.getHeight() - decreaseScale.getPrefHeight() * 2.8f);
+        stage.addActor(decreaseScale);
+
         renameWorldButton.setPosition(Gdx.graphics.getWidth() - renameWorldButton.getPrefWidth() - 28 - saveWorldButton.getPrefWidth(), Gdx.graphics.getHeight() - renameWorldButton.getPrefHeight() * 1.5f);
         renameWorldButton.addListener(new InputListener() {
             final TextField inputField = new TextField("", skin);
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Dialog renameDialog = new Dialog("Rename", skin) {
+                final Dialog renameDialog = new Dialog("Rename [saves if no world already saved]", skin) {
                     public void result(Object obj) {
                         if (obj.equals(true)) {
-                            Database.renameWorld(username, world.name, inputField.getText());
-
+                            if (!(Database.renameWorld(username, world, inputField.getText()))) {
+                                cancel();
+                                inputField.setText(inputField.getText() + " - TAKEN");
+;                            } else {
+                                world.name = inputField.getText();
+                                Database.saveWorld(username, world);
+                            }
                         }
                     }
                 };
+                renameDialog.add(inputField);
+                renameDialog.row();
                 renameDialog.button("OK", true);
                 renameDialog.button("Cancel", false);
+                renameDialog.pack();
                 renameDialog.show(stage);
-                renameDialog.setSize(80, 60);
 
                 return true;
             }
@@ -193,6 +228,17 @@ public class AppUI extends UI {
         controlsTips.setPosition(8, 8);
 
         stage.addActor(controlsTips);
+    }
+
+    public void handleRescale() {
+        mapDimensions = new Vector2((int) CHUNK_SIZE * levelAspectScalar * LEVEL_ASPECT_RATIO.x, (int) CHUNK_SIZE * levelAspectScalar * LEVEL_ASPECT_RATIO.y);
+        camera.position.set(mapDimensions.x * TILE_SIZE / 2, mapDimensions.y * TILE_SIZE / 2, 0);
+        camera.zoom = levelAspectScalar + 1; //a handy relationship between the values that I found works quite nicely
+    }
+
+    public void clearUI () {
+        generationSettingsPanel.reset();
+        tilePanel.reset();
     }
 
     public void update(float delta) {
@@ -295,12 +341,46 @@ public class AppUI extends UI {
         }
         generationSettingsPanel.row();
         generationSettingsPanel.add(centerPointButton);
+
         centerPointButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Dialog dialog = new Dialog("Editing centre coords", skin, "dialog") {
-                    //AAAAAAA
+                final TextField xInputField = new TextField("x", skin);
+                xInputField.setTextFieldFilter(new TextField.TextFieldFilter() {
+                    // Accepts all Alphanumeric Characters except
+                    public boolean acceptChar(TextField textField, char c) {
+                        if (Character.toString(c).matches(integerFilter)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                final TextField yInputField = new TextField("y", skin);
+                yInputField.setTextFieldFilter(new TextField.TextFieldFilter() {
+                    // Accepts all Alphanumeric Characters except
+                    public boolean acceptChar(TextField textField, char c) {
+                        if (Character.toString(c).matches(integerFilter)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                Dialog dialog = new Dialog("Change centre coordinates", skin) {
+                    public void result(Object obj) {
+                        if (obj.equals(true)) {
+                            if (!xInputField.getText().equals("") && !yInputField.getText().equals("")) {
+                                world.layers.get(selectedLayerIndex).setCenter(new Vector2((Integer.parseInt(xInputField.getText())), (Integer.parseInt(yInputField.getText()))));
+                            } else {
+                                cancel();
+                            }
+                        }
+                    }
                 };
+                dialog.text("Current seed is " + world.layers.get(selectedLayerIndex).getSeed() + "\nEnter new seed:");
+                dialog.add(xInputField);
+                dialog.add(yInputField);
+                dialog.button("OK", true);
+                dialog.button("Cancel", false);
                 dialog.show(stage);
                 return true;
             }
@@ -318,8 +398,8 @@ public class AppUI extends UI {
     }
 
     protected void loadMazeSettings() {
-        genSettingsTable.add(widthButton);
-        widthButton.addListener(new InputListener() {
+        genSettingsTable.add(sizeButton);
+        sizeButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 final TextField inputField = new TextField("", skin);
@@ -332,51 +412,11 @@ public class AppUI extends UI {
                         return false;
                     }
                 });
-                Dialog dialog = new Dialog("Set maze width", skin) {
+                Dialog dialog = new Dialog("Set maze size", skin) {
                     public void result(Object obj) {
                         if (obj.equals(true)) {
                             if (!inputField.getText().equals("")) {
                                 ((MazeLayer) world.layers.get(selectedLayerIndex)).setWidth(Integer.parseInt(inputField.getText()));
-                            } else {
-                                cancel();
-                            }
-                        }
-                    }
-                };
-                dialog.add(inputField);
-                dialog.button("OK", true);
-                dialog.button("Cancel", false);
-                dialog.show(stage);
-                return true;
-            }
-        });
-        genSettingsTable.add(widthSlider);
-        widthSlider.setValue(((MazeLayer) world.layers.get(selectedLayerIndex)).getWidth());
-        widthSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ((MazeLayer) world.layers.get(selectedLayerIndex)).setWidth((int) widthSlider.getValue());
-            }
-        });
-        genSettingsTable.row();
-        genSettingsTable.add(heightButton);
-        heightButton.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                final TextField inputField = new TextField("", skin);
-                inputField.setTextFieldFilter(new TextField.TextFieldFilter() {
-                    // Accepts all Alphanumeric Characters except
-                    public boolean acceptChar(TextField textField, char c) {
-                        if (Character.toString(c).matches(integerFilter)) {
-                            return true;
-                        }
-                        return false;
-                    }
-                });
-                Dialog dialog = new Dialog("Set maze height", skin) {
-                    public void result(Object obj) {
-                        if (obj.equals(true)) {
-                            if (!inputField.getText().equals("")) {
                                 ((MazeLayer) world.layers.get(selectedLayerIndex)).setHeight(Integer.parseInt(inputField.getText()));
                             } else {
                                 cancel();
@@ -391,12 +431,13 @@ public class AppUI extends UI {
                 return true;
             }
         });
-        genSettingsTable.add(heightSlider);
-        heightSlider.setValue(((MazeLayer) world.layers.get(selectedLayerIndex)).getHeight());
-        heightSlider.addListener(new ChangeListener() {
+        genSettingsTable.add(sizeSlider);
+        sizeSlider.setValue(((MazeLayer) world.layers.get(selectedLayerIndex)).getWidth());
+        sizeSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ((MazeLayer) world.layers.get(selectedLayerIndex)).setHeight((int) heightSlider.getValue());
+                ((MazeLayer) world.layers.get(selectedLayerIndex)).setWidth((int) sizeSlider.getValue() + (((int) sizeSlider.getValue() + 1) % 2));
+                ((MazeLayer) world.layers.get(selectedLayerIndex)).setHeight((int) sizeSlider.getValue() + (((int) sizeSlider.getValue() + 1) % 2));
             }
         });
 
@@ -487,6 +528,7 @@ public class AppUI extends UI {
         generationSettingsPanel.getTitleLabel().setText("Generation Settings: " + world.layers.get(selectedLayerIndex).getName() + " " + layerShown);
         inheritSeedCheck.setChecked(world.layers.get(selectedLayerIndex).inheritSeed());
         layerSeedButton.setText("Seed: " + world.layers.get(selectedLayerIndex).getSeed());
+        centerPointLabel.setText("x: " + intFormat.format(world.layers.get(selectedLayerIndex).getCenter().x) + ", y: " + intFormat.format(world.layers.get(selectedLayerIndex).getCenter().y));
 
         updateGenerationSettings(getLayerTypeChar(world.layers.get(selectedLayerIndex)));
     }
@@ -512,8 +554,7 @@ public class AppUI extends UI {
                 invertCheck.setChecked(((TerrainLayer) world.layers.get(selectedLayerIndex)).isInverted());
                 break;
             case 'M':
-                widthButton.setText("Width: " + intFormat.format(((MazeLayer) world.layers.get(selectedLayerIndex)).getWidth()));
-                heightButton.setText("Height: " + intFormat.format(((MazeLayer) world.layers.get(selectedLayerIndex)).getHeight()));
+                sizeButton.setText("Size: " + intFormat.format(((MazeLayer) world.layers.get(selectedLayerIndex)).getWidth()));
                 opaqueCheck.setChecked(((MazeLayer) world.layers.get(selectedLayerIndex)).isOpaque());
 
                 break;
@@ -730,6 +771,7 @@ public class AppUI extends UI {
         tilePanel.add(selectedLayerTilesetLabel);
         tilePanel.row();
 
+        tiles.clear();
         genTileList();
         tilePanel.add(tiles);
         tilePanel.row();
@@ -743,7 +785,11 @@ public class AppUI extends UI {
             }
         });
 
+        tilePanel.add(sortTilesButton);
+
         tilePanel.setSize(tilePanel.getPrefWidth() * 1.2f, tilePanel.getPrefHeight());
+        tilePanel.setPosition(6, 315);
+        tilePanel.pack();
     }
 
     public static void genTileList() {

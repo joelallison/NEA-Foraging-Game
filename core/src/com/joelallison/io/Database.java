@@ -73,8 +73,23 @@ public class Database {
         connection.close();
     }
 
-    public static void renameWorld(String username, String oldName, String newName) {
-        //might involve saving therefore
+    public static boolean renameWorld(String username, World world, String newName) {
+        ResultSet worldInDatabase = doSqlQuery("SELECT * FROM world WHERE username = '" + username + "' AND world_name = '" + world.name + "';"); //search with old name
+        try {
+            if (worldInDatabase.next()) { //if world is found in database, update it
+                return doSqlStatement(
+                        "UPDATE world " +
+                                "SET world_name = '" + newName + "', last_accessed_timestamp = '" + Instant.now().toString() + "' "
+                                + "WHERE username = '" + username + "' AND world_name = '" + world.name + "';" //update old name
+                );
+            } else {
+                saveWorld(username, world);
+            }
+        } catch (SQLException e) {
+            //System.out.println(e.getMessage());
+        }
+
+        return false;
     }
 
     public static void saveWorld(String username, World world) {

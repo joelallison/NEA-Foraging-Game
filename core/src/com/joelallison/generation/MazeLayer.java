@@ -76,7 +76,9 @@ public class MazeLayer extends Layer {
         this.tileSpecs.sort(NAME_COMPARATOR);
     }
 
-    public void genMaze() {
+    public void genMaze(Long seed) {
+        //so that seed can be inherited from the world
+        seed = seed;
         count = 0;
         maze = new int[height][width];
         // initialize the 2D array with 1s
