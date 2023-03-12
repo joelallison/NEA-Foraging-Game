@@ -1,0 +1,138 @@
+{
+  "name": "Colours",
+  "creator": "Joel Allison - From ENDESGA's 32 colour palette.",
+  "spriteSheet": "colours_tileSheet.png",
+  "tileSize": 8,
+  "baseColorHex": "#181425",
+  "map": {
+    "#be4a2f": {
+      "cornerX": 0,
+      "cornerY": 0
+    },
+    "#d77643": {
+      "cornerX": 1,
+      "cornerY": 0
+    },
+    "#ead4aa": {
+      "cornerX": 2,
+      "cornerY": 0
+    },
+    "#e4a672": {
+      "cornerX": 3,
+      "cornerY": 0
+    },
+    "#b86f50": {
+      "cornerX": 4,
+      "cornerY": 0
+    },
+    "#733e39": {
+      "cornerX": 5,
+      "cornerY": 0
+    },
+    "#3e2731": {
+      "cornerX": 6,
+      "cornerY": 0
+    },
+    "#a22633": {
+      "cornerX": 7,
+      "cornerY": 0
+    },
+    "#e43b44": {
+      "cornerX": 0,
+      "cornerY": 1
+    },
+    "#f77622": {
+      "cornerX": 1,
+      "cornerY": 1
+    },
+    "#feae34": {
+      "cornerX": 2,
+      "cornerY": 1
+    },
+    "#fee761": {
+      "cornerX": 3,
+      "cornerY": 1
+    },
+    "#63c74d": {
+      "cornerX": 4,
+      "cornerY": 1
+    },
+    "#3e8948": {
+      "cornerX": 5,
+      "cornerY": 1
+    },
+    "#265c42": {
+      "cornerX": 6,
+      "cornerY": 1
+    },
+    "#193c3e": {
+      "cornerX": 7,
+      "cornerY": 1
+    },
+    "#124e89": {
+      "cornerX": 0,
+      "cornerY": 2
+    },
+    "#0099db": {
+      "cornerX": 1,
+      "cornerY": 2
+    },
+    "#2ce8f5": {
+      "cornerX": 2,
+      "cornerY": 2
+    },
+    "#ffffff": {
+      "cornerX": 3,
+      "cornerY": 2
+    },
+    "#c0cbdc": {
+      "cornerX": 4,
+      "cornerY": 2
+    },
+    "#8b9bb4": {
+      "cornerX": 5,
+      "cornerY": 2
+    },
+    "#5a6988": {
+      "cornerX": 6,
+      "cornerY": 2
+    },
+    "#3a4466": {
+      "cornerX": 7,
+      "cornerY": 2
+    },
+    "#262b44": {
+      "cornerX": 0,
+      "cornerY": 3
+    },
+    "#181425": {
+      "cornerX": 1,
+      "cornerY": 3
+    },
+    "#ff0044": {
+      "cornerX": 2,
+      "cornerY": 3
+    },
+    "#68386c": {
+      "cornerX": 3,
+      "cornerY": 3
+    },
+    "#b55088": {
+      "cornerX": 4,
+      "cornerY": 3
+    },
+    "#f6757a": {
+      "cornerX": 5,
+      "cornerY": 3
+    },
+    "#e8b796": {
+      "cornerX": 6,
+      "cornerY": 3
+    },
+    "#c28569": {
+      "cornerX": 7,
+      "cornerY": 3
+    }
+  }
+}
+
