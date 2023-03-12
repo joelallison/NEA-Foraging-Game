@@ -28,7 +28,9 @@ public class World {
     public World(String name) {
         this.name = name;
         this.layers = new ArrayList<Layer>(){};
-        layers.add(new TerrainLayer(-1L));
+        TerrainLayer defaultLayer = new TerrainLayer(-1L);
+        defaultLayer.defaultTileValues();
+        layers.add(defaultLayer);
         dateCreated = now();
         lastAccessed = dateCreated;
     }

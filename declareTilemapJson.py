@@ -4,13 +4,14 @@ def getTiles(height, width):
     tiles_done = 0
     for y in range(int(height)):
         for x in range(int(width)):
-            values[y][x][0] = input("Tile name?")
-            while (values[y][x][0] in previous_tile_names):
-                values[y][x][0] = input("Tile names must be unique within a tileset.\nTile name?")
-            values[y][x][1] = x
-            values[y][x][2] = y
-            previous_tile_names[tiles_done] = values[y][x][0]
-            tiles_done += 1
+            values[y][x][0] = input("Tile name? [type 'ignore' to not add it]")
+            if (values[y][x][0] != "ignore"):
+                while (values[y][x][0] in previous_tile_names):
+                    values[y][x][0] = input("Tile names must be unique within a tileset.\nTile name?")
+                values[y][x][1] = x
+                values[y][x][2] = y
+                previous_tile_names[tiles_done] = values[y][x][0]
+                tiles_done += 1
     return values
 
 def formatMapLine(line):

@@ -36,6 +36,7 @@ public abstract class Layer {
 
     public void defaultTileValues() {
         //does nothing, class is abstract
+
     }
 
     public int getLayerID() {

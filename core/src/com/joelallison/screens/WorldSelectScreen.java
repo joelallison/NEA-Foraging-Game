@@ -26,13 +26,12 @@ public class WorldSelectScreen implements Screen {
         batch = new SpriteBatch();
 
         this.username = username;
-
-        menuUIStage = userInterface.genStage(menuUIStage);
-        userInterface.genUI(menuUIStage);
     }
 
     @Override
     public void show() {
+        menuUIStage = userInterface.genStage(menuUIStage);
+        userInterface.genUI(menuUIStage);
     }
 
     public void render(float delta) {
@@ -42,8 +41,6 @@ public class WorldSelectScreen implements Screen {
         batch.setProjectionMatrix(viewport.getCamera().combined);
         camera.update();
         ScreenUtils.clear(new Color(0.365f, 0.525f, 0.310f, 1f));
-
-        //userInterface.update(); --> there's no update method yet
 
         batch.begin();
         batch.end();

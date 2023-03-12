@@ -5,6 +5,8 @@ import com.joelallison.screens.AppScreen;
 
 import java.util.*;
 
+import static com.joelallison.screens.AppScreen.tilesets;
+
 public class MazeLayer extends Layer {
     //depth-first search (recursive) maze generation
     //(the stack typical of a DFS is via the call stack)
@@ -13,8 +15,8 @@ public class MazeLayer extends Layer {
 
     private int width;
     private int height;
-    public final int MAX_ACROSS = 857;
-    public final int MIN_ACROSS = 3;
+    public static final int MAX_ACROSS = 857;
+    public static final int MIN_ACROSS = 3;
     private int count = 0;
     private boolean opaque = true;
     public int[][] maze; //I thought about using a 2D boolean array, but an int array makes the conversion to a file slightly simpler.
@@ -46,18 +48,32 @@ public class MazeLayer extends Layer {
         this.height = 33;
         this.tilesetName = "Walls";
 
-        defaultTileValues();
+        this.tileSpecs = new ArrayList<>();
     }
 
     @Override
     public void defaultTileValues() {
-        this.tileSpecs = new ArrayList<>();
-        this.tileSpecs.add(new Tileset.MazeTileSpec("singular"));
+        Set<String> tiles = tilesets.get(this.tilesetName).map.keySet();
+
+        //set tile values to be evenly distributed
+        int tileNum = 0;
+        for (String tile : tiles) {
+            this.tileSpecs.add(new Tileset.MazeTileSpec(tile));
+            tileNum++;
+        }
     }
 
     @Override
     public void sortTileSpecs() {
-        //doesn't need to be sorted.
+        //using method outlined here: https://www.java67.com/2015/01/how-to-sort-hashmap-in-java-based-on.html
+        final Comparator<Tileset.MazeTileSpec> NAME_COMPARATOR  = new Comparator<Tileset.MazeTileSpec>() {
+            @Override
+            public int compare(Tileset.MazeTileSpec t1, Tileset.MazeTileSpec t2){
+                return t1.name.compareTo(t2.name);
+            }
+        };
+
+        this.tileSpecs.sort(NAME_COMPARATOR);
     }
 
     public void genMaze() {

@@ -20,6 +20,7 @@ import com.joelallison.generation.World;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.screens.userInterface.AppUI;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import static com.joelallison.io.FileHandling.importTilesets;
@@ -65,7 +66,7 @@ public class AppScreen implements Screen {
         //declare player stuff
         userInput = new UserInput(0, 0);
 
-        tilesets = importTilesets("core/src/com/joelallison/tilesets/");
+        //tilesets = importTilesets("core/src/com/joelallison/tilesets/");
 
         stateTime = 0f;
 
@@ -134,9 +135,9 @@ public class AppScreen implements Screen {
                         if (tileAbove[x][y] == false) { // no need to draw if there's already a tile above
                                 switch (getLayerTypeChar(world.layers.get(i))) {
                                     case 'T':
-                                        TextureRegion tile = getTextureForTerrainValue(world.layers.get(i), x, y);
-                                        if (tile != null) {
-                                            batch.draw(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                                        TextureRegion terrainTile = getTextureForTerrainValue(world.layers.get(i), x, y);
+                                        if (terrainTile != null) {
+                                            batch.draw(terrainTile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                                             tileAbove[x][y] = true;
                                         }
                                         break;
@@ -146,8 +147,11 @@ public class AppScreen implements Screen {
                                             //if y is within maze
                                             if (y + yPos < (world.layers.get(i)).getCenter().y + ((MazeLayer) world.layers.get(i)).getHeight()+1 && (y + yPos > (world.layers.get(i)).getCenter().y)) {
                                                 if (((MazeLayer) world.layers.get(i)).maze[(int) (y + yPos - world.layers.get(i).getCenter().y-1)][(int) (x + xPos - world.layers.get(i).getCenter().x-1)] == 1) {
-                                                    batch.draw(tilesets.get(world.layers.get(i).tilesetName).getTileTextureFromName(getTileNameForMazeLoc(world.layers.get(i), (int) (x + xPos - world.layers.get(i).getCenter().x-1), (int) (y + yPos - world.layers.get(i).getCenter().y-1))), x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                                                    tileAbove[x][y] = true;
+                                                    TextureRegion mazeTile = getTextureForNeighbourMap(world.layers.get(i), (int) (x + xPos - world.layers.get(i).getCenter().x-1), (int) (((MazeLayer) world.layers.get(i)).getHeight() - (y + yPos - world.layers.get(i).getCenter().y-1) - 1));
+                                                    if (mazeTile != null) {
+                                                        batch.draw(mazeTile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                                                        tileAbove[x][y] = true;
+                                                    }
                                                 } else if (((MazeLayer) world.layers.get(i)).isOpaque()) {
                                                     tileAbove[x][y] = true;
                                                 }
@@ -163,6 +167,54 @@ public class AppScreen implements Screen {
 
             }
         }
+    }
+
+    public TextureRegion getTextureForNeighbourMap(Layer layer, int x, int y) {
+        String tileName = getTileNameForNeighbourMap(layer, getNeighbourMap(layer, x, y));
+        if (!tileName.equals("-")){
+            return tilesets.get(layer.tilesetName).getTileTextureFromName(tileName);
+        } else {
+            return null;
+        }
+    }
+
+
+    public String getTileNameForNeighbourMap(Layer layer, boolean[][] map) {
+        for (int i = 0; i < ((MazeLayer) layer).tileSpecs.size(); i++) {
+            if (Arrays.deepEquals(((MazeLayer) layer).tileSpecs.get(i).neighbourMap, map)) {
+                return ((MazeLayer) layer).tileSpecs.get(i).name;
+            }
+        }
+
+        return "-";
+    }
+    boolean[][] getNeighbourMap(Layer layer, int y, int x) {
+        boolean[][] neighbourMap = new boolean[3][3];
+        for (int row = y + 1; row > y - 2; row--) {
+            for (int col = x - 1; col < x + 2; col++) {
+                //first if statement deals with corners
+                if (((row >= 0)) && (row < ((MazeLayer) layer).maze.length) && ((col >= 0)) && (col < ((MazeLayer) layer).maze[0].length)) {
+                    neighbourMap[col - x + 1][row - y + 1] = !((((MazeLayer) layer).maze[((MazeLayer) layer).maze[0].length - col - 1][row]) == 0);
+                } else {
+                    //if either row or column is out of bounds of the maze
+                    neighbourMap[col - x + 1][row - y + 1] = false;
+                }
+            }
+        }
+
+        //if any one of the corners is false, set them all to false
+        //-- this is becausethere is no actual tile where you would want an L-shaped mapping,
+        //but there are still tiles which are identified by having corners true
+        //e.g. a tile with tiles ALL around it
+        if (!neighbourMap[0][0] || !neighbourMap[0][2] || !neighbourMap[2][0] || !neighbourMap[2][2]) {
+            neighbourMap[0][0] = false;
+            neighbourMap[0][2] = false;
+            neighbourMap[2][0] = false;
+            neighbourMap[2][2] = false;
+        }
+
+
+        return neighbourMap;
     }
 
     public TextureRegion getTextureForTerrainValue(Layer layer, int x, int y) {
@@ -182,10 +234,6 @@ public class AppScreen implements Screen {
         }
 
         return "-"; //if there's nothing to be drawn here, return this
-    }
-
-    public String getTileNameForMazeLoc(Layer layer, int x, int y) {
-        return ((MazeLayer) layer).tileSpecs.get(0).name;
     }
 
     public static char getLayerTypeChar(Layer layer) {

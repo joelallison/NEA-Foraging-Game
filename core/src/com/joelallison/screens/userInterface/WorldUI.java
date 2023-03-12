@@ -1,5 +1,6 @@
 package com.joelallison.screens.userInterface;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,6 +14,7 @@ import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.generation.World;
 import com.joelallison.io.Database;
+import com.joelallison.screens.LoginScreen;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,54 +25,74 @@ import java.util.ArrayList;
 
 import static com.joelallison.screens.WorldSelectScreen.loadWorldIntoApp;
 import static com.joelallison.screens.WorldSelectScreen.username;
+import static com.joelallison.screens.userInterface.AppUI.stage;
 
 public class WorldUI extends UI {
     //this https://stackoverflow.com/a/17999317 was incredibly useful in getting the scrollpane to work
-    Table containerTable = new Table();
     Table worlds = new Table();
-    private static final String PATTERN_FORMAT = "dd/MM/yyyy - HH:mm";
-    Dialog newworld = newWorldPopup();
+    private static final String DATE_FORMAT = "dd/MM/yyyy - HH:mm";
+    Dialog newWorld = newWorldPopup();
+    TextButton newWorldButton = new TextButton("New World", skin);
+    TextButton backButton = new TextButton("Back", skin);
+
 
     public void genUI(final Stage stage) { //stage is made final here so that it can be accessed within inner classes
-        worlds.defaults().space(8);
-        loadWorlds(stage);
-        worlds.row();
-
-        TextButton newworldButton = new TextButton("New World", skin);
-        newworldButton.addListener(
-                new InputListener() {
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        newworld.show(stage);
-                        return true;
-                    }
-                });
-
-        worlds.add(newworldButton);
-
-        worlds.setSize(worlds.getPrefWidth(), worlds.getPrefHeight());
-        //worlds.setDebug(true);
-
+        genWorlds(stage);
         ScrollPane selectionScroll = new ScrollPane(worlds);
         selectionScroll.setSize(Gdx.graphics.getWidth() * 0.3f, Gdx.graphics.getHeight());
         selectionScroll.setPosition(Gdx.graphics.getWidth() / 2 - selectionScroll.getWidth() / 2, Gdx.graphics.getHeight() / 2 - selectionScroll.getHeight() / 2);
         selectionScroll.setScrollbarsVisible(true);
         selectionScroll.setScrollingDisabled(false, true);
-        //selectionScroll.setDebug(true);
-
-        //containerTable.add(new Label("worlds - Load", skin));
-        //containerTable.row();
-        //containerTable.add(selectionScroll);
-        //containerTable.row();
 
         stage.addActor(selectionScroll);
     }
 
-    public void loadWorlds(Stage stage) {
+    public void genWorlds(final Stage stage) {
+        worlds.defaults().space(8);
+        loadWorldsIn(stage);
+        worlds.row();
+
+        newWorldButton.addListener(
+                new InputListener() {
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        newWorld.show(stage);
+                        return true;
+                    }
+                });
+
+        worlds.add(newWorldButton);
+        worlds.row();
+        backButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Dialog backDialog = new Dialog("Go back", skin) {
+                    public void result(Object obj) {
+                        if (obj.equals(true)) {
+                            ((Game) Gdx.app.getApplicationListener()).setScreen(new LoginScreen());
+                        }
+                    }
+                };
+
+                backDialog.text("This will log you out.");
+                backDialog.button("Continue", true);
+                backDialog.button("Cancel", false);
+                backDialog.show(stage);
+
+                return true;
+            }
+        });
+        worlds.add(backButton);
+
+        worlds.setSize(worlds.getPrefWidth(), worlds.getPrefHeight());
+        //worlds.setDebug(true);
+    }
+
+    public void loadWorldsIn(final Stage stage) {
         //getting the metadata of the worlds so that the user can have more information about what they're choosing before they choose it.
 
         try {
-            ResultSet getWorldsResults = Database.doSqlQuery(
+            ResultSet getWorldsResults = Database.doSqlQuery (
                     "SELECT * FROM world " +
                             "WHERE \"username\" = '" + username + "' " +
                             "ORDER BY last_accessed_timestamp DESC;"
@@ -80,7 +102,7 @@ public class WorldUI extends UI {
             if (getWorldsResults.next()) {
                 try {
                     do {
-                        String name = getWorldsResults.getString("world_name");
+                        final String name = getWorldsResults.getString("world_name");
                         Instant dateCreated = getWorldsResults.getTimestamp("created_timestamp").toInstant();
                         Instant lastAccessed = getWorldsResults.getTimestamp("last_accessed_timestamp").toInstant();
                         Long seed = getWorldsResults.getLong("world_seed");
@@ -95,6 +117,28 @@ public class WorldUI extends UI {
 
                         worlds.row();
                         worlds.add(selectWorldButton(name, dateCreated, lastAccessed, layerCount, seed));
+                        TextButton deleteWorldButton = new TextButton("Delete", skin);
+                        deleteWorldButton.addListener(new InputListener() {
+                            @Override
+                            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                                Dialog deleteDialog = new Dialog("Delete world: " + name, skin) {
+                                    public void result(Object obj) {
+                                        if (obj.equals(true)) {
+                                            deleteWorld(name, username);
+                                        }
+                                    }
+                                };
+
+                                deleteDialog.text("Are you sure you want to delete '" + name + "'?");
+                                deleteDialog.button("Yes", true);
+                                deleteDialog.button("No", false);
+                                deleteDialog.show(stage);
+
+                                return true;
+                            }
+                        });
+
+                        worlds.add(deleteWorldButton);
 
                     } while (getWorldsResults.next());
                 } catch (SQLException e) {
@@ -106,8 +150,19 @@ public class WorldUI extends UI {
         }
     }
 
+    void deleteWorld(String worldName, String username) {
+        //because layers, tileSpecs etc. cascade all that's needed is to
+        Database.doSqlStatement("DELETE FROM world WHERE "
+                + "world_name = '" + worldName + "' "
+                + "AND username = '" + username + "';"
+        );
+
+        worlds.clear();
+        genWorlds(stage);
+    }
+
     public TextButton selectWorldButton(final String name, final Instant dateCreated, final Instant lastAccessed, int layerCount, final Long seed) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_FORMAT).withZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT).withZone(ZoneId.systemDefault());
 
         TextButton button = new TextButton("World name: " + name +
                 "\nDate created: " + formatter.format(dateCreated) +
@@ -229,6 +284,8 @@ public class WorldUI extends UI {
 
 
     public static Dialog newWorldPopup() {
+        //for this popup, I decided to see if it was worth making a custom table instead of the default Dialog one
+        //While this is definitely a better looking popup than others, the default system still works quite well
         final Dialog popupBox = new Dialog("New creation", skin);
 
         Table table = new Table();
@@ -275,7 +332,7 @@ public class WorldUI extends UI {
         cancelButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                popupBox.cancel();
+                popupBox.hide();
                 return true;
             }
         });

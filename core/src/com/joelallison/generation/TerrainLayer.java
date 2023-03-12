@@ -4,10 +4,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.joelallison.graphics.Tileset;
 import tools.OpenSimplex2S; //K.jpg's OpenSimplex 2, smooth variant ("SuperSimplex") - https://github.com/KdotJPG/OpenSimplex2/blob/master/java/OpenSimplex2S.java
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+
+import static com.joelallison.screens.AppScreen.tilesets;
 
 public class TerrainLayer extends Layer {
     private float scale;
@@ -58,18 +57,19 @@ public class TerrainLayer extends Layer {
         this.wrap = random.nextInt(WRAP_MIN, WRAP_MAX/4);
         this.invert = random.nextBoolean();
 
-        defaultTileValues();
+        tileSpecs = new ArrayList<>();
     }
 
     @Override
     public void defaultTileValues() {
-        this.tileSpecs = new ArrayList<>();
-        this.tileSpecs.add(new Tileset.TerrainTileSpec("bush", 0.35f));
-        this.tileSpecs.add(new Tileset.TerrainTileSpec("plant", 0.4f));
-        this.tileSpecs.add(new Tileset.TerrainTileSpec("tree_1", 0.6f));
-        this.tileSpecs.add(new Tileset.TerrainTileSpec("rock_1", 0.7f));
-        this.tileSpecs.add(new Tileset.TerrainTileSpec("tree_2", 0.75f));
-        this.tileSpecs.add(new Tileset.TerrainTileSpec("rock_2", 0.95f));
+        Set<String> tiles = tilesets.get(this.tilesetName).map.keySet();
+
+        //set tile values to be evenly distributed
+        int tileNum = 0;
+        for (String tile : tiles) {
+            this.tileSpecs.add(new Tileset.TerrainTileSpec(tile, (float) tileNum * (1f / tiles.size())));
+            tileNum++;
+        }
     }
 
     @Override

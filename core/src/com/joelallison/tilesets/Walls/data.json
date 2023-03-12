@@ -6,18 +6,6 @@
   "baseColorHex": "#1F1814",
   "defaultTile": "singular",
   "map": {
-    "cabbage": {
-      "cornerX": 0,
-      "cornerY": 0
-    },
-    "beans": {
-      "cornerX": 1,
-      "cornerY": 0
-    },
-    "something": {
-      "cornerX": 2,
-      "cornerY": 0
-    },
     "crossroad": {
       "cornerX": 3,
       "cornerY": 0
@@ -80,10 +68,6 @@
     },
     "bottom_end": {
       "cornerX": 3,
-      "cornerY": 3
-    },
-    "hrmm": {
-      "cornerX": 4,
       "cornerY": 3
     }
   }

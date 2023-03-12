@@ -73,6 +73,10 @@ public class Database {
         connection.close();
     }
 
+    public static void renameWorld(String username, String oldName, String newName) {
+        //might involve saving therefore
+    }
+
     public static void saveWorld(String username, World world) {
         //these were notes to self when writing, but I've left them in:
         //update world entry

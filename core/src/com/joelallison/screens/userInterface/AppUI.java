@@ -1,5 +1,6 @@
 package com.joelallison.screens.userInterface;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -15,6 +16,7 @@ import com.joelallison.generation.MazeLayer;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
 import com.joelallison.io.Database;
+import com.joelallison.screens.WorldSelectScreen;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -26,8 +28,20 @@ public class AppUI extends UI {
     //many elements of the ui are used in multiple methods, so it's best that they're all declared globally [to the class]
 
     //for all layer type gen settings
+    char oldLayer = ' ';
+    protected Table genSettingsTable = new Table();
     protected TextButton layerSeedButton = new TextButton("Seed: ", skin);
     protected CheckBox inheritSeedCheck = new CheckBox("", skin);
+    protected Label centerPointLabel = new Label("x: , y:", skin); // for variable names, I'm reluctantly using the American spelling of 'centre' as it feels like convention :-(
+    protected TextButton centerPointButton = new TextButton("Centre coords:", skin);
+
+    //for maze gen settings
+    protected TextButton widthButton = new TextButton("Width:", skin);
+    final Slider widthSlider = new Slider(MazeLayer.MIN_ACROSS, MazeLayer.MAX_ACROSS, 1, false, skin);
+    protected TextButton heightButton = new TextButton("Height:", skin);
+    final Slider heightSlider = new Slider(MazeLayer.MIN_ACROSS, MazeLayer.MAX_ACROSS, 0.5f, false, skin);
+    protected Label opaqueLabel = new Label ("Opaque:", skin);
+    protected CheckBox opaqueCheck = new CheckBox("", skin);
 
     //for terrain gen settings
     protected Label scaleLabel = new Label("Scale:", skin);
@@ -36,21 +50,19 @@ public class AppUI extends UI {
     protected Label wrapFactorLabel = new Label("Wrap factor:", skin);
     protected Label invertLabel = new Label("Invert:", skin);
     protected CheckBox invertCheck = new CheckBox("", skin);
-    protected Label centerPointLabel = new Label("x: , y:", skin); // for variable names, I'm reluctantly using the American spelling of 'centre' as it feels like convention :-(
-    protected TextButton centerPointButton = new TextButton("Centre coords:", skin);
     String integerFilter = "[0-9]+";
     final Slider scaleSlider = new Slider(TerrainLayer.SCALE_MIN, TerrainLayer.SCALE_MAX, 0.001f, false, skin);
     final Slider octavesSlider = new Slider(TerrainLayer.OCTAVES_MIN, TerrainLayer.OCTAVES_MAX, 1, false, skin);
     final Slider lacunaritySlider = new Slider(TerrainLayer.LACUNARITY_MIN, TerrainLayer.LACUNARITY_MAX, 0.01f, false, skin);
     final Slider wrapFactorSlider = new Slider(TerrainLayer.WRAP_MIN, TerrainLayer.WRAP_MAX, 1, false, skin);
     protected static DecimalFormat floatFormat = new DecimalFormat("##0.00");
-    protected static DecimalFormat intFormat = new DecimalFormat("00000");
+    protected static DecimalFormat intFormat = new DecimalFormat("#");
     protected Window generationSettingsPanel = new Window("Generation parameters:", skin);
     protected Window layerPanel = new Window("Layers:", skin);
     protected Label selectedLayerLabel = new Label("The currently selected layer is '[].", skin);
 
     //for tile panel
-    protected Window tilePanel = new Window("Tiles and aesthetics: ", skin);
+    protected static Window tilePanel = new Window("Tiles and aesthetics: ", skin);
     Label selectedLayerTilesetLabel = new Label("", skin);
     static VerticalGroup tiles = new VerticalGroup();
     //layer panel
@@ -66,6 +78,8 @@ public class AppUI extends UI {
     public static int selectedLayerIndex;
     public static String saveProgress = ""; // for updating the user on progress of save, public static so it can be changed in other classes
     //misc ui buttons at top of screen
+    TextButton backButton = new TextButton("Back", skin);
+    TextButton renameWorldButton = new TextButton("Rename", skin);
     TextButton saveWorldButton = new TextButton("Save", skin);
     Label saveDialogText = new Label(saveProgress, skin);
     TextButton exportWorldButton = new TextButton("Export", skin);
@@ -74,20 +88,67 @@ public class AppUI extends UI {
         this.stage = stage;
 
         //box to edit generation settings for selected layer
-        doGenerationSettingsPanel();
+        initGenerationSettingsPanel();
         stage.addActor(generationSettingsPanel);
 
         //box for managing the different layers of generation
         layerPanel.add(layerGroup);
-        doLayerPanel();
+        initLayerPanel();
         stage.addActor(layerPanel);
 
         //box to edit tiles and visuals
-        doTilePanel();
+        initTilePanel();
         stage.addActor(tilePanel);
 
         topLabel.setPosition(48, Gdx.graphics.getHeight() - (2 * topLabel.getPrefHeight()));
         stage.addActor(topLabel);
+
+        backButton.setPosition(backButton.getPrefWidth() / 2, Gdx.graphics.getHeight() - backButton.getPrefHeight() * 1.5f);
+        backButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Dialog backDialog = new Dialog("Go back", skin) {
+                    public void result(Object obj) {
+                        if (obj.equals(true)) {
+                            ((Game) Gdx.app.getApplicationListener()).setScreen(new WorldSelectScreen(username));
+                        }
+                    }
+                };
+
+                backDialog.text("You may lose your changes if you haven't saved...");
+                backDialog.button("Continue", true);
+                backDialog.button("Cancel", false);
+                backDialog.show(stage);
+
+                return true;
+            }
+        });
+
+        stage.addActor(backButton);
+
+        renameWorldButton.setPosition(Gdx.graphics.getWidth() - renameWorldButton.getPrefWidth() - 28 - saveWorldButton.getPrefWidth(), Gdx.graphics.getHeight() - renameWorldButton.getPrefHeight() * 1.5f);
+        renameWorldButton.addListener(new InputListener() {
+            final TextField inputField = new TextField("", skin);
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Dialog renameDialog = new Dialog("Rename", skin) {
+                    public void result(Object obj) {
+                        if (obj.equals(true)) {
+                            Database.renameWorld(username, world.name, inputField.getText());
+
+                        }
+                    }
+                };
+                renameDialog.button("OK", true);
+                renameDialog.button("Cancel", false);
+                renameDialog.show(stage);
+                renameDialog.setSize(80, 60);
+
+                return true;
+            }
+        });
+
+        stage.addActor(renameWorldButton);
 
         saveWorldButton.setPosition(Gdx.graphics.getWidth() - saveWorldButton.getPrefWidth() * 1.5f, Gdx.graphics.getHeight() - saveWorldButton.getPrefHeight() * 1.5f);
         saveWorldButton.addListener(new InputListener() {
@@ -162,9 +223,21 @@ public class AppUI extends UI {
         }
     }
 
-    protected void doGenerationSettingsPanel() {
-        String selectedLayerType = world.layers.get(selectedLayerIndex).getClass().getName().replace("com.joelallison.generation.", "").replace("Layer", "");
+    void resetGenSettingsPanel() {
+        //I would iterate through all the actors in the table,
+        // but there's a strange bug with the sliders that means it doesn't work
+        genSettingsTable.reset();
+        switch (getLayerTypeChar(world.layers.get(selectedLayerIndex))) {
+            case 'T':
+                loadTerrainSettings();
+                break;
+            case 'M':
+                loadMazeSettings();
+                break;
+        }
+    }
 
+    protected void initGenerationSettingsPanel() {
         Label inheritLabel = new Label("Inherit global seed: ", skin);
         generationSettingsPanel.add(inheritLabel);
         inheritSeedCheck.addListener(new ChangeListener() {
@@ -195,10 +268,8 @@ public class AppUI extends UI {
                             if (!inputField.getText().equals("")) {
                                 world.layers.get(selectedLayerIndex).setSeed(Long.parseLong(inputField.getText()));
                             } else {
-                                //if left blank, do nothing, just close window
+                                cancel();
                             }
-                        } else {
-                            cancel();
                         }
                     }
                 };
@@ -214,87 +285,14 @@ public class AppUI extends UI {
         generationSettingsPanel.add(layerSeedButton).colspan(2).align(Align.center);
         generationSettingsPanel.row();
 
-        switch (selectedLayerType) {
-            case "Terrain":
+        switch (getLayerTypeChar(world.layers.get(selectedLayerIndex))) {
+            case 'T':
                 loadTerrainSettings();
-
                 break;
-            default:
-                // 0_o
+            case 'M':
+                loadMazeSettings();
+                break;
         }
-
-        generationSettingsPanel.setPosition(5f, Gdx.graphics.getHeight() - 400f);
-        generationSettingsPanel.padLeft(4f);
-        generationSettingsPanel.padRight(4f);
-        generationSettingsPanel.setSize(generationSettingsPanel.getPrefWidth() * 1.2f, generationSettingsPanel.getPrefHeight());
-    }
-
-    protected void loadTerrainSettings() {
-        generationSettingsPanel.add(scaleLabel);
-
-        scaleSlider.setValue(((TerrainLayer) world.layers.get(selectedLayerIndex)).getScale());
-        scaleSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) world.layers.get(selectedLayerIndex)).setScale(scaleSlider.getValue());
-            }
-        });
-
-        generationSettingsPanel.add(scaleSlider);
-        generationSettingsPanel.row();
-
-        generationSettingsPanel.add(octavesLabel);
-
-        octavesSlider.setValue(((TerrainLayer) world.layers.get(selectedLayerIndex)).getOctaves());
-
-        octavesSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) world.layers.get(selectedLayerIndex)).setOctaves((int) octavesSlider.getValue());
-            }
-        });
-
-        generationSettingsPanel.add(octavesSlider);
-
-        generationSettingsPanel.row();
-        generationSettingsPanel.add(lacunarityLabel);
-
-        lacunaritySlider.setValue(((TerrainLayer) world.layers.get(selectedLayerIndex)).getLacunarity());
-
-        lacunaritySlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) world.layers.get(selectedLayerIndex)).setLacunarity(lacunaritySlider.getValue());
-            }
-        });
-
-        generationSettingsPanel.add(lacunaritySlider);
-
-        generationSettingsPanel.row();
-        generationSettingsPanel.add(wrapFactorLabel);
-
-        wrapFactorSlider.setValue(((TerrainLayer) world.layers.get(selectedLayerIndex)).getWrap());
-
-        wrapFactorSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) world.layers.get(selectedLayerIndex)).setWrap((int) wrapFactorSlider.getValue());
-            }
-        });
-
-        generationSettingsPanel.add(wrapFactorSlider);
-
-        generationSettingsPanel.row();
-        generationSettingsPanel.add(invertLabel);
-        invertCheck.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                ((TerrainLayer) world.layers.get(selectedLayerIndex)).setInvert(invertCheck.isChecked());
-            }
-        });
-
-        generationSettingsPanel.add(invertCheck);
-
         generationSettingsPanel.row();
         generationSettingsPanel.add(centerPointButton);
         centerPointButton.addListener(new InputListener() {
@@ -308,11 +306,179 @@ public class AppUI extends UI {
             }
         });
 
-
         generationSettingsPanel.add(centerPointLabel);
+
+        generationSettingsPanel.row();
+        generationSettingsPanel.add(genSettingsTable);
+
+        generationSettingsPanel.setPosition(5f, Gdx.graphics.getHeight() - 400f);
+        generationSettingsPanel.padLeft(4f);
+        generationSettingsPanel.padRight(4f);
+        generationSettingsPanel.setSize(generationSettingsPanel.getPrefWidth() * 1.2f, generationSettingsPanel.getPrefHeight());
     }
 
-    protected void updateGenerationSettingsPanel() {
+    protected void loadMazeSettings() {
+        genSettingsTable.add(widthButton);
+        widthButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                final TextField inputField = new TextField("", skin);
+                inputField.setTextFieldFilter(new TextField.TextFieldFilter() {
+                    // Accepts all Alphanumeric Characters except
+                    public boolean acceptChar(TextField textField, char c) {
+                        if (Character.toString(c).matches(integerFilter)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                Dialog dialog = new Dialog("Set maze width", skin) {
+                    public void result(Object obj) {
+                        if (obj.equals(true)) {
+                            if (!inputField.getText().equals("")) {
+                                ((MazeLayer) world.layers.get(selectedLayerIndex)).setWidth(Integer.parseInt(inputField.getText()));
+                            } else {
+                                cancel();
+                            }
+                        }
+                    }
+                };
+                dialog.add(inputField);
+                dialog.button("OK", true);
+                dialog.button("Cancel", false);
+                dialog.show(stage);
+                return true;
+            }
+        });
+        genSettingsTable.add(widthSlider);
+        widthSlider.setValue(((MazeLayer) world.layers.get(selectedLayerIndex)).getWidth());
+        widthSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ((MazeLayer) world.layers.get(selectedLayerIndex)).setWidth((int) widthSlider.getValue());
+            }
+        });
+        genSettingsTable.row();
+        genSettingsTable.add(heightButton);
+        heightButton.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                final TextField inputField = new TextField("", skin);
+                inputField.setTextFieldFilter(new TextField.TextFieldFilter() {
+                    // Accepts all Alphanumeric Characters except
+                    public boolean acceptChar(TextField textField, char c) {
+                        if (Character.toString(c).matches(integerFilter)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                Dialog dialog = new Dialog("Set maze height", skin) {
+                    public void result(Object obj) {
+                        if (obj.equals(true)) {
+                            if (!inputField.getText().equals("")) {
+                                ((MazeLayer) world.layers.get(selectedLayerIndex)).setHeight(Integer.parseInt(inputField.getText()));
+                            } else {
+                                cancel();
+                            }
+                        }
+                    }
+                };
+                dialog.add(inputField);
+                dialog.button("OK", true);
+                dialog.button("Cancel", false);
+                dialog.show(stage);
+                return true;
+            }
+        });
+        genSettingsTable.add(heightSlider);
+        heightSlider.setValue(((MazeLayer) world.layers.get(selectedLayerIndex)).getHeight());
+        heightSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ((MazeLayer) world.layers.get(selectedLayerIndex)).setHeight((int) heightSlider.getValue());
+            }
+        });
+
+        genSettingsTable.row();
+        genSettingsTable.add(opaqueLabel);
+        genSettingsTable.add(opaqueCheck);
+        opaqueCheck.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ((MazeLayer) world.layers.get(selectedLayerIndex)).setOpaque(opaqueCheck.isChecked());
+            }
+        });
+
+    }
+
+    protected void loadTerrainSettings() {
+        genSettingsTable.add(scaleLabel);
+
+        scaleSlider.setValue(((TerrainLayer) world.layers.get(selectedLayerIndex)).getScale());
+        scaleSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ((TerrainLayer) world.layers.get(selectedLayerIndex)).setScale(scaleSlider.getValue());
+            }
+        });
+
+        genSettingsTable.add(scaleSlider);
+        genSettingsTable.row();
+
+        genSettingsTable.add(octavesLabel);
+
+        octavesSlider.setValue(((TerrainLayer) world.layers.get(selectedLayerIndex)).getOctaves());
+        octavesSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ((TerrainLayer) world.layers.get(selectedLayerIndex)).setOctaves((int) octavesSlider.getValue());
+            }
+        });
+
+        genSettingsTable.add(octavesSlider);
+
+        genSettingsTable.row();
+        genSettingsTable.add(lacunarityLabel);
+
+        lacunaritySlider.setValue(((TerrainLayer) world.layers.get(selectedLayerIndex)).getLacunarity());
+
+        lacunaritySlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ((TerrainLayer) world.layers.get(selectedLayerIndex)).setLacunarity(lacunaritySlider.getValue());
+            }
+        });
+
+        genSettingsTable.add(lacunaritySlider);
+
+        genSettingsTable.row();
+        genSettingsTable.add(wrapFactorLabel);
+
+        wrapFactorSlider.setValue(((TerrainLayer) world.layers.get(selectedLayerIndex)).getWrap());
+
+        wrapFactorSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ((TerrainLayer) world.layers.get(selectedLayerIndex)).setWrap((int) wrapFactorSlider.getValue());
+            }
+        });
+
+        genSettingsTable.add(wrapFactorSlider);
+
+        genSettingsTable.row();
+        genSettingsTable.add(invertLabel);
+        invertCheck.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ((TerrainLayer) world.layers.get(selectedLayerIndex)).setInvert(invertCheck.isChecked());
+            }
+        });
+
+        genSettingsTable.add(invertCheck);
+    }
+
+    void updateGenerationSettingsPanel() {
         String layerShown = "(hidden)";
         if (world.layers.get(selectedLayerIndex).layerShown()) {
             layerShown = "(shown)";
@@ -322,11 +488,11 @@ public class AppUI extends UI {
         inheritSeedCheck.setChecked(world.layers.get(selectedLayerIndex).inheritSeed());
         layerSeedButton.setText("Seed: " + world.layers.get(selectedLayerIndex).getSeed());
 
-        updateGenerationSettingsTerrain();
+        updateGenerationSettings(getLayerTypeChar(world.layers.get(selectedLayerIndex)));
     }
 
-    protected void updateGenerationSettingsTerrain() {
-        switch (getLayerTypeChar(world.layers.get(selectedLayerIndex))) {
+    void updateGenerationSettings(char type) {
+        switch (type) {
             case 'T':
                 if (((TerrainLayer) world.layers.get(selectedLayerIndex)).getOctaves() < 2) { // lacunarity has no effect if octaves is less than 2, this visual update attempts to indicate that to the user
                     lacunarityLabel.setColor(0.45f, 0.45f, 0.45f, 1);
@@ -346,13 +512,17 @@ public class AppUI extends UI {
                 invertCheck.setChecked(((TerrainLayer) world.layers.get(selectedLayerIndex)).isInverted());
                 break;
             case 'M':
+                widthButton.setText("Width: " + intFormat.format(((MazeLayer) world.layers.get(selectedLayerIndex)).getWidth()));
+                heightButton.setText("Height: " + intFormat.format(((MazeLayer) world.layers.get(selectedLayerIndex)).getHeight()));
+                opaqueCheck.setChecked(((MazeLayer) world.layers.get(selectedLayerIndex)).isOpaque());
 
                 break;
         }
 
+        generationSettingsPanel.pack();
     }
 
-    protected void doLayerPanel() {
+    void initLayerPanel() {
         for (int i = world.layers.size() - 1; i >= 0; i--) {
             layerGroup.addActor(createLayerWidget((world.layers.get(i))));
         }
@@ -364,8 +534,6 @@ public class AppUI extends UI {
 
         SelectBox tilesetSelect = new SelectBox(skin);
         tilesetSelect.setItems(tilesets.keySet().toArray());
-
-        // make it so that dialog calls adding of the new thingamabob. cool. goodnight.
 
         TextButton addTerrainLayer = new TextButton("+T", skin);
         addTerrainLayer.addListener(new InputListener() {
@@ -419,18 +587,15 @@ public class AppUI extends UI {
         Dialog addLayerPopup;
         final SelectBox tilesetSelect = new SelectBox(skin);
         tilesetSelect.setItems(tilesets.keySet().toArray());
-        final CheckBox useDefaults = new CheckBox("", skin);
         switch (type) {
             case 'T':
                 addLayerPopup = new Dialog("New terrain layer", skin) {
                     public void result(Object obj) {
                         if (obj.equals(true)) {
                             TerrainLayer terrainLayer = new TerrainLayer(world.seed);
-                            if (!useDefaults.isChecked()) {
-                                terrainLayer.tilesetName = (String) tilesetSelect.getSelected();
-                                terrainLayer.tileSpecs = new ArrayList<>();
-                                terrainLayer.tileSpecs.add(new Tileset.TerrainTileSpec(tilesets.get(terrainLayer.tilesetName).getDefaultTile()));
-                            }
+                            terrainLayer.tilesetName = (String) tilesetSelect.getSelected();
+                            terrainLayer.tileSpecs = new ArrayList<>();
+                            terrainLayer.defaultTileValues();
                             world.layers.add(terrainLayer);
                             selectedLayerIndex = selectedLayerIndex + 1;
                             layersChanged = true;
@@ -440,9 +605,6 @@ public class AppUI extends UI {
                 addLayerPopup.button("OK", true);
                 addLayerPopup.button("Cancel", false);
                 addLayerPopup.add(tilesetSelect);
-                addLayerPopup.text("Use default settings? (this will override tileset too)");
-                addLayerPopup.add(useDefaults);
-
                 addLayerPopup.show(stage);
                 break;
             case 'M':
@@ -450,11 +612,9 @@ public class AppUI extends UI {
                     public void result(Object obj) {
                         if (obj.equals(true)) {
                             MazeLayer mazeLayer = new MazeLayer(world.seed);
-                            if (!useDefaults.isChecked()) {
-                                mazeLayer.tilesetName = (String) tilesetSelect.getSelected();
-                                mazeLayer.tileSpecs = new ArrayList<>();
-                                mazeLayer.tileSpecs.add(new Tileset.MazeTileSpec(tilesets.get(mazeLayer.tilesetName).getDefaultTile()));
-                            }
+                            mazeLayer.tilesetName = (String) tilesetSelect.getSelected();
+                            mazeLayer.tileSpecs = new ArrayList<>();
+                            mazeLayer.defaultTileValues();
                             world.layers.add(mazeLayer);
                             selectedLayerIndex = selectedLayerIndex + 1;
                             layersChanged = true;
@@ -464,8 +624,6 @@ public class AppUI extends UI {
                 addLayerPopup.button("OK", true);
                 addLayerPopup.button("Cancel", false);
                 addLayerPopup.add(tilesetSelect);
-                addLayerPopup.text("Use default settings? (this will override tileset too)");
-                addLayerPopup.add(useDefaults);
 
                 addLayerPopup.show(stage);
                 break;
@@ -475,17 +633,21 @@ public class AppUI extends UI {
     }
 
     protected void updateLayerPanel() {
-
         // only make updates to the layers if anything has been edited, otherwise it's unnecessary as there's no change
         if (layersChanged) {
             tileDataChanged = true;
             layerGroup.clear();
-            doLayerPanel();
+            initLayerPanel();
 
+            if (oldLayer != getLayerTypeChar(world.layers.get(selectedLayerIndex))) {
+                resetGenSettingsPanel();
+            }
+            oldLayer = getLayerTypeChar(world.layers.get(selectedLayerIndex));
             layersChanged = false;
         }
 
         selectedLayerLabel.setText("The currently selected layer is '" + world.layers.get(selectedLayerIndex).getName() + "'.");
+        layerPanel.pack();
     }
 
     protected HorizontalGroup createLayerWidget(final Layer layer) {
@@ -513,6 +675,7 @@ public class AppUI extends UI {
                 for (int i = 0; i < world.layers.size(); i++) {
                     if (Objects.equals(world.layers.get(i), layer)) {
                         AppUI.selectedLayerIndex = i;
+                        layersChanged = true;
                         tileDataChanged = true;
                     }
                 }
@@ -563,7 +726,7 @@ public class AppUI extends UI {
         return layerGroup;
     }
 
-    protected void doTilePanel() {
+    protected void initTilePanel() {
         tilePanel.add(selectedLayerTilesetLabel);
         tilePanel.row();
 
@@ -579,7 +742,6 @@ public class AppUI extends UI {
                 return false;
             }
         });
-        tilePanel.add(sortTilesButton);
 
         tilePanel.setSize(tilePanel.getPrefWidth() * 1.2f, tilePanel.getPrefHeight());
     }
@@ -607,31 +769,24 @@ public class AppUI extends UI {
         selectedLayerTilesetLabel.setText("Using: " + world.layers.get(selectedLayerIndex).tilesetName);
         // only make updates to the tiles if anything has been edited, otherwise it's unnecessary as there's no change
 
-        if (layersChanged) {
-            System.out.println("Yeah.");
-
-
-            layersChanged = false;
-        }
-
         if (tileDataChanged) {
             tiles.clear();
             genTileList();
-            for (int i = 0; i < tiles.getChildren().size; i++) {
-                switch (getLayerTypeChar(world.layers.get(selectedLayerIndex))) {
-                    case 'T':
+            switch (getLayerTypeChar(world.layers.get(selectedLayerIndex))) {
+                case 'T':
+                    for (int i = 0; i < tiles.getChildren().size; i++) {
                         Tileset.TerrainTileSpec terrainTile = ((TerrainLayer) world.layers.get(selectedLayerIndex)).tileSpecs.get(i);
-                        ((Label) ((HorizontalGroup) tiles.getChild(i)).getChild(1)).setText("name: " + terrainTile.name + ", thresh: " + floatFormat.format(terrainTile.lowerBound));
-                        break;
-                    case 'M':
+                        ((Label) ((HorizontalGroup) tiles.getChild(i)).getChild(1)).setText(terrainTile.name + ", thresh: " + floatFormat.format(terrainTile.lowerBound));
+                    }
+                    break;
+                case 'M':
+                    for (int i = 0; i < tiles.getChildren().size; i++) {
                         Tileset.MazeTileSpec mazeTile = ((MazeLayer) world.layers.get(selectedLayerIndex)).tileSpecs.get(i);
-                        ((Label) ((HorizontalGroup) tiles.getChild(i)).getChild(1)).setText("name: " + mazeTile.name);
-                        break;
-                }
-
-
+                        ((Label) ((HorizontalGroup) tiles.getChild(i)).getChild(1)).setText(mazeTile.name);
+                    }
+                    break;
             }
-
+            tilePanel.pack();
             tileDataChanged = false;
         }
     }
@@ -650,7 +805,7 @@ public class AppUI extends UI {
                 Image terrainTileImg = new Image(terrainTileImgDrawable);
                 tileDataGroup.addActor(terrainTileImg);
 
-                Label terrainTileName = new Label("name: " + terrainTile.name + ", thresh: " + floatFormat.format(terrainTile.lowerBound), skin);
+                Label terrainTileName = new Label( terrainTile.name + ", thresh: " + floatFormat.format(terrainTile.lowerBound), skin);
                 tileDataGroup.addActor(terrainTileName);
 
                 final Slider lowerBoundSlider = new Slider(0, 1, 0.01f, false, skin);
@@ -672,20 +827,49 @@ public class AppUI extends UI {
                 Image mazeTileImg = new Image(mazeTileImgDrawable);
                 tileDataGroup.addActor(mazeTileImg);
 
-                Label mazeTileName = new Label("name: " + mazeTile.name, skin);
+                Label mazeTileName = new Label(mazeTile.name, skin);
                 tileDataGroup.addActor(mazeTileName);
 
-                TextButton neighbourMapButton = new TextButton("[define condition]", skin);
+                TextButton neighbourMapButton = new TextButton("[define]", skin);
                 neighbourMapButton.addListener(new InputListener() {
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        //NEIGHBOUR MAP DIALOG
+                        editNeighbourMap(mazeTile.name, selectedTile);
                         return false;
                     }
                 });
+                tileDataGroup.addActor(neighbourMapButton);
                 break;
         }
 
-
         return tileDataGroup;
+    }
+
+    static void editNeighbourMap(String tileName, final int selectedTile) {
+        final Table checkBoxes = new Table();
+        checkBoxes.defaults().padLeft(4).padRight(4);
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                CheckBox checkBox = new CheckBox("", skin);
+                checkBox.setChecked((((MazeLayer) world.layers.get(selectedLayerIndex)).tileSpecs.get(selectedTile).neighbourMap[y][x]));
+                checkBoxes.add(checkBox);
+            }
+            checkBoxes.row();
+        }
+
+
+        final Dialog editTileSpecs = new Dialog("Edit " + tileName, skin) {
+            public void result(Object obj) {
+                if (obj.equals(true)) {
+                    boolean[][] boxes = new boolean[3][3];
+                    for (int i = 0; i < checkBoxes.getChildren().size; i++) {
+                        boxes[i / 3][i % 3] = ((CheckBox) checkBoxes.getChild(i)).isChecked();
+                    }
+                    ((MazeLayer) world.layers.get(selectedLayerIndex)).tileSpecs.get(selectedTile).neighbourMap = boxes;
+                }
+            }
+        };
+        editTileSpecs.add(checkBoxes);
+        editTileSpecs.button("OK", true);
+        editTileSpecs.show(stage);
     }
 }

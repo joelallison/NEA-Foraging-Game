@@ -13,7 +13,6 @@ public class Tileset {
     private int tileSize;
     private Color baseColor;
     private String baseColorHex;
-    private String defaultTile;
     public HashMap<String, TileCorner> map = new HashMap<String, TileCorner>(); //Tile name : Tile location
 
     public Tileset(String creator, String spriteSheet, int tileSize, String baseColorHex, String defaultTile, HashMap<String, TileCorner> map) {
@@ -22,7 +21,6 @@ public class Tileset {
         this.tileSize = tileSize;
         this.map = map;
         this.baseColorHex = baseColorHex;
-        this.defaultTile = defaultTile;
     }
 
 
@@ -98,7 +96,6 @@ public class Tileset {
     }
 
     public void initTileset(String spritesheetLocation) {
-        System.out.println(spritesheetLocation);
         spritesheetTexture = new Texture(spritesheetLocation);
         baseColor = Color.valueOf(this.baseColorHex);
     }
@@ -125,8 +122,5 @@ public class Tileset {
     }
     public Texture getSpritesheetTexture() {
         return spritesheetTexture;
-    }
-    public String getDefaultTile() {
-        return defaultTile;
     }
 }

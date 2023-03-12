@@ -79,6 +79,9 @@ public class LoginUI extends UI {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 register();
+                usernameField.setText("");
+                passwordField.setText("");
+                feedbackLabel.setText("");
                 return true;
             }
         });
@@ -88,6 +91,9 @@ public class LoginUI extends UI {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 login();
+                usernameField.setText("");
+                passwordField.setText("");
+                feedbackLabel.setText("");
                 return true;
             }
         });
