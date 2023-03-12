@@ -3,7 +3,7 @@
   "creator": "Joel Allison - From ENDESGA's 32 colour palette.",
   "spriteSheet": "colours_tileSheet.png",
   "tileSize": 8,
-  "baseColorHex": "#181425",
+  "baseColorHex": "#ffffff",
   "map": {
     "#be4a2f": {
       "cornerX": 0,

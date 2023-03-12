@@ -1,5 +1,9 @@
 package com.joelallison.io;
 
+import com.badlogic.gdx.math.Vector2;
+import com.joelallison.generation.MazeLayer;
+import com.joelallison.generation.TerrainLayer;
+import com.joelallison.generation.World;
 import com.joelallison.graphics.Tileset;
 
 import java.io.File;
@@ -9,6 +13,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.joelallison.io.JsonHandling.tilesetJsonToObject;
+import static com.joelallison.screens.AppScreen.*;
 
 public abstract class FileHandling {
 
@@ -64,37 +69,124 @@ public abstract class FileHandling {
 
         return fileText.toString();
     }
-    public static boolean createFile(String filename) {
+
+    public static String export(World world, String filename, int startX, int endX, int startY, int endY) {
+        String[] arr = formatForWrite(createTileNameArray(world, startX, endX, startY, endY));
+
+        return createFile(filename) + writeToCSVFile(filename, arr);
+    }
+
+    static String[] formatForWrite(String[][] input) {
+        String[] output = new String[input.length];
+        for (int i = 0; i < output.length; i++) {
+            String line = Arrays.deepToString(input[i]);
+            output[i] = line.substring(1, line.length() - 1);
+        }
+
+        return output;
+    }
+
+    static String[][] createTileNameArray(World world, int startX, int endX, int startY, int endY) {
+        Vector2 dimensions = new Vector2(endX - startX, endY - startY);
+
+        //init string array with '-'
+        String[][] array = new String[(int) dimensions.x][(int) dimensions.y];
+        for (int x = 0; x < array.length; x++) {
+            for (int y = 0; y < array[x].length; y++) {
+                array[x][y] = "-";
+            }
+        }
+
+
+        //generate
+        for (int i = 0; i < world.layers.size(); i++) {
+            switch(getLayerTypeChar(world.layers.get(i))) {
+                case 'T':
+                    ((TerrainLayer) world.layers.get(i)).genValueMap(world.getLayerSeed(i), dimensions, startX + (int) (world.layers.get(i).getCenter().x), startY + (int) (world.layers.get(i).getCenter().y));
+                    break;
+                case 'M':
+                    ((MazeLayer) world.layers.get(i)).genMaze(world.getLayerSeed(i));
+            }
+        }
+
+        boolean[][] tileAbove = new boolean[(int) dimensions.x][(int) dimensions.y];
+        //write into array
+        for (int x = startX; x < endX; x++) {
+            for (int y = startY; y < endY; y++) {
+                // top layer to bottom layer
+                for (int i = world.layers.size() - 1; i >= 0; i--) {
+                    if (world.layers.get(i).layerShown()) {
+                        if (tileAbove[x - startX][y - startY] == false) { // no need to draw if there's already a tile above
+                            switch (getLayerTypeChar(world.layers.get(i))) {
+                                case 'T':
+                                    String terrainTileName = getTileNameForTerrainValue(world.layers.get(i), x - startX, y - startY);
+                                    String terrainTile = formatTile(world.layers.get(i).tilesetName, terrainTileName);
+                                    if (terrainTileName != "-") {
+                                        array[x - startX][y - startY] = terrainTile;
+                                        tileAbove[x - startX][y - startY] = true;
+                                    }
+                                    break;
+                                case 'M':
+                                    //if x is within maze
+                                    if (x < (world.layers.get(i)).getCenter().x + ((MazeLayer) world.layers.get(i)).getWidth()+1 && (x > (world.layers.get(i)).getCenter().x)) {
+                                        //if y is within maze
+                                        if (y < (world.layers.get(i)).getCenter().y + ((MazeLayer) world.layers.get(i)).getHeight()+1 && (y > (world.layers.get(i)).getCenter().y)) {
+                                            if (((MazeLayer) world.layers.get(i)).maze[(int) (y - world.layers.get(i).getCenter().y-1)][(int) (x - world.layers.get(i).getCenter().x-1)] == 1) {
+                                                String mazeTileName = getTileNameForNeighbourMap(world.layers.get(i), getNeighbourMap(world.layers.get(i), ((int) (x - world.layers.get(i).getCenter().x-1) - startX), (int) (((MazeLayer) world.layers.get(i)).getHeight() - (y - world.layers.get(i).getCenter().y-1) - 1) - startY));
+                                                String mazeTile = formatTile(world.layers.get(i).tilesetName, mazeTileName);
+                                                if (mazeTileName != "-") {
+                                                    array[x - startX][y - startY] = mazeTile;
+                                                    tileAbove[x - startX][y - startY] = true;
+                                                }
+                                            } else if (((MazeLayer) world.layers.get(i)).isOpaque()) {
+                                                tileAbove[x - startX][y - startY] = true;
+                                            }
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return array;
+    }
+
+    static String formatTile(String tileset, String tile) {
+        return tileset + "." + tile;
+    }
+
+    public static String createFile(String filename) {
         try {
             File file = new File(filename);
             if (file.createNewFile()) {
-                System.out.println("Created file: " + file.getAbsolutePath());
-                return false;
+                return "Created file: " + file.getAbsolutePath();
             } else {
-                System.out.println("File already exists.");
-                return true;
+                return "File already exists";
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return true;
+        return "Error creating file";
     }
 
-    public static void writeToFile(String filename, String[] text) {
+    public static String writeToCSVFile(String filename, String[] text) {
         try {
             FileWriter myWriter = new FileWriter(filename, false);
 
             for (int i = 0; i < text.length - 1; i++) {
-                myWriter.write(text[i] + "\n");
-            } myWriter.write(text[text.length-1]); //so that last line doesn't have \n
+                myWriter.write(text[i] + "\r"); //\r is used for CSVs (rather than \n)
+            } myWriter.write(text[text.length-1]); //so that last line doesn't have \r
 
             myWriter.close();
-            //System.out.println("Successfully wrote to the file.");
+            return ", file exported.";
         } catch (IOException e) {
-            System.out.println("An error occurred.");
             e.printStackTrace();
+            return " ...an error occured.";
         }
     }
 
@@ -116,6 +208,8 @@ public abstract class FileHandling {
         return fileText;
     }
 
+
+    //this works but is never used
     public String[] RGBA2dArrayToStringArray(RGBA[][] inputArray) {
         String[] outputArray = new String[inputArray.length];
         String line = "";
@@ -130,6 +224,8 @@ public abstract class FileHandling {
         return outputArray;
     }
 
+    //this is never really done within the app, but
+    //the commented out code seen in DesktopLauncher works to export a maze to .pgm
     public static String[] mazeToStringArray(int[][] maze, String format, boolean pad, boolean invert) {
         String[] outputArray;
 
@@ -152,6 +248,7 @@ public abstract class FileHandling {
         return outputArray;
     }
 
+    //rgba is WIP
     public static String[] toFileFormat(String[] inputArray, String format, boolean bigEndian) {
         String[] outputArray;
 
@@ -164,11 +261,6 @@ public abstract class FileHandling {
                 outputArray = new String[inputArray.length + 1];
 
                 //BMP files are little-endian, meaning that the least significant bit is first [etc.]
-
-
-
-
-
 
                 break;
             case "pgm": //converts to PGM file format
@@ -190,6 +282,8 @@ public abstract class FileHandling {
 
         return outputArray;
     }
+
+    //never used
 
     class RGBA {
         public int r;
