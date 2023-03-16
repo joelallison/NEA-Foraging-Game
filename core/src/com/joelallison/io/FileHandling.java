@@ -36,11 +36,9 @@ public abstract class FileHandling {
                         int nameEndIndex = nameStartIndex + "\"name\": \"".length() + i;
                         String name = json.substring(nameStartIndex + "\"name\": \"".length(), nameEndIndex);
                         json = json.replace(json.substring(nameStartIndex, nameEndIndex + 3), ""); //remove the name declaration line from the json - the extra three chars are '", '
-
                         tilesets.put(name, tilesetJsonToObject(json));
                         tilesets.get(name).initTileset(subfolder.getPath() + "/" + tilesets.get(name).getSpritesheetName());
                     }
-
                 }
             }
         } catch (NullPointerException e) {
@@ -190,6 +188,7 @@ public abstract class FileHandling {
         }
     }
 
+    //eventually ended up not being used but I wrote this early in development just so I have it
     public static List<String> readFromFile(String filename) {
         List<String> fileText = new ArrayList<String>();
         try {
@@ -209,22 +208,7 @@ public abstract class FileHandling {
     }
 
 
-    //this works but is never used
-    public String[] RGBA2dArrayToStringArray(RGBA[][] inputArray) {
-        String[] outputArray = new String[inputArray.length];
-        String line = "";
-
-        for (int i = 0; i < inputArray.length; i++) {
-            for (int j = 0; j < inputArray[i].length; j++) {
-                line = line + inputArray[i][j].toString();
-            }
-            outputArray[i] = line;
-        }
-
-        return outputArray;
-    }
-
-    //this is never really done within the app, but
+    //this is never done within the app, but
     //the commented out code seen in DesktopLauncher works to export a maze to .pgm
     public static String[] mazeToStringArray(int[][] maze, String format, boolean pad, boolean invert) {
         String[] outputArray;
@@ -244,6 +228,21 @@ public abstract class FileHandling {
         }
 
         outputArray = toFileFormat(mazeArray, format, true);
+
+        return outputArray;
+    }
+
+    //this works but is never used, ended up going with only CSV
+    public String[] RGBA2dArrayToStringArray(RGBA[][] inputArray) {
+        String[] outputArray = new String[inputArray.length];
+        String line = "";
+
+        for (int i = 0; i < inputArray.length; i++) {
+            for (int j = 0; j < inputArray[i].length; j++) {
+                line = line + inputArray[i][j].toString();
+            }
+            outputArray[i] = line;
+        }
 
         return outputArray;
     }

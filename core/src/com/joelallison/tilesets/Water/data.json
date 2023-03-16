@@ -1,0 +1,22 @@
+{
+  "name": "Water",
+  "creator": "Joel Allison",
+  "spriteSheet": "water_tileSheet.png",
+  "AAAAAAAAA": 8,
+  "baseColorHex": "#3B3BAC",
+  "map": {
+    "water_1": {
+      "cornerX": 0,
+      "cornerY": 0
+    },
+    "water_2": {
+      "cornerX": 1,
+      "cornerY": 0
+    },
+    "water_3": {
+      "cornerX": 2,
+      "cornerY": 0
+    }
+  }
+}
+

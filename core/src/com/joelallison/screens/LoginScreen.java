@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.joelallison.io.Database.doSqlQuery;
+import static com.joelallison.screens.userInterface.LoginUI.*;
 
 public class LoginScreen implements Screen {
     SpriteBatch batch;
@@ -74,18 +75,18 @@ public class LoginScreen implements Screen {
                 byte[] salt = rs.getBytes("password_salt");
                 //checking hashed & salted password against stored hashed & salted password
                 if (hashString(LoginUI.getPasswordField(), salt).equals(rs.getString("password"))) {
-                    LoginUI.feedbackLabel.setText("Login successful.");
+                    feedbackLabel.setText("Login successful.");
                     rs.close();
                     return true;
                 } else {
                     //writing 'username or password', when it's clear within the code that the issue is that the username is not in the database, increases security.
-                    LoginUI.feedbackLabel.setText("Username or password is incorrect.");
+                    feedbackLabel.setText("Username or password is incorrect.");
                     rs.close();
                     return false;
                 }
             } else {
                 //writing 'username or password', when it's clear within the code that the issue is that the username is not in the database, increases security.
-                LoginUI.feedbackLabel.setText("Username or password is incorrect.");
+                feedbackLabel.setText("Username or password is incorrect.");
                 rs.close();
                 return false;
             }
@@ -99,7 +100,6 @@ public class LoginScreen implements Screen {
         for (byte aByte : genSalt()) {
             result.append(String.format("%02x", aByte));
         }
-        System.out.println(result.toString());
         if (addNewUser()) {
             ((Game) Gdx.app.getApplicationListener()).setScreen(new WorldSelectScreen(LoginUI.getUsernameField()));
         }
@@ -120,7 +120,7 @@ public class LoginScreen implements Screen {
                             addUser.setBinaryStream(1, new ByteArrayInputStream(salt), salt.length);
 
                             if (addUser.executeUpdate() > 0) {
-                                LoginUI.feedbackLabel.setText("User added.");
+                                feedbackLabel.setText("User added.");
                                 return true;
                             }
                         } catch (SQLException e) {
@@ -128,15 +128,15 @@ public class LoginScreen implements Screen {
                         }
 
                     } else {
-                        LoginUI.feedbackLabel.setText("Password must have a \nminimum of eight characters and maximum of 32, \nat least one letter, one number, \none of these: *.!@$%_?/~+-=, \none uppercase character, one lowercase character.");
+                        feedbackLabel.setText("Password must have a \nminimum of eight characters and maximum of 20, \nat least one letter, one number, \none of these: *.!@$%_?/~+-=, \none uppercase character, one lowercase character.");
                         return false;
                     }
                 } else {
-                    LoginUI.feedbackLabel.setText("Username must have a length <= 20.");
+                    feedbackLabel.setText("Username must have a length <= 20.");
                     return false;
                 }
             } else {
-                LoginUI.feedbackLabel.setText("Username taken.");
+                feedbackLabel.setText("Username taken.");
                 return false;
             }
         return false;
@@ -207,7 +207,7 @@ public class LoginScreen implements Screen {
 
     @Override
     public void hide() {
-
+        clearFields();
     }
 
     @Override

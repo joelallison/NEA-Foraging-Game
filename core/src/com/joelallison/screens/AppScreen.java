@@ -23,6 +23,8 @@ import com.joelallison.screens.userInterface.AppUI;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import static com.joelallison.io.FileHandling.importTilesets;
+
 public class AppScreen implements Screen {
     Stage mainUIStage;
     //viewport displays the generated tiles
@@ -35,9 +37,8 @@ public class AppScreen implements Screen {
     public static final int TILE_SIZE = 32;
     public static final int CHUNK_SIZE = 14;
     public static final Vector2 LEVEL_ASPECT_RATIO = new Vector2(4, 3);
-    public static int levelAspectScalar = 2;
+    public static int levelAspectScalar = 1; //default as smallest value, so as to not overwhelm the user!
     public static Vector2 mapDimensions = new Vector2((int) CHUNK_SIZE * levelAspectScalar * LEVEL_ASPECT_RATIO.x, (int) CHUNK_SIZE * levelAspectScalar * LEVEL_ASPECT_RATIO.y);
-    Texture missing_tile = new Texture(Gdx.files.internal("missing_tile.png"));
     public static int xPos, yPos;
     public static UserInput userInput;
     float stateTime;

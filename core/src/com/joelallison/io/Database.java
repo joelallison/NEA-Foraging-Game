@@ -1,5 +1,7 @@
 package com.joelallison.io;
 
+import com.badlogic.gdx.math.Vector2;
+import com.joelallison.generation.Layer;
 import com.joelallison.generation.MazeLayer;
 import com.joelallison.generation.TerrainLayer;
 import com.joelallison.graphics.Tileset;
@@ -8,6 +10,8 @@ import com.joelallison.generation.World;
 
 import java.sql.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.joelallison.screens.userInterface.AppUI.saveProgress;
 
@@ -75,24 +79,26 @@ public class Database {
 
     public static boolean renameWorld(String username, World world, String newName) {
         ResultSet worldInDatabase = doSqlQuery("SELECT * FROM world WHERE username = '" + username + "' AND world_name = '" + world.name + "';"); //search with old name
+        ResultSet nameTaken = doSqlQuery("SELECT * FROM world WHERE username = '" + username + "' AND world_name = '" + newName + "';");
         try {
-            if (worldInDatabase.next()) { //if world is found in database, update it
+            if (worldInDatabase.next() && (nameTaken == null) && (!newName.equals(""))) {
+                //if world is found in database and name is usable, update world with new name
                 return doSqlStatement(
                         "UPDATE world " +
                                 "SET world_name = '" + newName + "', last_accessed_timestamp = '" + Instant.now().toString() + "' "
                                 + "WHERE username = '" + username + "' AND world_name = '" + world.name + "';" //update old name
                 );
+            } else if ((nameTaken == null) && (!newName.equals(""))) {
+                return saveWorld(username, world);
             } else {
-                saveWorld(username, world);
+                return false;
             }
         } catch (SQLException e) {
-            //System.out.println(e.getMessage());
+            return false;
         }
-
-        return false;
     }
 
-    public static void saveWorld(String username, World world) {
+    public static boolean saveWorld(String username, World world) {
         //these were notes to self when writing, but I've left them in:
         //update world entry
         //for each layer, update layer
@@ -105,37 +111,33 @@ public class Database {
 
         boolean done = true;
 
-        ResultSet worldInDatabase = doSqlQuery("SELECT * FROM world WHERE username = '" + username + "' AND world_name = '" + world.name + "';");
-        try {
-            if (worldInDatabase.next()) { //if world is found in database, update it
-                doSqlStatement(
-                        "UPDATE world " +
-                                "SET world_name = '" + world.name + "', last_accessed_timestamp = '" + Instant.now().toString() + "', world_seed = " + world.seed +
-                                "WHERE username = '" + username + "' AND world_name = '" + world.name + "';"
-                );
-                try {
-                    //get number of layers in the saved version for later comparison
-                    ResultSet layerCountRS = doSqlQuery("SELECT COUNT(*) FROM layer WHERE world_name = '" + world.name + "' AND username = '" + username + "'");
-                    if (layerCountRS.next()) {
-                        layersInDatabase = layerCountRS.getInt("count");
-                    }
-                    saveProgress = "Comparing number of layers with database...";
-                } catch (SQLException e) {
-                    System.out.println(e.getMessage());
+
+        if (checkForWorldName(username, world.name)) { //if world is found in database, update it
+            doSqlStatement(
+                    "UPDATE world " +
+                            "SET world_name = '" + world.name + "', last_accessed_timestamp = '" + Instant.now().toString() + "', world_seed = " + world.seed +
+                            "WHERE username = '" + username + "' AND world_name = '" + world.name + "';"
+            );
+            try {
+                //get number of layers in the saved version for later comparison
+                ResultSet layerCountRS = doSqlQuery("SELECT COUNT(*) FROM layer WHERE world_name = '" + world.name + "' AND username = '" + username + "'");
+                if (layerCountRS.next()) {
+                    layersInDatabase = layerCountRS.getInt("count");
                 }
-            } else { //world not found? make a new entry into database
-                saveProgress = "World not in database, saving as new world...";
-                doSqlStatement("INSERT INTO world (username, world_name, created_timestamp, last_accessed_timestamp, world_seed)" +
-                        "VALUES ("
-                        + "'" + username + "', "
-                        + "'" + world.name + "', "
-                        + "'" + world.dateCreated.toString() + "', "
-                        + "'" + Instant.now().toString() + "', "
-                        + world.seed +
-                        ");");
+                saveProgress = "Comparing number of layers with database...";
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } else { //world not found? make a new entry into database
+            saveProgress = "World not in database, saving as new world...";
+            doSqlStatement("INSERT INTO world (username, world_name, created_timestamp, last_accessed_timestamp, world_seed)" +
+                    "VALUES ("
+                    + "'" + username + "', "
+                    + "'" + world.name + "', "
+                    + "'" + world.dateCreated.toString() + "', "
+                    + "'" + Instant.now().toString() + "', "
+                    + world.seed +
+                    ");");
         }
         if (layersInDatabase > localLayersCount) {
             doSqlStatement("DELETE * FROM layer" +
@@ -161,8 +163,19 @@ public class Database {
 
         if (done) {
             saveProgress = "Done!";
+            return true;
         }
 
+        return false;
+    }
+
+    public static boolean checkForWorldName(String username, String worldName) {
+        ResultSet worldInDatabase = doSqlQuery("SELECT * FROM world WHERE username = '" + username + "' AND world_name = '" + worldName + "';");
+        try {
+            return worldInDatabase.next();
+        } catch (SQLException e){
+            return true; //if there's an error, consider it to be the same as world already existing
+        }
     }
 
     static boolean saveLayer(String username, int layerIndex, String saveType) {
@@ -191,7 +204,7 @@ public class Database {
                     + Boolean.toString(AppScreen.world.layers.get(layerIndex).layerShown()) + ", "
                     + "'" + layerType + "', "
                     + layer_id + ", "
-                    + AppScreen.world.layers.get(layerIndex).inheritSeed() + ", "
+                    + AppScreen.world.layers.get(layerIndex).isSeedInherited() + ", "
                     + Long.toString(AppScreen.world.layers.get(layerIndex).getSeed()) + ", "
                     + AppScreen.world.layers.get(layerIndex).getCenter().x + ", "
                     + AppScreen.world.layers.get(layerIndex).getCenter().y + ", "
@@ -270,7 +283,7 @@ public class Database {
                     + "show_layer = " + Boolean.toString(AppScreen.world.layers.get(layerIndex).layerShown()) + ", "
                     + "layer_type = '" + layerType + "', "
                     + "layer_id = " + AppScreen.world.layers.get(layerIndex).getLayerID() + ", "
-                    + "inherit_seed = " + AppScreen.world.layers.get(layerIndex).inheritSeed() + ", "
+                    + "inherit_seed = " + AppScreen.world.layers.get(layerIndex).isSeedInherited() + ", "
                     + "seed = " + Long.toString(AppScreen.world.layers.get(layerIndex).getSeed()) + ", "
                     + "center_x = " + AppScreen.world.layers.get(layerIndex).getCenter().x + ", "
                     + "center_y = " + AppScreen.world.layers.get(layerIndex).getCenter().y + ", "
@@ -333,5 +346,103 @@ public class Database {
             }
         }
         return false;
+    }
+
+    public static World getWorld(String worldName, String username, Long seed, Instant dateCreated) {
+        ArrayList<Layer> layers = new ArrayList<>();
+
+        ResultSet worldLayers = doSqlQuery(
+                "SELECT * FROM layer " +
+                        "WHERE \"username\" = '" + username + "' " +
+                        "AND \"world_name\" = '" + worldName + "'" +
+                        "ORDER BY layer_number ASC;"
+        );
+
+        try {
+            while(worldLayers.next()) {
+                //loading all layers found from the query into the arraylist
+                switch(worldLayers.getString("layer_type").charAt(0)) {
+                    //need to be processed differently based on type (different constructors etc.)
+                    //I could have the different types of layer-loading as methods, but I don't need to get individual layers from the database in any other place so it's pointless
+                    case 'T':
+                        ResultSet terrainLayerRS = doSqlQuery(
+                                "SELECT * FROM terrain_layer " +
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
+                        );
+
+                        //as worldLayers.next() == true, and that layer is marked 'T', a terrain layer will be returned from the query, terrainLayerRS shouldn't be null
+                        terrainLayerRS.next();
+
+                        TerrainLayer terrainLayer = new TerrainLayer(
+                                worldLayers.getInt("layer_id"),
+                                worldLayers.getString("layer_name"),
+                                worldLayers.getLong("seed"),
+                                terrainLayerRS.getFloat("scale"),
+                                terrainLayerRS.getInt("octaves"),
+                                terrainLayerRS.getFloat("lacunarity"),
+                                terrainLayerRS.getInt("wrap"),
+                                terrainLayerRS.getBoolean("invert")
+                        );
+
+                        terrainLayer.tilesetName = worldLayers.getString("tileset_name");
+                        terrainLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
+                        terrainLayer.setCenter(new Vector2(worldLayers.getInt("center_x"), worldLayers.getInt("center_y")));
+
+                        ResultSet terrainTileSpecsRS = doSqlQuery(
+                                "SELECT * FROM terrain_tile_specs " +
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
+                        );
+
+                        while(terrainTileSpecsRS.next()) {
+                            terrainLayer.tileSpecs.add(new Tileset.TerrainTileSpec(terrainTileSpecsRS.getString("tile_name"), terrainTileSpecsRS.getFloat("lower_bound")));
+                        }
+
+                        layers.add(terrainLayer);
+                        break;
+                    case 'M':
+                        ResultSet mazeLayerRS = doSqlQuery(
+                                "SELECT * FROM maze_layer " +
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
+                        );
+
+                        //as worldLayers.next() == true, and that layer is marked 'M', a maze layer will be returned from the query, mazeLayerRS shouldn't be null
+                        mazeLayerRS.next();
+
+                        MazeLayer mazeLayer
+                                = new MazeLayer(
+                                mazeLayerRS.getInt("layer_id"),
+                                worldLayers.getString("layer_name"),
+                                worldLayers.getLong("seed"),
+                                mazeLayerRS.getInt("width"),
+                                mazeLayerRS.getInt("height"),
+                                worldLayers.getString("tileset_name"),
+                                mazeLayerRS.getBoolean("opaque")
+                        );
+
+
+
+                        mazeLayer.setInheritSeed(worldLayers.getBoolean("inherit_seed"));
+                        mazeLayer.setCenter(new Vector2(worldLayers.getInt("center_x"), worldLayers.getInt("center_y")));
+
+
+
+                        ResultSet mazeTileSpecsRS = doSqlQuery(
+                                "SELECT * FROM maze_tile_specs " +
+                                        "WHERE \"layer_id\" = " + worldLayers.getInt("layer_id")
+                        );
+
+                        while(mazeTileSpecsRS.next()) {
+                            mazeLayer.tileSpecs.add(new Tileset.MazeTileSpec(mazeTileSpecsRS.getString("tile_name"), Tileset.MazeTileSpec.neighbourMapParseString(mazeTileSpecsRS.getString("neighbour_map"))));
+                        }
+
+                        layers.add(mazeLayer);
+                        break;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+
+        return new World(worldName, layers, seed, dateCreated);
     }
 }

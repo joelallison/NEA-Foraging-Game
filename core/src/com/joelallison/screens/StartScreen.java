@@ -6,9 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-import static com.joelallison.io.FileHandling.importTilesets;
-import static com.joelallison.screens.AppScreen.tilesets;
-
 public class StartScreen extends Game {
 
     SpriteBatch batch;
@@ -22,8 +19,6 @@ public class StartScreen extends Game {
 
         batch = new SpriteBatch();
         stage = new Stage();
-
-        tilesets = importTilesets("core/src/com/joelallison/tilesets/");
 
         this.setScreen(new LoginScreen());
     }

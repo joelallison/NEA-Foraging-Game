@@ -24,7 +24,7 @@ public class LoginUI extends UI {
     static TextField passwordField = new TextField("", skin);
     TextButton loginButton = new TextButton("Login", skin);
     TextButton registerButton = new TextButton("Register", skin);
-    TextButton skipButton = new TextButton("Go to app", skin);
+    //TextButton skipButton = new TextButton("Go to app", skin);
     public static Label feedbackLabel = new Label("", skin);
     Table loginTable = new Table();
 
@@ -79,9 +79,6 @@ public class LoginUI extends UI {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 register();
-                usernameField.setText("");
-                passwordField.setText("");
-                feedbackLabel.setText("");
                 return true;
             }
         });
@@ -91,9 +88,6 @@ public class LoginUI extends UI {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
                 login();
-                usernameField.setText("");
-                passwordField.setText("");
-                feedbackLabel.setText("");
                 return true;
             }
         });
@@ -101,6 +95,7 @@ public class LoginUI extends UI {
         loginTable.add(loginButton);
         loginTable.row();
 
+        /* skipButton for dev purposes, not in final code
         skipButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
@@ -109,8 +104,14 @@ public class LoginUI extends UI {
             }
         });
         loginTable.add(skipButton);
-        loginTable.row();
+        loginTable.row();*/
         loginTable.add(feedbackLabel).colspan(2);
+    }
+
+    public static void clearFields() {
+        usernameField.setText("");
+        passwordField.setText("");
+        feedbackLabel.setText("");
     }
 
     public static String getUsernameField() {

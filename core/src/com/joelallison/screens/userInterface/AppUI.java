@@ -159,23 +159,22 @@ public class AppUI extends UI {
         renameWorldButton.setPosition(Gdx.graphics.getWidth() - renameWorldButton.getPrefWidth() - 28 - saveWorldButton.getPrefWidth(), Gdx.graphics.getHeight() - renameWorldButton.getPrefHeight() * 1.5f);
         renameWorldButton.addListener(new InputListener() {
             final TextField inputField = new TextField("", skin);
+            final Label renameLabel = new Label("New name:", skin);
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 final Dialog renameDialog = new Dialog("Rename [saves if no world already saved]", skin) {
                     public void result(Object obj) {
                         if (obj.equals(true)) {
                             if (!(Database.renameWorld(username, world, inputField.getText()))) {
+                                renameLabel.setText("Name invalid!");
                                 cancel();
-                                inputField.setText(inputField.getText() + " - TAKEN");
-;                            } else {
-                                world.name = inputField.getText();
-                                Database.saveWorld(username, world);
-                            }
+;                            }
                         }
                     }
                 };
-                renameDialog.add(inputField);
-                renameDialog.row();
+                renameDialog.getContentTable().add(renameLabel);
+                renameDialog.getContentTable().add(inputField);
+                renameDialog.getContentTable().row();
                 renameDialog.button("OK", true);
                 renameDialog.button("Cancel", false);
                 renameDialog.pack();
@@ -468,6 +467,7 @@ public class AppUI extends UI {
         sizeButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                final Label mazeSizeLabel = new Label("Resize:", skin);
                 final TextField inputField = new TextField("", skin);
                 inputField.setTextFieldFilter(new TextField.TextFieldFilter() {
                     // Accepts all Alphanumeric Characters except
@@ -481,16 +481,21 @@ public class AppUI extends UI {
                 Dialog dialog = new Dialog("Set maze size", skin) {
                     public void result(Object obj) {
                         if (obj.equals(true)) {
-                            if (!inputField.getText().equals("")) {
+                            if (!inputField.getText().equals("") && ((Integer.parseInt(inputField.getText()) <= 857) && (Integer.parseInt(inputField.getText()) >3))) {
                                 ((MazeLayer) world.layers.get(selectedLayerIndex)).setWidth(Integer.parseInt(inputField.getText()));
                                 ((MazeLayer) world.layers.get(selectedLayerIndex)).setHeight(Integer.parseInt(inputField.getText()));
                             } else {
+                                if (!((Integer.parseInt(inputField.getText()) <= 857) && (Integer.parseInt(inputField.getText()) >3))) {
+                                    mazeSizeLabel.setText("(3 <= x <= 857)");
+                                }
                                 cancel();
                             }
                         }
                     }
                 };
-                dialog.add(inputField);
+                dialog.getContentTable().add(mazeSizeLabel);
+                dialog.getContentTable().row();
+                dialog.getContentTable().add(inputField);
                 dialog.button("OK", true);
                 dialog.button("Cancel", false);
                 dialog.show(stage);
@@ -592,7 +597,7 @@ public class AppUI extends UI {
         }
 
         generationSettingsPanel.getTitleLabel().setText("Generation Settings: " + world.layers.get(selectedLayerIndex).getName() + " " + layerShown);
-        inheritSeedCheck.setChecked(world.layers.get(selectedLayerIndex).inheritSeed());
+        inheritSeedCheck.setChecked(world.layers.get(selectedLayerIndex).isSeedInherited());
         layerSeedButton.setText("Seed: " + world.layers.get(selectedLayerIndex).getSeed());
         centerPointLabel.setText("x: " + intFormat.format(world.layers.get(selectedLayerIndex).getCenter().x) + ", y: " + intFormat.format(world.layers.get(selectedLayerIndex).getCenter().y));
 

@@ -74,7 +74,7 @@ public class World {
     }
 
     public Long getLayerSeed(int i) {
-        if (layers.get(i).inheritSeed()){
+        if (layers.get(i).isSeedInherited()){
             return seed;
         } else {
             return layers.get(i).getSeed();

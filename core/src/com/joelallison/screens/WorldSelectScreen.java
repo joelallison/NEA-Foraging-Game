@@ -10,6 +10,9 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.joelallison.screens.userInterface.WorldUI;
 import com.joelallison.generation.World;
 
+import static com.joelallison.io.FileHandling.importTilesets;
+import static com.joelallison.screens.AppScreen.tilesets;
+
 public class WorldSelectScreen implements Screen {
     SpriteBatch batch;
     Stage menuUIStage;
@@ -20,6 +23,9 @@ public class WorldSelectScreen implements Screen {
     public static String username;
 
     public WorldSelectScreen(String username) {
+        //this is done here as it needs to be done before AppScreen yet StartScreen doesn't stick around long enough to guarantee it gets run
+        tilesets = importTilesets("core/src/com/joelallison/tilesets/");
+
         camera = new OrthographicCamera(1920, 1080);
         viewport = new ExtendViewport(1920, 1080, camera);
 

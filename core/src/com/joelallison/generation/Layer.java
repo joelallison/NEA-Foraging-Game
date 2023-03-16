@@ -30,14 +30,9 @@ public abstract class Layer {
         this.seed = seed;
     }
 
-    public void sortTileSpecs(){
-        //does nothing, class is abstract
-    }
+    public abstract void sortTileSpecs();
 
-    public void defaultTileValues() {
-        //does nothing, class is abstract
-
-    }
+    public abstract void defaultTileValues();
 
     public int getLayerID() {
         return layerID;
@@ -79,12 +74,11 @@ public abstract class Layer {
         this.name = name;
     }
 
-    public boolean inheritSeed() {
-        return inheritSeed;
-    }
-
     public void setInheritSeed(boolean inheritSeed) {
         this.inheritSeed = inheritSeed;
+    }
+    public boolean isSeedInherited() {
+        return inheritSeed;
     }
 
 }
